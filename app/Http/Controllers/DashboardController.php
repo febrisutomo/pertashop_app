@@ -131,7 +131,7 @@ class DashboardController extends Controller
             $data['labels'][] = $shop->nama;
             $data['datasets'][1]['data'][] = 3000;
             $data['datasets'][0]['data'][] = $shop->stik_akhir * 21;
-            $data['datasets'][2]['data'][] = Sale::where('shop_id', $shop->id)->latest()->first()->losses_gain;
+            $data['datasets'][2]['data'][] = Sale::where('shop_id', $shop->id)->latest()->first()?->losses_gain;
             $data['datasets'][1]['backgroundColor'][] = 'lightgray';
             // Tentukan warna berdasarkan kondisi stok kurang dari 1500
             if ($shop->stik_akhir * 21 < 1500) {

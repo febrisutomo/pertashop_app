@@ -6,7 +6,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Laporan</h1>
+                    <h1>Laporan Laba Kotor</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -20,29 +20,26 @@
     </section>
 
     <section class="content">
-        <div class="container-fluid">
-            <div class="card card-primary card-outline">
-                <div class="card-header">
-                    <div class=" d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <h3 class="card-title mr-2">Laporan Laba Kotor</h3>
-                        </div>
-
-                        {{-- <a href="{{ route('sales.create') }}" class="btn btn-primary"><i class="fa fa-plus mr-2"></i>Tambah
-                            Penjualan</a> --}}
-                    </div>
-
+        <div id="section-to-print" class="container-fluid">
+            <div class="card text-sm">
+                <div class="card-header d-flex justify-content-center" style="border-bottom: 4px solid #000">
+                    <h3 class="card-title font-weight-bold text-uppercase text-center">Laporan Stock, Penjualan & Laba Kotor
+                        01 s/d 31 Agustus
+                        2023 <br>PERTASHOP 4P.531.58 KEL.GUMELAR KEC. GUMELAR KAB.BANYUMAS <br>CV SINERGY PETRAJAYA ABADI
+                    </h3>
                 </div>
                 <div class="card-body">
                     <p class="font-italic mb-0">PERTAMAX:</p>
                     @foreach ($reports as $i => $r)
                         <div class="row">
-                            <div class="col-lg-3">Harga Beli {{ $i + 1 }} : Rp <span
+                            <div class="col-md-3">Harga Beli {{ $i + 1 }} : Rp <span
                                     class="number">{{ $r['harga_beli'] }}</span></div>
-                            <div class="col-lg-3">Harga Jual {{ $i + 1 }}: Rp <span
+                            <div class="col-md-3">Harga Jual {{ $i + 1 }}: Rp <span
                                     class="number">{{ $r['harga_jual'] }}</span></div>
                             @if ($loop->last)
-                                <div class="col-lg-6 text-lg-right">Rata-rata omset Harian (&ell;) = <span class="number">{{ collect($reports)->sum('rata_rata_omset_harian') / collect($reports)->count() }}</span></div>
+                                <div class="col-md-6 text-md-right">Rata-rata omset Harian (&ell;) = <span
+                                        class="number">{{ collect($reports)->sum('rata_rata_omset_harian') / collect($reports)->count() }}</span>
+                                </div>
                             @endif
                         </div>
                     @endforeach
@@ -258,10 +255,104 @@
                             <hr>
                         @endforeach
 
+                        <div class="d-flex justify-content-end">
+                            <div class="">
+                                @foreach ($reports as $i => $r)
+                                    <table class="mb-2">
+                                        <tr>
+                                            <td width="120" class="p-2 text-xl text-center"
+                                                style="border: 2px solid #000">
+                                                {{ $i + 1 }}
+                                            </td>
+                                            <td width="360" class="p-2" style="border: 2px solid #000">
+                                                <table width="100%">
+                                                    <tr>
+                                                        <td width="180" class="text-right">Jumlah Penjualan Bersih
+                                                            {{ $i + 1 }}
+                                                        </td>
+                                                        <td class="px-2">=</td>
+                                                        <td class="d-flex justify-content-between"><span>Rp</span><span
+                                                                class="number-int">{{ $r['jumlah_penjualan_bersih_rp'] }}</span>
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-right">Jumlah Pembelian {{ $i + 1 }}</td>
+                                                        <td class="px-2">=</td>
+                                                        <td class="d-flex justify-content-between line-bottom">
+                                                            <span>Rp</span><span
+                                                                class="number-int">{{ $r['jumlah_pembelian_rp'] }}</span>
+                                                        </td>
+                                                        <td class="px-1">-</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-right font-weight-bold">Laba Kotor
+                                                            {{ $i + 1 }}
+                                                            (B-A)
+                                                        </td>
+                                                        <td class="px-2">=</td>
+                                                        <td class="d-flex justify-content-between font-weight-bold">
+                                                            <span>Rp</span><span
+                                                                class="number-int">{{ $r['laba_kotor'] }}</span>
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                @endforeach
+                                <table class="mb-2">
+                                    <tr>
+                                        <td width="120" class="p-2 text-xl text-center"
+                                            style="border: 2px solid #000">
+                                            1 + 2
+                                        </td>
+                                        <td width="360" class="p-2" style="border: 2px solid #000">
+                                            <table width="100%">
+                                                <tr>
+                                                    <td width="180" class="text-right">Laba Kotor 1 (B-A)
+                                                    </td>
+                                                    <td class="px-2">=</td>
+                                                    <td class="d-flex justify-content-between"><span>Rp</span><span
+                                                            class="number-int">{{ $reports[0]['laba_kotor'] }}</span>
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-right">Laba Kotor 2 (B-A)</td>
+                                                    <td class="px-2">=</td>
+                                                    <td class="d-flex justify-content-between line-bottom">
+                                                        <span>Rp</span><span
+                                                            class="number-int">{{ $reports[1]['laba_kotor'] }}</span>
+                                                    </td>
+                                                    <td class="px-1">-</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-right font-weight-bold ">Grand Total Laba Kotor
+                                                    </td>
+                                                    <td class="px-2">=</td>
+                                                    <td class="d-flex justify-content-between font-weight-bold">
+                                                        <span>Rp</span><span
+                                                            class="number-int">{{ collect($reports)->sum('laba_kotor') }}</span>
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                        </div>
 
                     </div>
                 </div>
             </div>
+        </div>
+        
+        <div class="container-fluid text-right mb-3">
+            <button class="btn btn-primary" onclick="window.print()"> <i class="fas fa-print mr-2 "></i> Cetak PDF</button>
         </div>
     </section>
 @endsection
@@ -270,6 +361,19 @@
     <style>
         .line-bottom {
             border-bottom: 2px solid #000;
+        }
+
+        @media print {
+            body {
+                visibility: hidden;
+            }
+
+            #section-to-print {
+                visibility: visible;
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
         }
     </style>
 @endpush
