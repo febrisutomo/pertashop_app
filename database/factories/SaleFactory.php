@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Operator;
 use App\Models\Sale;
 use App\Models\Shop;
 use App\Models\User;
 use App\Models\Price;
+use App\Models\Incoming;
+use App\Models\Operator;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,7 +23,7 @@ class SaleFactory extends Factory
      */
     public function definition(): array
     {
-       
+
         return [];
     }
 
@@ -30,16 +31,20 @@ class SaleFactory extends Factory
     {
 
         $shop = Shop::find($shop_id);
-        $sale = Sale::where('shop_id', $shop_id);
+        $sales = Sale::where('shop_id', $shop_id);
         $operator = Operator::where('shop_id', $shop_id);
 
         $stok_awal = $shop->stok_awal;
-        $skala = 21;
-        $penjualan_akhir = $sale->orderBy('id', 'desc')->first();
+
+        $penjualan_akhir = $sales->orderBy('id', 'desc')->first();
+
 
         $tanggal = $penjualan_akhir ? ($penjualan_akhir->created_at->format('H') == 15 ?  Carbon::createFromFormat('Y-m-d H:i:s', $penjualan_akhir->created_at)->setHour((21)) : Carbon::createFromFormat('Y-m-d H:i:s', $penjualan_akhir->created_at)->addDay()->setHour(15))  : '2023-08-01 15:00:00';
-        $totalisator_awal = $penjualan_akhir ? $penjualan_akhir->totalisator_akhir : $shop->totalisator_akhir;
+        $totalisator_awal = $penjualan_akhir ? $penjualan_akhir->totalisator_akhir : $shop->totalisator_awal;
         $operator_id = $penjualan_akhir?->created_at->format('H') == 15 ? $operator->orderBy('user_id', 'asc')->first()->id : $operator->orderBy('user_id', 'desc')->first()->id;
+
+        $datang =  Incoming::where('shop_id', $shop_id)
+            ->where('created_at', '<', $tanggal)->where('created_at', '>', $penjualan_akhir ? $penjualan_akhir->created_at : '2021-01-01')->get()->sum('jumlah');
 
         $min_penjualan = 300;
         $max_penjualan = 400;
@@ -47,15 +52,15 @@ class SaleFactory extends Factory
         $totalisator_akhir = $totalisator_awal + $penjualan;
 
         $total_penjualan = Sale::where('shop_id', $shop_id)->get()->sum('jumlah') +  $penjualan;
-        $sisa_stok = $stok_awal - $total_penjualan;
+        $sisa_stok = $stok_awal + Incoming::where('shop_id', $shop_id)->get()->sum('jumlah') - $total_penjualan;
 
         $losses = 2 + (mt_rand() / mt_getrandmax()) * 2;
 
-        $sisa_stok_akhir = ($penjualan_akhir ? $penjualan_akhir->stik_akhir : 142.85) * $skala - $penjualan - $losses;
-        
-        $stik_akhir = round($sisa_stok_akhir / $skala, 2);
+        $sisa_stok_akhir = ($penjualan_akhir ? $penjualan_akhir->stik_akhir : 142.85) * 21 + $datang - $penjualan - $losses;
 
-        $losses_gain = ($stik_akhir * $skala - $sisa_stok) / $total_penjualan * 100;
+        $stik_akhir = round($sisa_stok_akhir / 21, 2);
+
+        $losses_gain = $stik_akhir * 21 - $sisa_stok;
 
         return $this->state(function (array $attributes) use ($shop_id, $tanggal, $operator_id, $totalisator_akhir, $totalisator_awal, $stik_akhir, $losses_gain) {
             return [
@@ -66,13 +71,8 @@ class SaleFactory extends Factory
                 'totalisator_akhir' => $totalisator_akhir,
                 'price_id' => Price::latest()->first()->id,
                 'stik_akhir' => $stik_akhir,
-                'losses_gain' => $losses_gain
+                // 'losses_gain' => $losses_gain
             ];
-        })->afterCreating(function (Sale $sale) use ($totalisator_akhir, $stik_akhir) {
-            $sale->shop()->update([
-                'totalisator_akhir' => $totalisator_akhir,
-                'stik_akhir' => $stik_akhir
-            ]);
         });
     }
 }

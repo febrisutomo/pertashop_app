@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('shop_id')->constrained();
             $table->foreignId('operator_id')->constrained();
+            $table->decimal('totalisator_awal', 10, 2);
             $table->decimal('totalisator_akhir', 10, 2);
-            $table->decimal('jumlah', 10, 2);
             $table->timestamps();
         });
     }

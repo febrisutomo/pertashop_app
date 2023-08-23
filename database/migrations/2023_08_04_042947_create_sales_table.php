@@ -19,7 +19,6 @@ return new class extends Migration
             $table->decimal('totalisator_akhir', 10, 3);
             $table->decimal('stik_akhir', 10, 2);
             $table->foreignId('price_id');
-            $table->decimal('losses_gain', 10, 3);
             $table->timestamps();
         });
     }

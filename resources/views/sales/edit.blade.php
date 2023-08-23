@@ -33,20 +33,60 @@
                     @csrf
                     @method('PATCH')
                     <div class="card-body">
-                        {{-- <div class="form-group">
-                            <label for="operator">Operator</label>
-                            <input type="text" class="form-control" value="{{ Auth::user()->name }}" id="operator"
-                                readonly>
-                        </div> --}}
-                        <div class="form-group">
-                            <label for="created_at">Tanggal</label>
-                            <input type="date" class="form-control @error('created_at') is-invalid @enderror"
-                                id="created_at" name="created_at"
-                                value="{{ old('created_at', $sale->created_at->format('Y-m-d')) }}" required>
-                            @error('created_at')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
+
+                        @if (Auth::user()->role != 'operator')
+                            <div class="row">
+                                <div class="form-group col-lg-6">
+                                    <label for="date">Tanggal</label>
+                                    <input type="date" class="form-control @error('date') is-invalid @enderror"
+                                        id="date" name="date"
+                                        value="{{ old('date', $sale->created_at->format('Y-m-d')) }}" required>
+                                    @error('date')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-lg-6">
+                                    <label for="time">Jam</label>
+                                    <input type="time" class="form-control @error('time') is-invalid @enderror"
+                                        id="time" name="time"
+                                        value="{{ old('time', $sale->created_at->format('H:i')) }}" required>
+                                    @error('time')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="shop_id">Pertashop</label>
+                                <select name="shop_id" id="shop_id"
+                                    class="form-control @error('shop_id') is-invalid @enderror">
+                                    <option value="">--Pilih Pertashop--</option>
+                                    @foreach ($shops as $shop)
+                                        <option value="{{ $shop->id }}" @selected($shop->id == old('shop_id', $sale->shop_id))>
+                                            {{ $shop->kode . ' ' . $shop->nama }}</option>
+                                    @endforeach
+                                </select>
+                                @error('shop_id')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="operator_id">Operator</label>
+                                <select name="operator_id" id="operator_id"
+                                    class="form-control @error('operator_id') is-invalid @enderror">
+                                    <option value="">--Pilih Operator--</option>
+                                </select>
+                                @error('operator_id')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        @endif
+
+
+
                         <div class="form-group">
                             <label for="totalisator_awal">Totalisator Awal</label>
                             <div class="input-group">
@@ -71,26 +111,7 @@
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="form-group">
-                            <label for="jumlah">Jumlah Penjualan</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="jumlah" name="jumlah"
-                                    value="{{ old('jumlah', $sale->jumlah) }}" readonly>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">&ell;</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="sisa_stok">Sisa Stok</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="sisa_stok" name="sisa_stok"
-                                    value="{{ old('sisa_stok', $sisa_stok) }}" readonly>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">&ell;</span>
-                                </div>
-                            </div>
-                        </div>
+
                         <div class="form-group">
                             <label for="stik_akhir">Deep Stick Akhir</label>
                             <div class="input-group">
@@ -107,35 +128,27 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="sisa_stok_akhir">Sisa Stok Akhir</label>
+                            <label for="jumlah">Jumlah Penjualan</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" id="sisa_stok_akhir" name="sisa_stok_akhir"
-                                    value="{{ old('sisa_stok_akhir') }}" readonly>
+                                <input type="number" class="form-control" id="jumlah" name="jumlah"
+                                    value="{{ old('jumlah') }}" readonly>
                                 <div class="input-group-append">
                                     <span class="input-group-text">&ell;</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="losses_gain">Lossess/Gain</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="losses_gain" name="losses_gain"
-                                    value="{{ old('losses_gain') }}" readonly>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </div>
-                        </div>
+
                         <div class="form-group">
                             <label for="harga">Harga per Liter</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">Rp</span>
                                 </div>
-                                <input type="text" class="form-control" id="harga" value="{{ $harga }}"
-                                    readonly>
+                                <input type="text" class="form-control" id="harga"
+                                    value="{{ $sale->price->harga_jual }}" readonly>
                             </div>
                         </div>
+
 
                         <div class="form-group">
                             <label for="omset">Omset</label>
@@ -147,6 +160,7 @@
                                     readonly>
                             </div>
                         </div>
+
                     </div>
                     <div class="card-footer">
                         <div class="d-flex justify-content-end">
@@ -161,59 +175,70 @@
 
 @push('script')
     <script>
-        $(document).ready(function() {
-            function calculateValues() {
-                var totalisator_awal = parseFloat($("#totalisator_awal").val()) || 0;
-                var totalisator_akhir = parseFloat($("#totalisator_akhir").val()) || 0;
-                var stik_akhir = parseFloat($("#stik_akhir").val()) || 0;
-                var skala = 21;
+        function getOperators() {
+            var shop_id = $('select[name=shop_id]').val();
+            var operator_id = @json(old('operator_id', $sale->operator_id));
 
-                var jumlah_penjualan = @json($jumlah_penjualan);
-                var sisa_stok = @json($sisa_stok);
-                var harga = @json($harga);
-                var stik_akhir_lama = @json($stik_akhir);
+            @if (Auth::user()->role == 'operator')
+                shop_id = @json(Auth::user()->operator->shop_id);
+            @endif
 
-                var jumlah = 0;
+            var options = `<option value=''>--Pilih Operator--</option>`;
+            $('select[name=operator_id]').html(options);
 
-                if (totalisator_akhir > totalisator_awal) {
-                    jumlah = totalisator_akhir - totalisator_awal;
-                    sisa_stok = sisa_stok - jumlah;
-                    jumlah_penjualan = jumlah_penjualan + jumlah;
-                }
+            $('input[name=totalisator_awal]').val(0)
+            if (shop_id) {
+                $.ajax({
+                    url: "{{ route('sales.edit', $sale) }}",
+                    method: 'GET',
+                    data: {
+                        shop_id
+                    },
+                    success: function(data) {
+                        var options = `<option value=''>--Pilih Operator--</option>`;
+                        data.operators.forEach(operator => {
+                            options +=
+                                `<option value='${operator.id}' ${operator.id == operator_id ? 'selected' : ''}>${operator.user.name}</option>`
+                        });
 
-                var sisa_stok_akhir = stik_akhir_lama * 21;
+                        $('select[name=operator_id]').html(options);
 
-                if (stik_akhir > 0) {
-                    sisa_stok_akhir = stik_akhir * skala;
-                }
+                        $('input[name=totalisator_awal]').val(data.totalisator_awal)
 
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            }
+        }
 
-                var loss_gain = 0;
-                if (stik_akhir > 0) {
-                    loss_gain = (sisa_stok_akhir - sisa_stok) / jumlah_penjualan * 100;
-                }
+        function calculateValues() {
+            var totalisator_awal = parseFloat($("#totalisator_awal").val()) || 0;
+            var totalisator_akhir = parseFloat($("#totalisator_akhir").val()) || 0;
 
+            var harga = @json($harga);
 
-                $("#jumlah").val(jumlah.toFixed(3));
-                $("#sisa_stok").val(sisa_stok.toFixed(3));
-                $("#sisa_stok_akhir").val(sisa_stok_akhir.toFixed(3));
-                $("#losses_gain").val(loss_gain.toFixed(3));
-                $("#omset").val(formatNumber(jumlah * harga))
-
+            var jumlah = 0;
+            if (totalisator_akhir > totalisator_awal) {
+                jumlah = totalisator_akhir - totalisator_awal
             }
 
-            $("#totalisator_akhir, #stik_akhir").on("input", calculateValues);
+            $("#jumlah").val(jumlah.toFixed(3));
+            $("#omset").val(formatNumber(jumlah * harga))
 
+        }
+
+        $(document).ready(function() {
             calculateValues();
+            $("#totalisator_akhir, #stik_akhir, #shop_id").on("input", calculateValues);
+
+            getOperators()
+            $('select[name=shop_id]').on('change', getOperators)
 
             var harga = $('#harga').val()
             $('#harga').val(formatNumber(harga))
 
-            $("#insertForm").submit(function(event) {
-                event.preventDefault();
-                calculateValues();
-                $(this).unbind('submit').submit(); // Continue with the form submission
-            });
         });
     </script>
 @endpush

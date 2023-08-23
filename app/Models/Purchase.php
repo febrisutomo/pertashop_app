@@ -13,11 +13,26 @@ class Purchase extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['tanggal', 'total_harga'];
+    protected $appends = ['tanggal', 'total_harga', 'datang', 'sisa'];
 
     public function price()
     {
         return $this->belongsTo(Price::class);
+    }
+
+    public function incomings()
+    {
+        return $this->hasMany(Incoming::class);
+    }
+
+    public function getSisaAttribute()
+    {
+        return $this->jumlah - $this->incomings->sum('jumlah');
+    }
+
+    public function getDatangAttribute()
+    {
+        return $this->jumlah - $this->sisa;
     }
 
     public function supplier()

@@ -24,16 +24,24 @@
                 <div class="card-header">
                     <div class=" d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
-                            <h3 class="card-title mr-2">Pertashop</h3>
-                            <select name="shop_id" class="form-control" style="width: 200px">
-                                @foreach ($shops as $shop)
-                                    <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
-                                @endforeach
-                            </select>
+                            {{-- <h3 class="card-title mr-2">Pertashop</h3> --}}
+                            @if (Auth::user()->role == 'operator')
+                                <h3 class="card-title mr-2">
+                                    {{ Auth::user()->operator->shop->kode . ' ' . Auth::user()->operator->shop->nama }}</h3>
+                            @else
+                                <select name="shop_id" class="form-control" style="width: 200px">
+                                    @foreach ($shops as $shop)
+                                        <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
+
                         </div>
+
 
                         <a href="{{ route('sales.create') }}" class="btn btn-primary"><i class="fa fa-plus mr-2"></i>Tambah
                             Penjualan</a>
+
                     </div>
 
                 </div>
@@ -74,7 +82,6 @@
                                     <th class="align-middle">Totalisator Awal (&#8467;)</th>
                                     <th class="align-middle">Totalisator Akhir (&#8467;)</th>
                                     <th class="align-middle">Jumlah (&#8467;)</th>
-                                    <th class="align-middle">Lossess / Gain (%)</th>
                                     <th class="align-middle">Harga per Liter (Rp)</th>
                                     <th class="align-middle">Omset (Rp)</th>
                                     <th class="align-middle">Operator</th>
@@ -105,6 +112,13 @@
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('sales.index') }}",
+                // ajax: {
+                //     url: "{{ route('sales.index') }}",
+                //     type: "GET",
+                //     data: {
+                //         shop_id: $('select[name=shop_id]').val()
+                //     },
+                // },
                 columns: [
                     // {
                     //     data: 'DT_RowIndex',
@@ -152,27 +166,6 @@
                         render: function(data, type) {
                             if (type === 'display') {
                                 return formatNumber(data, 3)
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        data: 'losses_gain',
-                        name: 'losses_gain',
-                        className: 'text-right',
-                        render: function(data, type, row) {
-                            if (type === 'display') {
-                                var formattedValue = formatNumber(Math.abs(data), 3);
-
-                                if (parseFloat(data) < 0) {
-                                    return '<span class="text-danger">' + formattedValue +
-                                        '</span>';
-                                } else if (parseFloat(data) > 0) {
-                                    return '<span class="text-success">' + formattedValue +
-                                        '</span>';
-                                }
-
-                                return formattedValue;
                             }
                             return data;
                         }
@@ -265,25 +258,7 @@
             });
 
             $('select[name=shop_id]').on('change', function() {
-                var selectedShopId = $(this).val();
-                // Lakukan permintaan AJAX
-                $.ajax({
-                    url: "{{ route('sales.index') }}",
-                    type: 'GET',
-                    data: {
-                        shop_id: selectedShopId
-                    },
-                    success: function(response) {
-                        // Hapus data yang ada pada tabel
-                        dataTable.clear().draw();
-
-                        // Tambahkan data baru dari respons AJAX
-                        dataTable.rows.add(response.data).draw();
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(error);
-                    }
-                });
+                dataTable.ajax.url(`?shop_id=${this.value}`).load();
             });
 
 
@@ -303,7 +278,7 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "DELETE",
-                            url: "/sales/" + saleId,
+                            url: "{{ url('') }}" + "/sales/" + saleId,
                             data: {
                                 "_token": "{{ csrf_token() }}"
                             },
@@ -311,7 +286,7 @@
                                 dataTable.ajax.reload();
                                 Swal.fire(
                                     'Terhapus!',
-                                    'Data penjualan telah dihapus.',
+                                    response.message,
                                     'success'
                                 );
                             }

@@ -6,12 +6,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Tambah Penjualan</h1>
+                    <h1>Tambah Percobaan</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('sales.index') }}">Penjualan</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('test-pumps.index') }}">Percobaan</a></li>
                         <li class="breadcrumb-item active">Tambah</li>
                     </ol>
                 </div>
@@ -24,11 +24,11 @@
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <div class=" d-flex justify-content-between align-items-center">
-                        <h3 class="card-title">Tambah Penjualan</h3>
+                        <h3 class="card-title">Tambah Percobaan</h3>
                     </div>
 
                 </div>
-                <form id="insertForm" action="{{ route('sales.store') }}" method="POST" class="needs-validation"
+                <form id="insertForm" action="{{ route('test-pumps.store') }}" method="POST" class="needs-validation"
                     novalidate>
                     @csrf
                     <div class="card-body">
@@ -110,21 +110,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="stik_akhir">Deep Stick Akhir</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control @error('stik_akhir') is-invalid @enderror"
-                                    id="stik_akhir" name="stik_akhir" value="{{ old('stik_akhir') }}" required>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">cm</span>
-                                </div>
-                            </div>
-                            @error('stik_akhir')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label for="jumlah">Jumlah Penjualan</label>
+                            <label for="jumlah">Jumlah</label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="jumlah" name="jumlah"
                                     value="{{ old('jumlah') }}" readonly>
@@ -133,30 +119,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="harga">Harga per Liter</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">Rp</span>
-                                </div>
-                                <input type="text" class="form-control" id="harga" value="{{ $harga }}"
-                                    readonly>
-                            </div>
-                        </div>
-
-
-                        <div class="form-group">
-                            <label for="omset">Omset</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">Rp</span>
-                                </div>
-                                <input type="text" class="form-control" id="omset" value="{{ old('omset') }}"
-                                    readonly>
-                            </div>
-                        </div>
-
                     </div>
                     <div class="card-footer">
                         <div class="d-flex justify-content-end">
@@ -173,7 +135,7 @@
 
 @push('script')
     <script>
-        function getOperators() {
+        function getData() {
             var shop_id = $('select[name=shop_id]').val();
             var operator_id = @json(old('operator_id'));
 
@@ -181,14 +143,13 @@
                 shop_id = @json(Auth::user()->operator->shop_id);
             @endif
 
-
             var options = `<option value=''>--Pilih Operator--</option>`;
             $('select[name=operator_id]').html(options);
 
             $('input[name=totalisator_awal]').val(0)
             if (shop_id) {
                 $.ajax({
-                    url: "{{ route('sales.create') }}",
+                    url: "{{ route('test-pumps.create') }}",
                     method: 'GET',
                     data: {
                         shop_id
@@ -216,27 +177,21 @@
             var totalisator_awal = parseFloat($("#totalisator_awal").val()) || 0;
             var totalisator_akhir = parseFloat($("#totalisator_akhir").val()) || 0;
 
-            var harga = @json($harga);
-
             var jumlah = 0;
             if (totalisator_akhir > totalisator_awal) {
                 jumlah = totalisator_akhir - totalisator_awal
             }
 
             $("#jumlah").val(jumlah.toFixed(3));
-            $("#omset").val(formatNumber(jumlah * harga))
 
         }
 
         $(document).ready(function() {
             calculateValues();
             $("#totalisator_akhir, #stik_akhir, #shop_id").on("input", calculateValues);
+            getData();
 
-            getOperators()
-            $('select[name=shop_id]').on('change', getOperators)
-
-            var harga = $('#harga').val()
-            $('#harga').val(formatNumber(harga))
+            $('select[name=shop_id]').on('change', getData);
 
         });
     </script>

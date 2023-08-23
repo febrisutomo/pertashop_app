@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('shop_id')->constrained();
             $table->foreignId('supplier_id')->constrained();
             $table->decimal('jumlah', 10, 2);
-            $table->decimal('sisa', 10, 2);
             $table->foreignId('price_id');
             $table->timestamps();
         });

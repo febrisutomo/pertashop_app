@@ -22,8 +22,7 @@ class ShopFactory extends Factory
             'kode' => fake()->randomNumber(9),
             'alamat' => fake()->address(),
             'corporation_id' => Corporation::inRandomOrder()->first()->id,
-            'totalisator_akhir' => fake()->randomFloat(3, 100000, 300000),
-            'stik_akhir' => 142.85
+            'totalisator_awal' => fake()->randomFloat(3, 100000, 300000),
         ];
     }
 }

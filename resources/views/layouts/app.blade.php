@@ -1,3 +1,7 @@
+<!-- Developed By Febri Sutomo -->
+<!-- https://github.com/febrisutomo -->
+<!-- febrisutomo@gmail.com -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,8 +26,8 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" rel="stylesheet">
-    @stack('style')
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
+    @stack('style')
 
 </head>
 
@@ -50,7 +54,13 @@
 
                 <li class="nav-item">
                     <div>
-                        <p class="mb-0 text-primary font-weight-bold">PT SINERGY PETRAJAYA ABADI</p>
+                        <p class="mb-0 text-primary font-weight-bold text-uppercase">
+                            @if (Auth::user()->role == 'operator')
+                                {{ Auth::user()->operator->shop->corporation->nama }}
+                            @else
+                                Admin Pertashop
+                            @endif
+                        </p>
                     </div>
                 </li>
 
@@ -97,59 +107,130 @@
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('purchases.index') }}"
-                                class="nav-link {{ Request::routeIs('purchases.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-download"></i>
-                                <p>
-                                    Pembelian
-                                </p>
-                            </a>
-                        </li>
+                        @if (collect(['super-admin', 'admin'])->contains(Auth::user()->role))
+                            <li class="nav-item">
+                                <a href="{{ route('purchases.index') }}"
+                                    class="nav-link {{ Request::routeIs('purchases.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-download"></i>
+                                    <p>
+                                        Pembelian
+                                    </p>
+                                </a>
+                            </li>
+                        @endif
+
                         <li class="nav-item">
                             <a href="{{ route('incomings.index') }}"
                                 class="nav-link {{ Request::routeIs('incomings.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-dolly-flatbed"></i>
+                                <i class="nav-icon fas fa-truck-moving"></i>
                                 <p>
-                                    Barang Masuk
+                                    Kedatangan
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('test-pumps.index') }}"
+                                class="nav-link {{ Request::routeIs('test-pumps.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-vial"></i>
+                                <p>
+                                    Percobaan
                                 </p>
                             </a>
                         </li>
 
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link {{ Request::routeIs('report.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-file-alt"></i>
-                                <p>
-                                    Laporan
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ route('report.laba_kotor') }}"
-                                        class="nav-link {{ Request::routeIs('report.laba_kotor') ? 'active' : '' }}">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Laba Kotor</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
+                        @if (collect(['super-admin', 'admin'])->contains(Auth::user()->role))
+                            <li class="nav-item {{ Request::routeIs('reports.*') ? 'menu-open' : '' }}">
+                                <a href="#" class="nav-link {{ Request::routeIs('reports.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-file-alt"></i>
+                                    <p>
+                                        Laporan
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ route('reports.index') }}"
+                                            class="nav-link {{ Request::routeIs('reports.index') ? 'active' : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Laporan Bulanan</p>
+                                        </a>
+                                    </li>
+                                    {{-- <li class="nav-item">
                                     <a href="/docs/3.2/components/main-sidebar.html" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Main Sidebar</p>
+                                        <p>Laba Bersih</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="/docs/3.2/components/control-sidebar.html" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Control Sidebar</p>
+                                        <p>Modal</p>
                                     </a>
-                                </li>
+                                </li> --}}
+                                    <li class="nav-item">
+                                        <a href="/docs/3.2/components/control-sidebar.html" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Rekap Modal</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/docs/3.2/components/control-sidebar.html" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Rekap Profit Sharing</p>
+                                        </a>
+                                    </li>
 
-                            </ul>
+                                </ul>
 
-                        </li>
-                        <li class="nav-item">
+                            </li>
+                            <li class="nav-item {{ Request::is('data/*') ? 'menu-open' : '' }}">
+                                <a href="#" class="nav-link {{ Request::is('data/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-database"></i>
+                                    <p>
+                                        Data Master
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ route('operators.index') }}"
+                                            class="nav-link {{ Request::routeIs('operators.index') ? 'active' : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Operator</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/docs/3.2/components/main-sidebar.html" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Investor</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/docs/3.2/components/main-sidebar.html" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Pertashop</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/docs/3.2/components/control-sidebar.html" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Badan Usaha</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/docs/3.2/components/control-sidebar.html" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Harga</p>
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+                        @endif
+                        <li class="nav-item pt-2 border-top">
                             <a class="nav-link" href="{{ route('logout') }}" onclick="logout(event)">
                                 <i class="nav-icon fas fa-sign-out-alt"></i>
                                 <p>Logout</p>
@@ -172,10 +253,9 @@
 
         <footer class="main-footer">
             <div class="float-right d-none d-sm-inline">
-                v3.2
+                v1.0
             </div>
-            <strong>Copyright &copy; 2014-2022 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights
-            reserved.
+            <strong>&copy; 2023 <a href="#">Pertashop App</a>. </strong> Developed By  <a href="https://github.com/febrisutomo">Febri S</a>.
         </footer>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
@@ -193,8 +273,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.0/dist/chart.min.js"></script>
 
-    @stack('script')
-
     <script src="{{ asset('js/adminlte.min.js') }}"></script>
 
     <script>
@@ -205,15 +283,20 @@
             });
         }
 
+        function formatCurrency(data, fractionDigit = 2) {
+            return parseFloat(data).toLocaleString('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: fractionDigit,
+                maximumFractionDigits: fractionDigit
+            });
+        }
+
         $(document).ready(function() {
             $('.currency').each(function() {
                 var value = parseFloat($(this).text());
                 if (!isNaN(value)) {
-                    var formattedValue = value.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        maximumFractionDigits: 0
-                    });
+                    var formattedValue = formatCurrency(value, 0);
                     $(this).text(formattedValue);
                 }
             });
@@ -276,6 +359,8 @@
             sessionStorage.setItem('shown-' + popupId, '1');
         @endif
     </script>
+
+    @stack('script')
 
 </body>
 

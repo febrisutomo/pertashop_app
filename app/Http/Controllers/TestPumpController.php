@@ -2,32 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Sale;
+use Carbon\Carbon;
 use App\Models\Shop;
-use App\Models\Price;
 use App\Models\Operator;
+use App\Models\TestPump;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
-class SaleController extends Controller
+class TestPumpController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-
         if ($request->ajax()) {
             $shop_id = $request->input('shop_id', 1);
 
             if (Auth::user()->role != 'operator') {
-                $data = Sale::with(['operator.user', 'price'])->where('shop_id', $shop_id)->latest()->get();
-                return Datatables::of($data)
-                    // ->addIndexColumn()
+                $data = TestPump::with(['shop', 'operator.user'])->where('shop_id', $shop_id)->latest()->get();
+                return DataTables::of($data)
+                    ->addIndexColumn()
                     ->addColumn('action', function ($row) {
-                        $button = '<a href="' . route('sales.edit', $row->id) . '" class="btn btn-sm btn-info" title="Edit"><i class="fa fa-edit"></i></a>';
+                        $button = '<a href="' . route('test-pumps.edit', $row->id) . '" class="btn btn-sm btn-info" title="Edit"><i class="fa fa-edit"></i></a>';
                         $button .= ' <button class="btn btn-sm btn-danger btn-delete" title="hapus" data-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
                         return $button;
                     })
@@ -36,14 +34,14 @@ class SaleController extends Controller
             }
 
             $shop_id = Auth::user()->operator->shop->id;
-            $data = Sale::with(['operator.user', 'price'])->where('shop_id', $shop_id)->latest()->get();
+            $data = TestPump::with(['shop', 'operator.user'])->where('shop_id', $shop_id)->latest()->get();
             return Datatables::of($data)
                 ->addColumn('action', function ($row) use ($data) {
                     $lastRow = $data->first(); // Mendapatkan data terakhir dari koleksi
                     $button = '';
 
                     if ($row->id === $lastRow->id && $row->operator_id === Auth::user()->operator->id) { // Menambahkan tombol hanya pada data terakhir
-                        $button = '<a href="' . route('sales.edit', $row->id) . '" class="btn btn-sm btn-info" title="Edit"><i class="fa fa-edit"></i></a>';
+                        $button = '<a href="' . route('test-pumps.edit', $row->id) . '" class="btn btn-sm btn-info" title="Edit"><i class="fa fa-edit"></i></a>';
                     }
 
                     return $button;
@@ -53,7 +51,8 @@ class SaleController extends Controller
         }
 
 
-        return view('sales.index', ['shops' => Shop::all()]);
+        $shops = Shop::all();
+        return view('test-pump.index', compact('shops'));
     }
 
     /**
@@ -61,7 +60,6 @@ class SaleController extends Controller
      */
     public function create(Request $request)
     {
-
         if ($request->ajax()) {
             $shop_id = $request->input('shop_id');
             $operators = Operator::with('user')->where('shop_id', $shop_id)->get();
@@ -70,10 +68,10 @@ class SaleController extends Controller
             return response()->json(compact('totalisator_awal', 'operators'));
         }
 
-        $harga = Price::latest()->first()->harga_jual;
+        $operators = Operator::all();
         $shops = Shop::all();
 
-        return view('sales.create', compact('harga', 'shops'));
+        return view('test-pump.create', compact('operators', 'shops'));
     }
 
     /**
@@ -91,7 +89,6 @@ class SaleController extends Controller
             $validatedData = $request->validate([
                 'totalisator_awal' => 'required|numeric',
                 'totalisator_akhir' => 'required|numeric',
-                'stik_akhir' => 'required|numeric',
             ], $customMessages);
 
             $validatedData['operator_id'] = Auth::user()->operator->id;
@@ -105,23 +102,20 @@ class SaleController extends Controller
                 'shop_id' => 'required|numeric',
                 'totalisator_awal' => 'required|numeric',
                 'totalisator_akhir' => 'required|numeric',
-                'stik_akhir' => 'required|numeric',
             ], $customMessages);
+
             $validatedData['created_at'] = $validatedData['date'] . ' ' . $validatedData['time'];
         }
 
+        TestPump::create($validatedData);
 
-        $validatedData['price_id'] =  Price::latest()->first()->id;
-
-        Sale::create($validatedData);
-
-        return to_route('sales.index')->with('success', 'Data penjualan telah berhasil disimpan.');
+        return to_route('test-pumps.index')->with('success', 'Data percobaan telah berhasil disimpan.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Sale $sale)
+    public function show(TestPump $testPump)
     {
         //
     }
@@ -129,26 +123,26 @@ class SaleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Sale $sale)
+    public function edit(Request $request, TestPump $testPump)
     {
         if ($request->ajax()) {
             $shop_id = $request->input('shop_id');
             $operators = Operator::with('user')->where('shop_id', $shop_id)->get();
-            $totalisator_awal = $sale->totalisator_awal;
+            $totalisator_awal = $testPump->totalisator_awal;
 
             return response()->json(compact('totalisator_awal', 'operators'));
         }
 
-        $harga = Price::latest()->first()->harga_jual;
+        $operators = Operator::all();
         $shops = Shop::all();
 
-        return view('sales.edit', compact('sale', 'harga', 'shops'));
+        return view('test-pump.edit', compact('operators', 'shops', 'testPump'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Sale $sale)
+    public function update(Request $request, TestPump $testPump)
     {
         $customMessages = [
             'required' => ':attribute wajib diisi.',
@@ -160,9 +154,7 @@ class SaleController extends Controller
             $validatedData = $request->validate([
                 'totalisator_awal' => 'required|numeric',
                 'totalisator_akhir' => 'required|numeric',
-                'stik_akhir' => 'required|numeric',
             ], $customMessages);
-
         } else {
             $validatedData = $request->validate([
                 'date' => 'required|date',
@@ -171,27 +163,25 @@ class SaleController extends Controller
                 'shop_id' => 'required|numeric',
                 'totalisator_awal' => 'required|numeric',
                 'totalisator_akhir' => 'required|numeric',
-                'stik_akhir' => 'required|numeric',
             ], $customMessages);
 
             $validatedData['created_at'] = $validatedData['date'] . ' ' . $validatedData['time'];
         }
 
+        $testPump->update($validatedData);
 
-        $sale->update($validatedData);
-
-        return to_route('sales.index')->with('success', 'Data penjualan telah berhasil diupdate.');
+        return to_route('test-pumps.index')->with('success', 'Data percobaan telah berhasil diubah.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Sale $sale)
+    public function destroy(TestPump $testPump)
     {
-        $sale->delete();
+        $testPump->delete();
 
         return response()->json([
-            'message' => 'Data penjualan telah dihapus.'
+            'message' => 'Data percobaan telah dihapus.'
         ]);
     }
 }

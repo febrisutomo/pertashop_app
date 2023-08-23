@@ -38,7 +38,7 @@
                                     class="number">{{ $r['harga_jual'] }}</span></div>
                             @if ($loop->last)
                                 <div class="col-md-6 text-md-right">Rata-rata omset Harian (&ell;) = <span
-                                        class="number">{{ collect($reports)->sum('rata_rata_omset_harian') / collect($reports)->count() }}</span>
+                                        class="number">{{ $reports->sum('rata_rata_omset_harian') / $reports->count() }}</span>
                                 </div>
                             @endif
                         </div>
@@ -74,7 +74,7 @@
                                 <tr>
                                     <td></td>
                                     <td class="d-flex justify-content-between pl-3">
-                                        <span class="mr-2">Gmlr Datang</span>
+                                        <span class="mr-2">Datang</span>
                                         <span>
                                             <span>{{ $r['count_datang'] }}</span>
                                             <span class="px-3">x</span>
@@ -147,8 +147,9 @@
                                     <td></td>
                                     <td class="pl-3">d. Percobaan 1 (Test Pump)</td>
                                     <td class="px-2">=</td>
-                                    <td class="text-right line-bottom"><span class="number">{{ 0 }}</span><span
-                                            class="ml-2">&ell;</span></td>
+                                    <td class="text-right line-bottom"><span
+                                            class="number">{{ $r['test_pump'] }}</span><span class="ml-2">&ell;</span>
+                                    </td>
                                     <td class="px-3">-</td>
                                 </tr>
                                 <tr>
@@ -256,44 +257,88 @@
                         @endforeach
 
                         <div class="d-flex justify-content-end">
-                            <div class="">
-                                @foreach ($reports as $i => $r)
+                            @if ($reports->count() > 1)
+                                <div class="">
+                                    @foreach ($reports as $i => $r)
+                                        <table class="mb-2">
+                                            <tr>
+                                                <td width="120" class="p-2 text-xl text-center"
+                                                    style="border: 2px solid #000">
+                                                    {{ $i + 1 }}
+                                                </td>
+                                                <td width="360" class="p-2" style="border: 2px solid #000">
+                                                    <table width="100%">
+                                                        <tr>
+                                                            <td width="180" class="text-right">Jumlah Penjualan Bersih
+                                                                {{ $i + 1 }}
+                                                            </td>
+                                                            <td class="px-2">=</td>
+                                                            <td class="d-flex justify-content-between"><span>Rp</span><span
+                                                                    class="number-int">{{ $r['jumlah_penjualan_bersih_rp'] }}</span>
+                                                            </td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-right">Jumlah Pembelian {{ $i + 1 }}
+                                                            </td>
+                                                            <td class="px-2">=</td>
+                                                            <td class="d-flex justify-content-between line-bottom">
+                                                                <span>Rp</span><span
+                                                                    class="number-int">{{ $r['jumlah_pembelian_rp'] }}</span>
+                                                            </td>
+                                                            <td class="px-1">-</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-right font-weight-bold">Laba Kotor
+                                                                {{ $i + 1 }}
+                                                                (B-A)
+                                                            </td>
+                                                            <td class="px-2">=</td>
+                                                            <td class="d-flex justify-content-between font-weight-bold">
+                                                                <span>Rp</span><span
+                                                                    class="number-int">{{ $r['laba_kotor'] }}</span>
+                                                            </td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    @endforeach
                                     <table class="mb-2">
                                         <tr>
                                             <td width="120" class="p-2 text-xl text-center"
                                                 style="border: 2px solid #000">
-                                                {{ $i + 1 }}
+                                                1 + 2
                                             </td>
                                             <td width="360" class="p-2" style="border: 2px solid #000">
                                                 <table width="100%">
+                                                    @foreach ($reports as $i => $r)
+                                                        <tr>
+                                                            <td width="180" class="text-right">Laba Kotor
+                                                                {{ $i + 1 }} (B-A)
+                                                            </td>
+                                                            <td class="px-2">=</td>
+                                                            <td
+                                                                class="d-flex justify-content-between @if ($loop->last) line-bottom @endif">
+                                                                <span>Rp</span><span
+                                                                    class="number-int">{{ $r['laba_kotor'] }}</span>
+                                                            </td>
+                                                            <td class="px-1">
+                                                                @if ($loop->last)
+                                                                    -
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+
                                                     <tr>
-                                                        <td width="180" class="text-right">Jumlah Penjualan Bersih
-                                                            {{ $i + 1 }}
-                                                        </td>
-                                                        <td class="px-2">=</td>
-                                                        <td class="d-flex justify-content-between"><span>Rp</span><span
-                                                                class="number-int">{{ $r['jumlah_penjualan_bersih_rp'] }}</span>
-                                                        </td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="text-right">Jumlah Pembelian {{ $i + 1 }}</td>
-                                                        <td class="px-2">=</td>
-                                                        <td class="d-flex justify-content-between line-bottom">
-                                                            <span>Rp</span><span
-                                                                class="number-int">{{ $r['jumlah_pembelian_rp'] }}</span>
-                                                        </td>
-                                                        <td class="px-1">-</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="text-right font-weight-bold">Laba Kotor
-                                                            {{ $i + 1 }}
-                                                            (B-A)
+                                                        <td class="text-right font-weight-bold ">Grand Total Laba Kotor
                                                         </td>
                                                         <td class="px-2">=</td>
                                                         <td class="d-flex justify-content-between font-weight-bold">
                                                             <span>Rp</span><span
-                                                                class="number-int">{{ $r['laba_kotor'] }}</span>
+                                                                class="number-int">{{ $reports->sum('laba_kotor') }}</span>
                                                         </td>
                                                         <td></td>
                                                     </tr>
@@ -301,48 +346,53 @@
                                             </td>
                                         </tr>
                                     </table>
-                                @endforeach
-                                <table class="mb-2">
-                                    <tr>
-                                        <td width="120" class="p-2 text-xl text-center"
-                                            style="border: 2px solid #000">
-                                            1 + 2
-                                        </td>
-                                        <td width="360" class="p-2" style="border: 2px solid #000">
-                                            <table width="100%">
-                                                <tr>
-                                                    <td width="180" class="text-right">Laba Kotor 1 (B-A)
-                                                    </td>
-                                                    <td class="px-2">=</td>
-                                                    <td class="d-flex justify-content-between"><span>Rp</span><span
-                                                            class="number-int">{{ $reports[0]['laba_kotor'] }}</span>
-                                                    </td>
-                                                    <td></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-right">Laba Kotor 2 (B-A)</td>
-                                                    <td class="px-2">=</td>
-                                                    <td class="d-flex justify-content-between line-bottom">
-                                                        <span>Rp</span><span
-                                                            class="number-int">{{ $reports[1]['laba_kotor'] }}</span>
-                                                    </td>
-                                                    <td class="px-1">-</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-right font-weight-bold ">Grand Total Laba Kotor
-                                                    </td>
-                                                    <td class="px-2">=</td>
-                                                    <td class="d-flex justify-content-between font-weight-bold">
-                                                        <span>Rp</span><span
-                                                            class="number-int">{{ collect($reports)->sum('laba_kotor') }}</span>
-                                                    </td>
-                                                    <td></td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
+                                </div>
+                            @else
+                                <div class="">
+                                    <table class="mb-2">
+                                        <tr>
+                                            <td width="120" class="p-2 text-lg text-center"
+                                                style="border: 2px solid #000">
+                                                Laba Kotor
+                                            </td>
+                                            <td width="360" class="p-2" style="border: 2px solid #000">
+                                                <table width="100%">
+                                                    <tr>
+                                                        <td width="180" class="text-right">Jumlah Penjualan Bersih
+                                                        </td>
+                                                        <td class="px-2">=</td>
+                                                        <td class="d-flex justify-content-between"><span>Rp</span><span
+                                                                class="number-int">{{ $reports[0]['jumlah_penjualan_bersih_rp'] }}</span>
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-right">Jumlah Pembelian
+                                                        </td>
+                                                        <td class="px-2">=</td>
+                                                        <td class="d-flex justify-content-between line-bottom">
+                                                            <span>Rp</span><span
+                                                                class="number-int">{{ $reports[0]['jumlah_pembelian_rp'] }}</span>
+                                                        </td>
+                                                        <td class="px-1">-</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-right font-weight-bold">Total Laba Kotor
+                                                        </td>
+                                                        <td class="px-2">=</td>
+                                                        <td class="d-flex justify-content-between font-weight-bold">
+                                                            <span>Rp</span><span
+                                                                class="number-int">{{ $reports[0]['laba_kotor'] }}</span>
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            @endif
+
 
                         </div>
 
@@ -350,9 +400,10 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="container-fluid text-right mb-3">
-            <button class="btn btn-primary" onclick="window.print()"> <i class="fas fa-print mr-2 "></i> Cetak PDF</button>
+            <button class="btn btn-primary" onclick="window.print()"> <i class="fas fa-print mr-2 "></i> Cetak
+                PDF</button>
         </div>
     </section>
 @endsection

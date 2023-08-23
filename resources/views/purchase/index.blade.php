@@ -23,7 +23,15 @@
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <div class=" d-flex justify-content-between align-items-center">
-                        <h3 class="card-title">Data Pembelian</h3>
+                        <div class="d-flex align-items-center">
+                            {{-- <h3 class="card-title mr-2">Pertashop</h3> --}}
+                            <select name="shop_id" class="form-control" style="width: 200px">
+                                @foreach ($shops as $shop)
+                                    <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
+                                @endforeach
+                            </select>
+
+                        </div>
                         <a href="{{ route('purchases.create') }}" class="btn btn-primary"><i
                                 class="fa fa-plus mr-2"></i>Tambah
                             Pembelian</a>
@@ -34,16 +42,6 @@
 
                     <div class="table-responsive-lg">
                         <table id="purchase-table" class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th class="align-middle">Tanggal</th>
-                                    <th class="align-middle">Supplier</th>
-                                    <th class="align-middle">Jumlah (&#8467;)</th>
-                                    <th class="align-middle">Harga per Liter (Rp)</th>
-                                    <th class="align-middle">Total Harga (Rp)</th>
-                                    <th class="align-middle">Aksi</th>
-                                </tr>
-                            </thead>
                         </table>
                     </div>
                 </div>
@@ -66,15 +64,23 @@
                     //     name: 'DT_RowIndex'
                     // }, 
                     {
+                        title: 'ID Pembelian',
+                        data: 'id',
+                        name: 'id',
+                    },
+                    {
+                        title: 'Tanggal',
                         data: 'tanggal',
                         name: 'tanggal',
                     },
                     {
+                        title: 'Supplier',
                         data: 'supplier.nama',
                         name: 'supplier.nama',
                     },
 
                     {
+                        title: 'Jumlah (&ell;)',
                         data: 'jumlah',
                         name: 'jumlah',
                         className: 'text-right',
@@ -85,10 +91,35 @@
                             return data;
                         }
                     },
+                    {
+                        title: 'Datang (&ell;)',
+                        data: 'datang',
+                        name: 'datang',
+                        className: 'text-right',
+                        render: function(data, type) {
+                            if (type === 'display') {
+                                return formatNumber(data)
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        title: 'Sisa (&ell;)',
+                        data: 'sisa',
+                        name: 'sisa',
+                        className: 'text-right',
+                        render: function(data, type) {
+                            if (type === 'display') {
+                                return formatNumber(data)
+                            }
+                            return data;
+                        }
+                    },
 
                     {
-                        data: 'harga',
-                        name: 'harga',
+                        title: 'Harga per Liter (Rp)',
+                        data: 'price.harga_beli',
+                        name: 'price.harga_beli',
                         className: 'text-right',
                         render: function(data, type) {
                             if (type === 'display') {
@@ -98,17 +129,19 @@
                         }
                     },
                     {
+                        title: 'Total Harga (Rp)',
                         data: 'total_harga',
                         name: 'total_harga',
                         className: 'text-right',
                         render: function(data, type) {
                             if (type === 'display') {
-                                return formatNumber(data);
+                                return formatNumber(data, 0);
                             }
                             return data;
                         }
                     },
                     {
+                        title: 'Aksi',
                         data: 'action',
                         name: 'action',
                         orderable: false,
@@ -142,6 +175,10 @@
                 }
             });
 
+            $('select[name=shop_id]').on('change', function() {
+                dataTable.ajax.url(`?shop_id=${this.value}`).load();
+            });
+
 
             $('#purchase-table').on('click', '.btn-delete', function() {
                 var saleId = $(this).data('id');
@@ -159,7 +196,7 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "DELETE",
-                            url: "/purchases/" + saleId,
+                            url: "{{ url('') }}" + "/purchases/" + saleId,
                             data: {
                                 "_token": "{{ csrf_token() }}"
                             },
@@ -167,7 +204,7 @@
                                 dataTable.ajax.reload();
                                 Swal.fire(
                                     'Terhapus!',
-                                    'Data pembelian telah dihapus.',
+                                    response.message,
                                     'success'
                                 );
                             }

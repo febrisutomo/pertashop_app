@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Models\Price;
 use App\Models\Purchase;
+use App\Models\Shop;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
 class PurchaseController extends Controller
@@ -17,7 +17,9 @@ class PurchaseController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Purchase::with('supplier')->latest()->get();
+            $shop_id = $request->input('shop_id', 1);
+
+            $data = Purchase::where('shop_id', $shop_id)->with(['supplier', 'price'])->latest()->get();
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -30,7 +32,8 @@ class PurchaseController extends Controller
         }
 
 
-        return view('purchase.index');
+        $shops = Shop::all();
+        return view('purchase.index', compact('shops'));
     }
 
     /**
@@ -38,12 +41,11 @@ class PurchaseController extends Controller
      */
     public function create()
     {
-        $data = [
-            'harga' => Product::latest()->first()->harga_beli,
-            'suppliers' => Supplier::orderBy('nama')->get(),
-        ];
+        $harga = Price::latest()->first()->harga_beli;
+        $suppliers = Supplier::all();
+        $shops = Shop::all();
 
-        return view('purchase.create', $data);
+        return view('purchase.create', compact('harga', 'suppliers', 'shops'));
     }
 
     /**
@@ -57,16 +59,14 @@ class PurchaseController extends Controller
 
         $validatedData = $request->validate([
             'created_at' => 'required|date',
+            'shop_id' => 'required|numeric',
             'supplier_id' => 'required|numeric',
             'jumlah' => 'required|numeric',
 
         ], $customMessages);
 
-        $currentTime = Carbon::now();
-        $validatedData['created_at'] = Carbon::createFromFormat('Y-m-d', $validatedData['created_at'])
-            ->setTime($currentTime->hour, $currentTime->minute, 0);
 
-        $validatedData['harga'] =  Product::latest()->first()->harga_beli;
+        $validatedData['price_id'] =  Price::latest()->first()->id;
 
 
         Purchase::create($validatedData);
@@ -87,12 +87,10 @@ class PurchaseController extends Controller
      */
     public function edit(Purchase $purchase)
     {
-        $data = [
-            'purchase' => $purchase,
-            'suppliers' => Supplier::orderBy('nama')->get(),
-        ];
-
-        return view('purchase.edit', $data);
+        $harga = $purchase->price->harga_beli;
+        $suppliers = Supplier::all();
+        $shops = Shop::all();
+        return view('purchase.edit', compact('harga', 'suppliers', 'shops', 'purchase'));
     }
 
     /**
@@ -106,17 +104,11 @@ class PurchaseController extends Controller
 
         $validatedData = $request->validate([
             'created_at' => 'required|date',
+            'shop_id' => 'required|numeric',
             'supplier_id' => 'required|numeric',
             'jumlah' => 'required|numeric',
 
         ], $customMessages);
-
-        $currentTime = Carbon::now();
-        $validatedData['created_at'] = Carbon::createFromFormat('Y-m-d', $validatedData['created_at'])
-            ->setTime($currentTime->hour, $currentTime->minute, 0);
-
-        $validatedData['harga'] =  Product::latest()->first()->harga_beli;
-
 
         $purchase->update($validatedData);
 

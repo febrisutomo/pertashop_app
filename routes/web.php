@@ -1,11 +1,14 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PurchaseController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\SaleController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SaleController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\IncomingController;
+use App\Http\Controllers\OperatorController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\TestPumpController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Auth\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,15 +28,24 @@ Route::delete('logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/data', [DashboardController::class, 'data'])->name('dashbaord.data');
 
     Route::resources([
         'sales' => SaleController::class,
         'purchases' => PurchaseController::class,
-        'incomings' => IncomingController::class
+        'incomings' => IncomingController::class,
+        'test-pumps' => TestPumpController::class,
     ]);
 
-    Route::prefix('laporan')->group(function () {
-        Route::get('/', [ReportController::class, 'laba_kotor'])->name('report.laba_kotor');
+    Route::prefix('data')->group(function () {
+        Route::resources([
+            'operators' => OperatorController::class,
+        ]);
+    });
+    Route::prefix('reports')->group(function () {
+        Route::prefix('bulanan')->group(function () {
+            Route::get('/', [ReportController::class, 'index'])->name('reports.index');
+            Route::get('/{shop_id}/{month}', [ReportController::class, 'show'])->name('reports.show');
+            Route::get('/laba-kotor', [ReportController::class, 'laba_kotor'])->name('reports.laba_kotor');
+        });
     });
 });

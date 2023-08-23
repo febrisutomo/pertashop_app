@@ -30,7 +30,7 @@
                 <div class="d-flex justify-content-center mb-3">
                     <img src="{{ asset('images/logo-pertashop.png') }}" width="120" alt="">
                 </div>
-                <a href="#" class="h3"><b>CV. SINERGY PETRA JAYA</b></a>
+                <a href="#" class="h3 text-uppercase"><b>Pertashop App</b></a>
             </div>
             <div class="card-body">
                 {{-- <p class="login-box-msg">Login untuk menggunakan aplikasi.</p> --}}

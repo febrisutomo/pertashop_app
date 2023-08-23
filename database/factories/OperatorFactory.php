@@ -25,6 +25,7 @@ class OperatorFactory extends Factory
             'shop_id' => Shop::factory(),
             'alamat' => fake()->address(),
             'no_rekening' => fake()->randomNumber(9),
+            'no_hp' => fake()->e164PhoneNumber(),
         ];
     }
 }

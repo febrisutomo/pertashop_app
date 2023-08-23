@@ -6,12 +6,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Kedatangan</h1>
+                    <h1>Percobaan</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item active">Kedatangan</li>
+                        <li class="breadcrumb-item active">Percobaan</li>
                     </ol>
                 </div>
             </div>
@@ -37,9 +37,9 @@
                             @endif
 
                         </div>
-                        <a href="{{ route('incomings.create') }}" class="btn btn-primary"><i
+                        <a href="{{ route('test-pumps.create') }}" class="btn btn-primary"><i
                                 class="fa fa-plus mr-2"></i>Tambah
-                            Kedatangan</a>
+                            Percobaan</a>
                     </div>
 
                 </div>
@@ -47,7 +47,6 @@
 
                     <div class="table-responsive-lg">
                         <table id="table" class="table table-bordered">
-
                         </table>
                     </div>
                 </div>
@@ -63,7 +62,7 @@
             var dataTable = $('#table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('incomings.index') }}",
+                ajax: "{{ route('test-pumps.index') }}",
                 columns: [
                     // {
                     //     data: 'DT_RowIndex',
@@ -74,17 +73,32 @@
                         data: 'tanggal',
                         name: 'tanggal',
                     },
+
                     {
-                        title: 'ID Pembelian',
-                        data: 'purchase_id',
-                        name: 'purchase_id',
-                    },
-                    {
-                        title: 'Supplier',
-                        data: 'purchase.supplier.nama',
-                        name: 'supplier',
+                        title: 'Totalisator Awal',
+                        data: 'totalisator_awal',
+                        name: 'totalisator_awal',
+                        className: 'text-right',
+                        render: function(data, type) {
+                            if (type === 'display') {
+                                return formatNumber(data, 3)
+                            }
+                            return data;
+                        }
                     },
 
+                    {
+                        title: 'Totalisator Akhir',
+                        data: 'totalisator_akhir',
+                        name: 'totalisator_akhir',
+                        className: 'text-right',
+                        render: function(data, type) {
+                            if (type === 'display') {
+                                return formatNumber(data, 3)
+                            }
+                            return data;
+                        }
+                    },
                     {
                         title: 'Jumlah (&ell;)',
                         data: 'jumlah',
@@ -98,36 +112,11 @@
                         }
                     },
 
-                    {
-                        title: 'Stik Awal (cm)',
-                        data: 'stik_awal',
-                        name: 'stik_awal',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatNumber(data);
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        title: 'Stik Akhir (cm)',
-                        data: 'stik_akhir',
-                        name: 'stik_akhir',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatNumber(data);
-                            }
-                            return data;
-                        }
-                    },
 
                     {
                         title: 'Operator',
                         data: 'operator.user.name',
                         name: 'operator',
-                        className: 'text-right',
                     },
 
                     {
@@ -155,7 +144,7 @@
                         display: DataTable.Responsive.display.modal({
                             header: function(row) {
                                 var data = row.data();
-                                return 'Detail Kedatangan';
+                                return 'Detail Percobaan';
                             }
                         }),
                         renderer: DataTable.Responsive.renderer.tableAll({
@@ -175,7 +164,7 @@
 
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
-                    text: "Data barang Masuk akan dihapus secara permanen!",
+                    text: "Data percobaan akan dihapus secara permanen!",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -186,7 +175,7 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "DELETE",
-                            url: "{{ url('') }}" + "/incomings/" + saleId,
+                            url: "{{ url('') }}" + "/test-pumps/" + saleId,
                             data: {
                                 "_token": "{{ csrf_token() }}"
                             },

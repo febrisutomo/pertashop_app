@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('shop_id')->constrained();
-            $table->string('alamat');
-            $table->string('no_rekening');
+            $table->string('no_hp')->nullable();
+            $table->string('alamat')->nullable();
+            $table->string('no_rekening')->nullable();
             $table->timestamps();
         });
     }

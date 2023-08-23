@@ -4,101 +4,85 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\Shop;
-use App\Models\Price;
-use App\Models\Incoming;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
 
-        $pertashop =  Shop::find(1);
-        $harga = Price::latest()->first();
-        $harga_beli = $harga->harga_beli;
-        $harga_jual = $harga->harga_jual;
+        if ($request->ajax()) {
+            $shop_id = $request->input('shop_id');
 
-        // $penjualan_awal = Sale::whereMonth('created_at', Carbon::now()->month)->oldest()->first();
-        // $penjualan_akhir = Sale::whereMonth('created_at', Carbon::now()->month)->latest()->first();
-        // $penjualan_akhir = Sale::where('shop_id', 1)->latest()->first();
+            if (Auth::user()->role == 'operator') {
+                $shop_id = Auth::user()->operator->shop->id;
+            }
 
-        // SISA STOK AKHIR 
-        $stik_akhir = $pertashop->stik_akhir;
-        $sisa_stok_akhir = $stik_akhir * 21;
+            $time_filter = $request->input('filter');
 
-        // PEMBELIAN 
-        $penjualan_terakhir_bulan_lalu = Sale::whereMonth('created_at', '<', Carbon::now()->month)->latest()->first();
-        $stik_akhir_bulan_lalu = $penjualan_terakhir_bulan_lalu ?  $penjualan_terakhir_bulan_lalu->stik_akhir * 21 : 142.85;
-        $stok_awal =  $stik_akhir_bulan_lalu * 21;
-        $datang = Incoming::where('shop_id', 1)->whereMonth('created_at', Carbon::now()->month)->get()->sum('jumlah');
-        $jumlah_pembelian = $stok_awal + $datang;
-        $jumlah_pembelian_rp = $jumlah_pembelian * $harga_beli;
+            $sales = $this->getSales($shop_id, $time_filter);
 
-        // PENJUALAN 
-        // $totalisator_awal = $penjualan_awal->totalisator_awal; //a
-        // $totalisator_akhir = $penjualan_akhir->totalisator_akhir; //b
-        // $total_penjualan = $totalisator_akhir - $totalisator_awal; //c: (a-b)
-        $sales = Sale::where('shop_id', 1)->whereMonth('created_at', Carbon::now()->month)->get();
-        $total_penjualan = $sales->sum('jumlah');
-        $test_pump = 0; //d
+            $stocks = $this->getStock($shop_id);
 
-        $jumlah_penjualan = $total_penjualan - $test_pump; //B: (c-d)
-        $jumlah_penjualan_rp = $jumlah_penjualan * $harga_jual;
+            $summary = $this->getSummary($shop_id);
 
-        $sisa_stok = $jumlah_pembelian - $jumlah_penjualan; //(A-B)
-        $sisa_stok_rp = $sisa_stok * $harga_beli;
-
-        $jumlah_losses_gain =  $sisa_stok_akhir - $sisa_stok;
-
-
-        $losses_gain = $jumlah_penjualan != 0 ? $jumlah_losses_gain / $jumlah_penjualan * 100 : 0;
-
-
-        $jumlah_losses_gain_rp = $jumlah_losses_gain * $harga_beli;
-
-        $jumlah_penjualan_bersih_rp = $jumlah_penjualan_rp + $sisa_stok_rp + $jumlah_losses_gain_rp;
-
-        $laba_kotor = $jumlah_penjualan_bersih_rp - $jumlah_pembelian_rp;
-
-        $jumlah_hari = $sales->groupBy(function ($item) {
-            return $item->created_at->format('d/m/Y');
-        })->count();
-
-        $rata_rata_omset_harian = $jumlah_hari > 0 ? $jumlah_penjualan / $jumlah_hari : 0;
+            return response()->json([
+                'stocks' => $stocks,
+                'sales' => $sales,
+                'summary' => $summary
+            ]);
+        }
+        $reports = ReportController::calcLabaKotor(1);
 
         $data = [
-            'jumlah_penjualan' => $jumlah_penjualan,
-            'jumlah_penjualan_bersih_rp' => $jumlah_penjualan_bersih_rp,
-            'jumlah_pembelian_rp' => $jumlah_pembelian_rp,
-            'laba_kotor' => $laba_kotor,
-            'sisa_stok' => $sisa_stok,
-            'sisa_stok_akhir' => $sisa_stok_akhir,
-            'losses_gain' => $losses_gain,
-            'jumlah_losses_gain' => $jumlah_losses_gain,
-            'rata_rata_omset_harian' => $rata_rata_omset_harian,
+            'reports' => $reports,
             'shops' => Shop::all()
         ];
 
         return view('dashboard.index', $data);
     }
 
-    public function data(Request $request)
+    protected function getSummary($shop_id)
     {
-        $shop_id = $request->input('shop_id');
-        $time_filter = $request->input('filter');
+        $shops = Shop::all();
 
-        $sales = $this->getSales($shop_id, $time_filter);
+        if ($shop_id) {
+            $shops = Shop::where('id', $shop_id)->get();
+        }
 
-        $stocks = $this->getStock($shop_id);
+        $data = [];
+        $now = Carbon::now();
+        $start = $now->startOfMonth()->format('Y-m-d');
+        $end = $now->endOfMonth()->format('Y-m-d');
 
-        return response()->json([
-            'stocks' => $stocks,
-            'sales' => $sales
-        ]);
+        $count_omset = 0;
+        foreach ($shops as $shop) {
+            $reports = ReportController::calcLabaKotor($shop->id, $start, $end);
+            $data[] = [
+                'jumlah_penjualan_bersih_rp' => $reports->sum('jumlah_penjualan_bersih_rp'),
+                'jumlah_pembelian_rp' => $reports->sum('jumlah_pembelian_rp'),
+                'laba_kotor' => $reports->sum('laba_kotor'),
+                'rata_rata_omset_harian' => $reports->count() > 0 ? $reports->sum('rata_rata_omset_harian') / $reports->count() : 0,
+            ];
+            if ($reports->sum('rata_rata_omset_harian') > 0) {
+                $count_omset++;
+            }
+        }
+
+        $data = collect($data);
+        $summary = [
+            'jumlah_penjualan_bersih' => $data->sum('jumlah_penjualan_bersih_rp'),
+            'jumlah_pembelian' => $data->sum('jumlah_pembelian_rp'),
+            'laba_kotor' => $data->sum('laba_kotor'),
+            'omset_harian' => $count_omset > 0 ? $data->sum('rata_rata_omset_harian') / $count_omset : 0,
+        ];
+
+        return $summary;
     }
 
-    public function getStock($shop_id)
+    protected function getStock($shop_id)
     {
         $shops = Shop::all();
 
@@ -119,144 +103,29 @@ class DashboardController extends Controller
                     'data' => [],
                     'backgroundColor' => [], // Warna latar belakang untuk setiap bar
                 ],
-                [
-                    'label' => 'L/G',
-                    'data' => [],
-                    'backgroundColor' => [], // Warna latar belakang untuk setiap bar
-                ],
             ]
         ];
-
+        $now = Carbon::now();
+        $start = $now->startOfMonth()->format('Y-m-d');
+        $end = $now->endOfMonth()->format('Y-m-d');
         foreach ($shops as $shop) {
             $data['labels'][] = $shop->nama;
+            $stik_akhir = ReportController::calcLabaKotor($shop->id)->last() ? ReportController::calcLabaKotor($shop->id, $start, $end)->last()['stik_akhir'] : 142.85;
+            $data['datasets'][0]['data'][] = $stik_akhir * 21;
             $data['datasets'][1]['data'][] = 3000;
-            $data['datasets'][0]['data'][] = $shop->stik_akhir * 21;
-            $data['datasets'][2]['data'][] = Sale::where('shop_id', $shop->id)->latest()->first()?->losses_gain;
-            $data['datasets'][1]['backgroundColor'][] = 'lightgray';
             // Tentukan warna berdasarkan kondisi stok kurang dari 1500
-            if ($shop->stik_akhir * 21 < 1500) {
+            if ($stik_akhir * 21 < 1500) {
                 $data['datasets'][0]['backgroundColor'][] = '#dc3545'; // Warna hijau jika stok cukup
             } else {
                 $data['datasets'][0]['backgroundColor'][] = '#28a745'; // Warna merah jika stok kurang dari 1500
             }
+            $data['datasets'][1]['backgroundColor'][] = 'lightgray';
         }
 
 
         return $data;
     }
 
-
-    // protected function getSales($shop_id, $time_filter)
-    // {
-    //     $shops = Shop::all();
-
-    //     if ($shop_id) {
-    //         $shops = Shop::where('id', $shop_id)->get();
-    //     }
-
-    //     $data = [];
-    //     foreach ($shops as $shop) {
-    //         $sales = Sale::where('shop_id', $shop->id)->whereMonth('created_at', Carbon::now()->month)->oldest();
-    //         if ($time_filter === 'week') {
-    //             $startDateOfMonth = Carbon::now()->startOfMonth();
-    //             $sales = $sales->where('created_at', '>=', $startDateOfMonth)->get()->groupBy(function ($item) use ($startDateOfMonth) {
-    //                 $daysDiff = $item->created_at->diffInDays($startDateOfMonth);
-    //                 $weekOfMonth = ceil(($daysDiff + $startDateOfMonth->dayOfWeek) / 7);
-    //                 // $monthName = $startDateOfMonth->format('F');
-
-    //                 return "Minggu ke-" . $weekOfMonth;
-    //             });
-
-    //             // Mengisi tanggal-tanggal tanpa penjualan dengan nilai nol
-    //             $startDate = Carbon::now()->startOfMonth();
-    //             $endDate = Carbon::now()->endOfMonth();
-    //             $currentDate = $startDate;
-    //             while ($currentDate <= $endDate) {
-    //                 $daysDiff = $currentDate->diffInDays($startDateOfMonth);
-    //                 $weekOfMonth = ceil(($daysDiff + $startDateOfMonth->dayOfWeek) / 7);
-    //                 $formattedDate = "Minggu ke-" . $weekOfMonth;
-    //                 if (!isset($sales[$formattedDate])) {
-    //                     $sales[$formattedDate] = [];
-    //                 }
-    //                 $currentDate->addWeek();
-    //             }
-
-    //             $sortedSales = $sales->toArray();
-    //             ksort($sortedSales);
-    //         } elseif ($time_filter === 'month') {
-    //             $sales = $sales->where('created_at', '>=', Carbon::now()->startOfYear())->get()->groupBy(function ($item) {
-    //                 return $item->created_at->format('M Y');
-    //             });
-
-    //             $startMonth = Carbon::now()->startOfYear();
-    //             $endMonth = Carbon::now()->endOfYear();
-    //             $currentMonth = $startMonth;
-
-    //             while ($currentMonth <= $endMonth) {
-    //                 $formattedMonth = $currentMonth->format('M Y');
-    //                 if (!isset($sales[$formattedMonth])) {
-    //                     $sales[$formattedMonth] = [];
-    //                 }
-    //                 $currentMonth->addMonth();
-    //             }
-
-    //             $sortedSales = $sales->toArray();
-    //             // Sort the array using the custom comparison function
-    //             uksort($sortedSales, function ($a, $b) {
-    //                 $dateA = Carbon::createFromFormat('M Y', $a);
-    //                 $dateB = Carbon::createFromFormat('M Y', $b);
-
-    //                 return $dateA < $dateB ? -1 : ($dateA > $dateB ? 1 : 0);
-    //             });
-    //         } else {
-    //             $sales = $sales->get()->groupBy(function ($item) {
-    //                 return $item->created_at->format('d M');
-    //             });
-    //             // Mengisi tanggal-tanggal tanpa penjualan dengan nilai nol
-    //             $startDate = Carbon::now()->startOfMonth();
-    //             $endDate = Carbon::now()->endOfMonth();
-    //             $currentDate = $startDate;
-
-    //             while ($currentDate <= $endDate) {
-    //                 $formattedDate = $currentDate->format('d M');
-    //                 if (!isset($sales[$formattedDate])) {
-    //                     $sales[$formattedDate] = [];
-    //                 }
-    //                 $currentDate->addDay();
-    //             }
-
-    //             $sortedSales = $sales->toArray();
-    //             ksort($sortedSales);
-    //         }
-
-    //         // Ubah objek koleksi menjadi array dan urutkan berdasarkan tanggal
-
-
-    //         $data[$shop->nama] = $sortedSales;
-    //     }
-
-    //     return $data;
-
-
-
-
-    //     // $sales = Sale::where('shop_id', 1)->whereMonth('created_at', Carbon::now()->month)->oldest();
-    //     // if ($time_filter === 'week') {
-    //     //     $sales = $sales->where('created_at', '>=', Carbon::now()->subDays(7))->get()->groupBy(function ($item) {
-    //     //         return $item->created_at->format('d/m/Y');
-    //     //     });
-    //     // } elseif ($time_filter === 'month') {
-    //     //     $sales = $sales->where('created_at', '>=', Carbon::now()->subMonth(6))->get()->groupBy(function ($item) {
-    //     //         return $item->created_at->format('M Y');
-    //     //     });
-    //     // } else {
-    //     //     $sales = $sales->get()->groupBy(function ($item) {
-    //     //         return $item->created_at->format('Y-m-d');
-    //     //     });
-    //     // }
-
-    //     // return response()->json($sales);
-    // }
 
     protected function getSales($shop_id, $time_filter)
     {
@@ -367,30 +236,4 @@ class DashboardController extends Controller
 
         return $data;
     }
-
-
-
-    // public function getStok()
-    // {
-    //     $product = Product::latest()->first();
-    //     // PEMBELIAN 
-    //     $stok_awal = $product->stok_awal;
-    //     $jumlah_pembelian = $stok_awal;
-
-    //     // PENJUALAN 
-    //     $total_penjualan = Sale::get()->sum('jumlah');
-    //     $jumlah_penjualan = $total_penjualan;
-
-    //     $sisa_stok = $jumlah_pembelian - $jumlah_penjualan;
-    //     $losses_gain = Sale::get()->sum('losses_gain');
-    //     $jumlah_losses_gain = $losses_gain / 100 * $jumlah_penjualan;
-
-    //     // SISA STOK AKHIR 
-    //     $sisa_stok_akhir = $sisa_stok + $jumlah_losses_gain;
-
-    //     return response()->json([
-    //         'stok_akhir_teoritis' => $sisa_stok,
-    //         'stok_akhir_aktual' => $sisa_stok_akhir,
-    //     ]);
-    // }
 }

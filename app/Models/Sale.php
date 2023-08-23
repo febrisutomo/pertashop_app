@@ -14,7 +14,7 @@ class Sale extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['operator_id', 'totalisator_akhir', 'stik_akhir', 'harga', 'losses_gain'];
+    protected $guarded = ['id'];
 
     protected $appends = ['tanggal', 'jumlah', 'omset'];
 
@@ -55,11 +55,6 @@ class Sale extends Model
 
         return round($this->totalisator_akhir - $this->totalisator_awal, 3);
     }
-
-    // public function getLossesGainAttribute()
-    // {
-    //     return round((($this->stik_akhir * $this->skala - $this->totalisator_akhir) / ($this->stik_akhir * $this->skala)) * 100, 3);
-    // }
 
     public function getOmsetAttribute()
     {

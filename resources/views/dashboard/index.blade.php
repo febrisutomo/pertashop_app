@@ -4,17 +4,23 @@
 @section('content')
     <section class="content-header">
         <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-9">
+            <div class="row mb-2 align-items-center">
+                <div class="col-9">
                     <h1>Dashboard</h1>
                 </div>
-                <div class="col-sm-3">
-                    <select name="shop_id" class="form-control">
-                        <option value="">Semua Pertashop</option>
-                        @foreach ($shops as $shop)
-                            <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
-                        @endforeach
-                    </select>
+                <div class="col-3">
+                    @if (Auth::user()->role == 'operator')
+                        <h3 class="text-right text-md font-weight-bold">
+                            {{ Auth::user()->operator->shop->kode . ' ' . Auth::user()->operator->shop->nama }}</h3>
+                    @else
+                        <select name="shop_id" class="form-control">
+                            <option value="">Semua Pertashop</option>
+                            @foreach ($shops as $shop)
+                                <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
+                            @endforeach
+                        </select>
+                    @endif
+
                     {{-- <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item active">Home</li>
                     </ol> --}}
@@ -33,7 +39,7 @@
 
                         <div class="info-box-content">
                             <span class="info-box-text">Penjualan Bersih</span>
-                            <span class="info-box-number currency">{{ $jumlah_penjualan_bersih_rp }}/span>
+                            <span class="info-box-number" id="jumlahPenjualanBersih"></span>
                         </div>
                     </div>
                 </div>
@@ -43,8 +49,7 @@
                         <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-download"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Pembelian</span>
-                            <span class="info-box-number currency">
-                                {{ $jumlah_pembelian_rp }}
+                            <span class="info-box-number" id="jumlahPembelian">
                                 {{-- <small>&ell;</small> --}}
                             </span>
                         </div>
@@ -58,7 +63,8 @@
                         <span class="info-box-icon bg-success elevation-1"><i class="fas fa-wallet"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Laba Kotor</span>
-                            <span class="info-box-number currency">{{ $laba_kotor }}</span>
+                            <span class="info-box-number" id="labaKotor">
+                            </span>
                         </div>
 
                     </div>
@@ -70,7 +76,9 @@
                         <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-chart-bar"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Omset Harian</span>
-                            <span class="info-box-number"><span class="number">{{ $rata_rata_omset_harian }}</span>
+                            <span class="info-box-number">
+                                <span id="omsetHarian">
+                                </span>
                                 &ell;</span>
                         </div>
 
@@ -208,7 +216,7 @@
             var filter = $('input[name=filter]').val()
 
             $.ajax({
-                url: "{{ route('dashbaord.data') }}",
+                url: "{{ route('dashboard') }}",
                 method: 'GET',
                 data: {
                     filter,
@@ -217,8 +225,14 @@
                 success: function(data) {
                     var sales = data.sales;
                     var stocks = data.stocks;
-                    showSalesChart(sales)
-                    showStocks(stocks)
+                    showSalesChart(sales);
+                    showStocks(stocks);
+
+                    var summary = data.summary;
+                    $('#jumlahPenjualanBersih').text(formatCurrency(summary.jumlah_penjualan_bersih, 0));
+                    $('#jumlahPembelian').text(formatCurrency(summary.jumlah_pembelian, 0));
+                    $('#labaKotor').text(formatCurrency(summary.laba_kotor, 0));
+                    $('#omsetHarian').text(formatNumber(summary.omset_harian));
 
                 },
                 error: function(xhr, status, error) {
@@ -229,23 +243,6 @@
 
 
 
-        // function showLossesGain() {
-        //     var losses_gain = @json($losses_gain)
-
-        //     var formated_losses_gain = formatNumber(Math.abs(losses_gain), 3);
-
-        //     var losses_gain_text = ''
-        //     if (parseFloat(losses_gain) < 0) {
-        //         losses_gain_text = '<span class="text-danger"><i class="fas fa-arrow-down mr-1"></i>' +
-        //             formated_losses_gain +
-        //             ' %</span>';
-        //     } else if (parseFloat(losses_gain) > 0) {
-        //         losses_gain_text = '<span class="text-success"><i class="fas fa-arrow-up mr-1"></i>' +
-        //             formated_losses_gain +
-        //             ' %</span>';
-        //     }
-        //     $('#losses-gain').html(losses_gain_text)
-        // }
 
         $(document).ready(function() {
             // $('#time-filter').on('change', function() {
