@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('shareholders', function (Blueprint $table) {
+        Schema::create('investor_shop', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('investor_id')->constrained();
+            $table->foreignId('shop_id')->constrained();
+            $table->unsignedDecimal('percentage', 5, 2);
             $table->timestamps();
         });
     }
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shareholders');
+        Schema::dropIfExists('investor_shops');
     }
 };

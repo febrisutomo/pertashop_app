@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pengeluarans', function (Blueprint $table) {
+        Schema::create('spendings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('shop_id')->constrained();
-            $table->string('deskripsi');
+            $table->string('keterangan');
             $table->decimal('jumlah', 10, 2);
             $table->timestamps();
         });

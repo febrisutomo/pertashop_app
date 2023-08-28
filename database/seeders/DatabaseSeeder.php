@@ -4,18 +4,21 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-use App\Http\Controllers\ReportController;
 use App\Models\Sale;
 use App\Models\Shop;
 use App\Models\User;
 use App\Models\Price;
+use App\Models\Incoming;
+use App\Models\Investor;
 use App\Models\Purchase;
 use App\Models\Supplier;
-use App\Models\Corporation;
-use App\Models\Incoming;
-use App\Models\Pengeluaran;
 use App\Models\TestPump;
+use App\Models\Corporation;
+use App\Models\Pengeluaran;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\ReportController;
+use App\Models\Spending;
 
 class DatabaseSeeder extends Seeder
 {
@@ -68,21 +71,64 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Dwi Yuliarto',
-            'email' => 'admin@spa.com',
+            'email' => 'admin@gmail.com',
             'role' => 'admin'
         ]);
 
         User::factory()->create([
             'name' => 'Febri Sutomo',
-            'email' => 'super-admin@spa.com',
+            'email' => 'super-admin@gmail.com',
             'role' => 'super-admin'
         ]);
 
-        User::factory()->create([
-            'email' => 'stockholder1@sal.com',
-            'role' => 'stockholder'
+        #create user with role investor
+        $koko = User::create([
+            'name' => 'Koko Aribowo',
+            'email' => 'koko@gmail.com',
+            'role' => 'investor',
+            'password' => Hash::make('123'),
         ]);
 
+        $adlai = User::create([
+            'name' => 'R. Adlai BT Kalapaaking',
+            'email' => 'adlai@gmail.com',
+            'role' => 'investor',
+            'password' => Hash::make('123'),
+        ]);
+
+        $eko = User::create([
+            'name' => 'Eko Cahyonoo',
+            'email' => 'eko@gmail.com',
+            'role' => 'investor',
+            'password' => Hash::make('123'),
+        ]);
+
+        #create investor for user with role investor
+        $investor_koko = $koko->investor()->create([
+            'bank_rekening' => 'BCA',
+            'no_rekening' => '7510 6699 96',
+            'atas_nama_rekening' => 'PT. TRIMITRA CIPTA KREASI',
+            'no_hp' => '08123456789',
+        ]);
+        $investor_adlai = $adlai->investor()->create([
+            'bank_rekening' => 'Mandiri',
+            'no_rekening' => '13900 2109 0000',
+            'atas_nama_rekening' => 'R. ADLAI BT KALAPAAKING',
+            'no_hp' => '08123456789',
+        ]);
+        $investor_eko = $eko->investor()->create([
+            'bank_rekening' => 'BCA',
+            'no_rekening' => '4240 2645 82',
+            'atas_nama_rekening' => 'EKO CAHYONO',
+            'no_hp' => '08123456789',
+        ]);
+
+        #attach investor to shop
+        #attach to shop kalitapen
+        $investor_koko->shops()->attach($kalitapen, ['percentage' => 75]);
+        $investor_adlai->shops()->attach($kalitapen, ['percentage' => 15]);
+        $investor_eko->shops()->attach($kalitapen, ['percentage' => 10]);
+        #attach to shop kalibenda
 
         Price::insert([
             [
@@ -121,92 +167,94 @@ class DatabaseSeeder extends Seeder
         Supplier::factory(3)->create();
 
 
-        for ($i = 1; $i <= 6; $i++) {
-            Sale::factory()->forShopId($kalitapen->id)->create();
-            // Sale::factory()->forShopId($kalibenda->id)->create();
-            // Sale::factory()->forShopId($pageralang->id)->create();
-            // Sale::factory()->forShopId($gumelar->id)->create();
-            // Sale::factory()->forShopId($kemutug->id)->create();
-        }
+        // for ($i = 1; $i <= 6; $i++) {
+        //     Sale::factory()->forShopId($kalitapen->id)->create();
+        //     // Sale::factory()->forShopId($kalibenda->id)->create();
+        //     // Sale::factory()->forShopId($pageralang->id)->create();
+        //     // Sale::factory()->forShopId($gumelar->id)->create();
+        //     // Sale::factory()->forShopId($kemutug->id)->create();
+        // }
 
-        Price::create([
-            'harga_beli' => 10250,
-            'harga_jual' => 11500,
-            'created_at' => "2023-08-03"
-        ]);
+        // Price::create([
+        //     'harga_beli' => 10250,
+        //     'harga_jual' => 11500,
+        //     'created_at' => "2023-08-03"
+        // ]);
 
-        $purchase = Purchase::create([
-            'shop_id' => $kalitapen->id,
-            'supplier_id' => 1,
-            'jumlah' => 22000,
-            'price_id' => Price::latest()->first()->id,
-            'created_at' => "2023-08-03"
-        ]);
-
-
-        Incoming::create([
-            'shop_id' => 1,
-            'purchase_id' => $purchase->id,
-            'operator_id' => 2,
-            'jumlah' => 2000,
-            'stik_awal' => Sale::where('shop_id', 1)->latest()->first()->stik_akhir,
-            'stik_akhir' => Sale::where('shop_id', 1)->latest()->first()->stik_akhir + 2000 / 21,
-            'created_at' => "2023-08-04 14:00"
-        ]);
+        // $purchase = Purchase::create([
+        //     'no_so' => 123456,
+        //     'no_do' => 456789,
+        //     'shop_id' => $kalitapen->id,
+        //     'supplier_id' => 1,
+        //     'jumlah' => 22000,
+        //     'price_id' => Price::latest()->first()->id,
+        //     'created_at' => "2023-08-03"
+        // ]);
 
 
+        // Incoming::create([
+        //     'shop_id' => 1,
+        //     'purchase_id' => $purchase->id,
+        //     'operator_id' => 2,
+        //     'jumlah' => 2000,
+        //     'stik_awal' => Sale::where('shop_id', 1)->latest()->first()->stik_akhir,
+        //     'stik_akhir' => Sale::where('shop_id', 1)->latest()->first()->stik_akhir + 2000 / 21,
+        //     'created_at' => "2023-08-04 14:00"
+        // ]);
 
-        Sale::factory()->forShopId($kalitapen->id)->create();
 
-        for ($i = 1; $i <= 5; $i++) {
-            Sale::factory()->forShopId($kalitapen->id)->create();
-        }
 
-        TestPump::create([
-            'shop_id' => $kalitapen->id,
-            'operator_id' => 1,
-            'created_at' => "2023-08-06 22:30",
-            'totalisator_awal' => ReportController::calcLabaKotor($kalitapen->id)->last()['totalisator_akhir'],
-            'totalisator_akhir' => ReportController::calcLabaKotor($kalitapen->id)->last()['totalisator_akhir'] + 200,
-        ]);
+        // Sale::factory()->forShopId($kalitapen->id)->create();
 
-        Pengeluaran::insert([
-            [
-                'shop_id' => $kalitapen->id,
-                'created_at' => '2023-08-01',
-                'deskripsi' => 'Gaji 2 Operator',
-                'jumlah' => 2827612
-            ],
-            [
-                'shop_id' => $kalitapen->id,
-                'created_at' => '2023-08-01',
-                'deskripsi' => 'Gaji Admin',
-                'jumlah' => 500000
-            ],
-            [
-                'shop_id' => $kalitapen->id,
-                'created_at' => '2023-08-01',
-                'deskripsi' => 'Biaya Curah',
-                'jumlah' => 110000
-            ],
-            [
-                'shop_id' => $kalitapen->id,
-                'created_at' => '2023-08-01',
-                'deskripsi' => 'Fotocopy & ATK',
-                'jumlah' => 188000
-            ],
-            [
-                'shop_id' => $kalitapen->id,
-                'created_at' => '2023-08-01',
-                'deskripsi' => 'Pulsa Listrik',
-                'jumlah' => 53000
-            ],
-            [
-                'shop_id' => $kalitapen->id,
-                'created_at' => '2023-08-01',
-                'deskripsi' => 'Iuran Warga',
-                'jumlah' => 10000
-            ],
-        ]);
+        // for ($i = 1; $i <= 5; $i++) {
+        //     Sale::factory()->forShopId($kalitapen->id)->create();
+        // }
+
+        // TestPump::create([
+        //     'shop_id' => $kalitapen->id,
+        //     'operator_id' => 1,
+        //     'created_at' => "2023-08-06 22:30",
+        //     'totalisator_awal' => ReportController::calcLabaKotor($kalitapen->id)->last()['totalisator_akhir'],
+        //     'totalisator_akhir' => ReportController::calcLabaKotor($kalitapen->id)->last()['totalisator_akhir'] + 200,
+        // ]);
+
+        // Spending::insert([
+        //     [
+        //         'shop_id' => $kalitapen->id,
+        //         'created_at' => '2023-08-31',
+        //         'keterangan' => 'Gaji 2 Operator',
+        //         'jumlah' => 2827612
+        //     ],
+        //     [
+        //         'shop_id' => $kalitapen->id,
+        //         'created_at' => '2023-08-31',
+        //         'keterangan' => 'Gaji Admin',
+        //         'jumlah' => 500000
+        //     ],
+        //     [
+        //         'shop_id' => $kalitapen->id,
+        //         'created_at' => '2023-08-14',
+        //         'keterangan' => 'Biaya Curah',
+        //         'jumlah' => 110000
+        //     ],
+        //     [
+        //         'shop_id' => $kalitapen->id,
+        //         'created_at' => '2023-08-12',
+        //         'keterangan' => 'Fotocopy & ATK',
+        //         'jumlah' => 188000
+        //     ],
+        //     [
+        //         'shop_id' => $kalitapen->id,
+        //         'created_at' => '2023-08-13',
+        //         'keterangan' => 'Pulsa Listrik',
+        //         'jumlah' => 53000
+        //     ],
+        //     [
+        //         'shop_id' => $kalitapen->id,
+        //         'created_at' => '2023-08-23',
+        //         'keterangan' => 'Iuran Warga',
+        //         'jumlah' => 10000
+        //     ],
+        // ]);
     }
 }

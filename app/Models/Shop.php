@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Investor;
 use App\Models\Operator;
 use App\Models\Corporation;
 use Illuminate\Database\Eloquent\Model;
@@ -13,11 +14,17 @@ class Shop extends Model
 
     protected $guarded = ['id'];
 
-    public function operators() {
+    public function operators()
+    {
         return $this->hasMany(Operator::class);
     }
 
-    public function corporation() {
+    public function corporation()
+    {
         return $this->belongsTo(Corporation::class);
+    }
+    public function investors()
+    {
+        return $this->belongsToMany(Investor::class);
     }
 }

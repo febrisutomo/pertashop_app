@@ -6,6 +6,7 @@ use App\Models\Sale;
 use App\Models\Shop;
 use App\Models\Price;
 use App\Models\Incoming;
+use App\Models\Spending;
 use App\Models\TestPump;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -159,7 +160,7 @@ class ReportController extends Controller
         return view('report.laba_kotor', $data);
     }
 
-    protected function getSummary($shop_id, $month)
+    public static function getSummary($shop_id, $month)
     {
         $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->format('Y-m-d');
         $end = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->format('Y-m-d');
@@ -186,13 +187,26 @@ class ReportController extends Controller
             });
 
             $data = $sales->map(function ($value, $key) use ($shop_id) {
-                $summary = $this->getSummary($shop_id, $key);
+                $summary = self::getSummary($shop_id, $key);
+
+                // hitung laba bersih financial
+                list($year, $month) = explode("-", $key);
+                $spendings = Spending::with(['shop'])
+                    ->where('shop_id', $shop_id)
+                    ->whereMonth('created_at', $month)
+                    ->whereYear('created_at', $year)
+                    ->get();
+        
+                $total_biaya = $spendings->sum('jumlah');
+                $laba_bersih = $summary['laba_kotor']- $total_biaya;
+                $alokasi_dana_tak_terduga = 10 / 100 * $laba_bersih;
+                $laba_bersih_financial = $laba_bersih - $alokasi_dana_tak_terduga;
 
                 return [
                     'shop_id' => $shop_id,
                     'bulan' => $key,
                     'laba_kotor' => $summary['laba_kotor'],
-                    'laba_bersih' => 0,
+                    'laba_bersih' => $laba_bersih_financial,
                     'posisi_modal_kerja' => 0,
                 ];
             });
@@ -200,7 +214,7 @@ class ReportController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $button = '<a href="' . route('reports.show', ['shop_id' => $row['shop_id'], 'month' => $row['bulan']]) . '" class="btn btn-sm btn-success" title="Detail"><i class="fa fa-list mr-1"></i> Detail</a>';
+                    $button = '<a href="' . route('reports.laba_kotor', ['shop_id' => $row['shop_id'], 'year_month' => $row['bulan']]) . '" class="btn btn-sm btn-success" title="Detail"><i class="fa fa-list mr-1"></i> Detail</a>';
                     return $button;
                 })
                 ->rawColumns(['action'])
@@ -212,16 +226,43 @@ class ReportController extends Controller
         return view('report.index', compact('shops'));
     }
 
-    public function show(String $shop_id, String $month)
+    public function labaKotor(string $shop_id, string $year_month)
     {
-        
-        $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
-        $end = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+
+        $start = Carbon::createFromFormat('Y-m', $year_month)->startOfMonth();
+        $end = Carbon::createFromFormat('Y-m', $year_month)->endOfMonth();
 
         $reports = self::calcLabaKotor($shop_id, $start, $end);
 
         $shop = Shop::find($shop_id);
 
-        return view('report.show', compact('shop', 'reports', 'start', 'end'));
+        return view('report.laba_kotor', compact('shop', 'reports', 'start', 'end', 'year_month'));
+    }
+
+    public function labaBersih(string $shop_id, string $year_month)
+    {
+
+        $start = Carbon::createFromFormat('Y-m', $year_month)->startOfMonth();
+        $end = Carbon::createFromFormat('Y-m', $year_month)->endOfMonth();
+
+        $summary = self::getSummary($shop_id, $year_month);
+
+        $laba_kotor = $summary['laba_kotor'];
+
+        $shop = Shop::find($shop_id);
+
+        list($year, $month) = explode("-", $year_month);
+        $spendings = Spending::with(['shop'])
+            ->where('shop_id', $shop_id)
+            ->whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->get();
+
+        $total_biaya = $spendings->sum('jumlah');
+        $laba_bersih = $laba_kotor - $total_biaya;
+        $alokasi_dana_tak_terduga = 10 / 100 * $laba_bersih;
+        $laba_bersih_financial = $laba_bersih - $alokasi_dana_tak_terduga;
+
+        return view('report.laba_bersih', compact('shop', 'laba_kotor', 'start', 'end', 'year_month', 'spendings', 'total_biaya', 'laba_bersih', 'alokasi_dana_tak_terduga', 'laba_bersih_financial'));
     }
 }

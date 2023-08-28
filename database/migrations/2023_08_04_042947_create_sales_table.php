@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('operator_id')->constrained();
             $table->decimal('totalisator_awal', 10, 3);
             $table->decimal('totalisator_akhir', 10, 3);
+            $table->decimal('stik_awal', 10, 2);
             $table->decimal('stik_akhir', 10, 2);
             $table->foreignId('price_id');
             $table->timestamps();

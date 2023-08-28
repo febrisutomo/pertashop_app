@@ -21,17 +21,74 @@ class SaleController extends Controller
 
         if ($request->ajax()) {
             $shop_id = $request->input('shop_id', 1);
+            $group_by = $request->input('group_by', 'shift');
+            $year_month = $request->input('year_month', Carbon::now()->format('Y-m'));
+            list($year, $month) = explode("-", $year_month);
 
-            if (Auth::user()->role != 'operator') {
-                $data = Sale::with(['operator.user', 'price'])->where('shop_id', $shop_id)->latest()->get();
-                return Datatables::of($data)
-                    // ->addIndexColumn()
-                    ->addColumn('action', function ($row) {
-                        $button = '<a href="' . route('sales.edit', $row->id) . '" class="btn btn-sm btn-info" title="Edit"><i class="fa fa-edit"></i></a>';
-                        $button .= ' <button class="btn btn-sm btn-danger btn-delete" title="hapus" data-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
-                        return $button;
-                    })
-                    ->rawColumns(['action'])
+
+            if (Auth::user()->role === 'super-admin') {
+
+                if ($group_by === 'shift') {
+                    $sales = Sale::with(['operator.user', 'price'])
+                        ->whereYear('created_at', $year)
+                        ->whereMonth('created_at', $month)
+                        ->where('shop_id', $shop_id)
+                        ->latest()->get();
+
+                    return Datatables::of($sales)
+                        ->addIndexColumn()
+                        ->addColumn('action', function ($row) {
+                            $button = '<a href="' . route('sales.edit', $row->id) . '" class="btn btn-sm btn-info" title="Edit"><i class="fa fa-edit"></i></a>';
+                            $button .= ' <button class="btn btn-sm btn-danger btn-delete" title="hapus" data-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
+                            return $button;
+                        })
+                        ->rawColumns(['action'])
+                        ->make(true);
+                }
+
+                // Ambil data penjualan dari database
+                $sales = Sale::with(['operator.user', 'price'])
+                    ->where('shop_id', $shop_id)
+                    ->latest()
+                    ->get();
+
+                // Buat grup berdasarkan tanggal
+                $salesGrouped = $sales->groupBy(function ($item) {
+                    return $item->created_at->format('Y-m-d');
+                });
+
+                // Proses data grup
+                $result = [];
+                foreach ($salesGrouped as $date => $group) {
+                    // Ambil totalisator awal dari data pertama dalam grup
+                    $lastSale = $group->last();
+                    $totalisatorAwal = $lastSale->totalisator_awal;
+
+                    // Ambil totalisator akhir dari data terakhir dalam grup
+                    $firstSale = $group->first();
+                    $totalisatorAkhir = $firstSale->totalisator_akhir;
+
+                    // Jumlahkan volume dari seluruh penjualan dalam grup
+                    $totalVolume = $group->sum('volume');
+
+                    $totalRupiah = $group->sum('rupiah');
+
+
+
+                    // Tambahkan data ke hasil akhir
+                    $result[] = [
+                        'created_at' => $date,
+                        'totalisator_awal' => $totalisatorAwal,
+                        'totalisator_akhir' => $totalisatorAkhir,
+                        'volume' => $totalVolume,
+                        'rupiah' => $totalRupiah,
+                        'action' => '',
+                        'operator' => ['user' => ['short_name' => $group->pluck('operator.user.short_name')->implode(', ')]],
+                    ];
+                }
+
+                return Datatables::of($result)
+                    ->addIndexColumn()
                     ->make(true);
             }
 
@@ -162,7 +219,6 @@ class SaleController extends Controller
                 'totalisator_akhir' => 'required|numeric',
                 'stik_akhir' => 'required|numeric',
             ], $customMessages);
-
         } else {
             $validatedData = $request->validate([
                 'date' => 'required|date',

@@ -13,7 +13,12 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Introduction | AdminLTE v3.2 Documentation</title>
+    <title>Pertashop App</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
 
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -124,7 +129,7 @@
                                 class="nav-link {{ Request::routeIs('incomings.*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-truck-moving"></i>
                                 <p>
-                                    Kedatangan
+                                    Penerimaan
                                 </p>
                             </a>
                         </li>
@@ -134,7 +139,17 @@
                                 class="nav-link {{ Request::routeIs('test-pumps.*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-vial"></i>
                                 <p>
-                                    Percobaan
+                                    Test Pump
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('spendings.index') }}"
+                                class="nav-link {{ Request::routeIs('spendings.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-money-bill"></i>
+                                <p>
+                                    Pengeluaran
                                 </p>
                             </a>
                         </li>
@@ -142,7 +157,8 @@
 
                         @if (collect(['super-admin', 'admin'])->contains(Auth::user()->role))
                             <li class="nav-item {{ Request::routeIs('reports.*') ? 'menu-open' : '' }}">
-                                <a href="#" class="nav-link {{ Request::routeIs('reports.*') ? 'active' : '' }}">
+                                <a href="#"
+                                    class="nav-link {{ Request::routeIs('reports.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-file-alt"></i>
                                     <p>
                                         Laporan
@@ -255,7 +271,8 @@
             <div class="float-right d-none d-sm-inline">
                 v1.0
             </div>
-            <strong>&copy; 2023 <a href="#">Pertashop App</a>. </strong> Developed By  <a href="https://github.com/febrisutomo">Febri S</a>.
+            <strong>&copy; 2023 <a href="#">Pertashop App</a>. </strong> Developed By <a
+                href="https://github.com/febrisutomo">Febri S</a>.
         </footer>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"

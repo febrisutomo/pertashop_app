@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('alamat');
             $table->decimal('stok_awal', 10, 2)->default(3000);
             $table->decimal('totalisator_awal', 10, 3)->default(0);
+            $table->decimal('skala', 10, 2)->default(21);
             $table->timestamps();
         });
     }

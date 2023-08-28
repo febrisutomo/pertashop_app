@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchases', function (Blueprint $table) {
+        Schema::create('investors', function (Blueprint $table) {
             $table->id();
-            $table->string('no_so')->unique();
-            $table->string('no_do')->unique();
-            $table->foreignId('shop_id')->constrained();
-            $table->foreignId('supplier_id')->constrained();
-            $table->decimal('jumlah', 10, 2);
-            $table->foreignId('price_id');
+            $table->foreignId('user_id')->constrained();
+            $table->string('no_hp')->nullable();
+            $table->string('no_rekening')->nullable();
+            $table->string('atas_nama_rekening')->nullable();
+            $table->string('bank_rekening')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchases');
+        Schema::dropIfExists('investors');
     }
 };

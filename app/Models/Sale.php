@@ -16,7 +16,7 @@ class Sale extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['tanggal', 'jumlah', 'omset'];
+    protected $appends = ['tanggal', 'volume', 'rupiah'];
 
     public function price()
     {
@@ -27,6 +27,7 @@ class Sale extends Model
     {
         return $this->belongsTo(Operator::class);
     }
+    
 
     public function shop()
     {
@@ -39,25 +40,14 @@ class Sale extends Model
     }
 
 
-    // public function previousSale()
-    // {
-    //     return $this->where('created_at', '<', $this->created_at)->latest()->first();
-    // }
-
-    // public function getTotalisatorAwalAttribute()
-    // {
-    //     $previousSale = $this->getPreviousSale();
-    //     return $previousSale ?  $previousSale->totalisator_akhir : $this->shop;
-    // }
-
-    public function getJumlahAttribute()
+    public function getVolumeAttribute()
     {
 
-        return round($this->totalisator_akhir - $this->totalisator_awal, 3);
+        return round($this->totalisator_akhir - $this->totalisator_awal, 2);
     }
 
-    public function getOmsetAttribute()
+    public function getRupiahAttribute()
     {
-        return  $this->jumlah * $this->price->harga_jual;
+        return  $this->volume * $this->price->harga_jual;
     }
 }

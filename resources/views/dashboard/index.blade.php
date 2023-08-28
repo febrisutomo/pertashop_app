@@ -192,7 +192,7 @@
                 options: {
                     scales: {
                         x: {
-                            display: false, // Sembunyikan sumbu X
+                            // display: false, // Sembunyikan sumbu X
                             stacked: true,
                         },
                         y: {

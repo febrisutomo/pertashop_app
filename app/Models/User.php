@@ -3,10 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Investor;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -43,8 +44,21 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected $appends = ['short_name'];
+
     public function operator()
     {
         return $this->hasOne(Operator::class);
+    }
+
+    public function investor()
+    {
+        return $this->hasOne(Investor::class);
+    }
+
+    #accessor to get short name
+    public function getShortNameAttribute()
+    {
+        return explode(' ', $this->name)[0];
     }
 }
