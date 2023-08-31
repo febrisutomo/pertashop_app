@@ -14,8 +14,7 @@ class TestPump extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['jumlah', 'tanggal'];
-
+    protected $appends = ['volume'];
 
     public function operator()
     {
@@ -28,15 +27,8 @@ class TestPump extends Model
     }
 
 
-    public function getJumlahAttribute()
+    public function getVolumeAttribute()
     {
-
         return round($this->totalisator_akhir - $this->totalisator_awal, 3);
-    }
-
-    
-    public function getTanggalAttribute()
-    {
-        return Carbon::parse($this->created_at)->format('d/m/Y H:i');
     }
 }

@@ -77,16 +77,7 @@
 
 @push('script')
     <script>
-        function formatDate(inputDate) {
-            const date = new Date(inputDate);
-            const options = {
-                year: 'numeric',
-                month: 'long',
-                day: '2-digit',
-                weekday: 'long',
-            };
-            return date.toLocaleDateString('id-ID', options);
-        }
+    
         $(document).ready(function() {
 
             var dataTable = $('#sales-table').DataTable({

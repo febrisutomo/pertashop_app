@@ -17,9 +17,11 @@ return new class extends Migration
             $table->string('nama');
             $table->string('kode');
             $table->string('alamat');
-            $table->decimal('stok_awal', 10, 2)->default(3000);
-            $table->decimal('totalisator_awal', 10, 3)->default(0);
-            $table->decimal('skala', 10, 2)->default(21);
+            $table->unsignedDecimal('modal_awal', 10, 2)->default(60000000);
+            $table->unsignedDecimal('kapasitas', 10, 2)->default(3500);
+            $table->unsignedDecimal('stik_awal', 10, 2)->default(166.66);
+            $table->unsignedDecimal('totalisator_awal', 10, 3)->default(0);
+            $table->unsignedDecimal('skala', 10, 2)->default(21);
             $table->timestamps();
         });
     }

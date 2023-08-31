@@ -24,17 +24,24 @@
                 <div class="card-header">
                     <div class=" d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
-                            {{-- <h3 class="card-title mr-2">Pertashop</h3> --}}
-                            <select name="shop_id" class="form-control" style="width: 200px">
-                                @foreach ($shops as $shop)
-                                    <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
-                                @endforeach
-                            </select>
+                            @if (Auth::user()->role == 'admin')
+                                <h3 class="card-title mr-2">
+                                    {{ Auth::user()->admin->shop->kode . ' ' . Auth::user()->admin->shop->nama }}</h3>
+                            @else
+                                <select name="shop_id" class="form-control mr-2" style="width: 200px">
+                                    @foreach ($shops as $shop)
+                                        <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
 
                         </div>
-                        <a href="{{ route('purchases.create') }}" class="btn btn-primary"><i
-                                class="fa fa-plus mr-2"></i>Tambah
-                            Pembelian</a>
+                        @if (Auth::user()->role == 'admin')
+                            <a href="{{ route('purchases.create') }}" class="btn btn-primary"><i
+                                    class="fa fa-plus mr-2"></i>Tambah
+                                Pembelian</a>
+                        @endif
+
                     </div>
 
                 </div>
@@ -63,15 +70,22 @@
                     //     data: 'DT_RowIndex',
                     //     name: 'DT_RowIndex'
                     // }, 
-                    {
-                        title: 'ID Pembelian',
-                        data: 'id',
-                        name: 'id',
-                    },
+
                     {
                         title: 'Tanggal',
-                        data: 'tanggal',
-                        name: 'tanggal',
+                        data: 'created_at',
+                        name: 'created_at',
+                        render: function(data, type) {
+                            if (type === 'display') {
+                                return formatDate(data);
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        title: 'No. SO',
+                        data: 'no_so',
+                        name: 'no_so',
                     },
                     {
                         title: 'Supplier',
@@ -80,9 +94,9 @@
                     },
 
                     {
-                        title: 'Jumlah (&ell;)',
-                        data: 'jumlah',
-                        name: 'jumlah',
+                        title: 'Volume (&ell;)',
+                        data: 'volume',
+                        name: 'volume',
                         className: 'text-right',
                         render: function(data, type) {
                             if (type === 'display') {
@@ -92,9 +106,9 @@
                         }
                     },
                     {
-                        title: 'Datang (&ell;)',
-                        data: 'datang',
-                        name: 'datang',
+                        title: 'Diterima (&ell;)',
+                        data: 'diterima',
+                        name: 'diterima',
                         className: 'text-right',
                         render: function(data, type) {
                             if (type === 'display') {
@@ -103,23 +117,23 @@
                             return data;
                         }
                     },
-                    {
-                        title: 'Sisa (&ell;)',
-                        data: 'sisa',
-                        name: 'sisa',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatNumber(data)
-                            }
-                            return data;
-                        }
-                    },
+                    // {
+                    //     title: 'Sisa (&ell;)',
+                    //     data: 'sisa',
+                    //     name: 'sisa',
+                    //     className: 'text-right',
+                    //     render: function(data, type) {
+                    //         if (type === 'display') {
+                    //             return formatNumber(data)
+                    //         }
+                    //         return data;
+                    //     }
+                    // },
 
                     {
                         title: 'Harga per Liter (Rp)',
-                        data: 'price.harga_beli',
-                        name: 'price.harga_beli',
+                        data: 'harga',
+                        name: 'harga',
                         className: 'text-right',
                         render: function(data, type) {
                             if (type === 'display') {
@@ -129,9 +143,9 @@
                         }
                     },
                     {
-                        title: 'Total Harga (Rp)',
-                        data: 'total_harga',
-                        name: 'total_harga',
+                        title: 'Total Bayar (Rp)',
+                        data: 'total_bayar',
+                        name: 'total_bayar',
                         className: 'text-right',
                         render: function(data, type) {
                             if (type === 'display') {

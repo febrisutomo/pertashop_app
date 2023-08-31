@@ -6,7 +6,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Laba Bersih {{ $end->monthName . ' ' . $end->year }}</h1>
+                    <h1>Laba Bersih {{ $date->monthName . ' ' . $date->year }}</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -28,7 +28,7 @@
                     <div class=" d-flex justify-content-between align-items-center">
                         <h3 class="card-title text-uppercase">Pertashop {{ $shop->kode . ' ' . $shop->nama }}</h3>
                         <div class="d-flex justify-content-between align-items-center">
-                            <a href="{{ route('reports.laba_kotor', ['shop_id' => $shop->id, 'year_month' => $year_month]) }}"
+                            <a href="{{ route('reports.laba_kotor', ['shop_id' => $shop->id, 'year_month' => $date->format('Y-m')]) }}"
                                 class="btn btn-link mr-2">Laba Kotor</a>
                             <button class="btn btn-primary mr-2">Laba Bersih</button>
                             <button class="btn btn-link">Modal Kerja</button>
@@ -42,8 +42,8 @@
                         <div class="pb-2 mb-2 d-flex justify-content-center" style="border-bottom: 4px solid #000">
                             <h3 class="card-title font-weight-bold text-uppercase text-center">
                                 Perhitungan Laba Bersih
-                                {{ $start->format('d') }} s/d
-                                {{ $end->format('d') . ' ' . $end->monthName . ' ' . $end->year }}
+                                {{ $date->startOfMonth()->format('d') }} s/d
+                                {{ $date->endOfMonth()->format('d') . ' ' . $date->monthName . ' ' . $date->year }}
                                 <br>PERTASHOP {{ $shop->kode }} {{ $shop->alamat }} <br> {{ $shop->corporation->nama }}
                             </h3>
                         </div>
@@ -94,7 +94,7 @@
                                 @foreach ($spendings as $spending)
                                     <tr>
                                         <td><span style="width: 20px; display: inline-block">{{ $loop->iteration }}</span>
-                                            <span class="text-uppercase">{{ $spending->keterangan }}</span>
+                                            <span class="text-uppercase">{{ $spending->category->nama }}</span>
                                         </td>
                                         <td>=</td>
                                         <td
@@ -167,8 +167,7 @@
                                     <td width="150">
                                         <div class="line-bottom d-flex justify-content-between">
                                             <span>Rp</span>
-                                            <span
-                                                class="number-int">{{ $alokasi_dana_tak_terduga }}</span>
+                                            <span class="number-int">{{ $alokasi_dana_tak_terduga }}</span>
                                         </div>
 
                                     </td>
@@ -180,8 +179,7 @@
                                     <td width="150">
                                         <div class="d-flex justify-content-between">
                                             <span>Rp</span>
-                                            <span
-                                                class="number-int">{{ $laba_bersih_financial }}</span>
+                                            <span class="number-int">{{ $laba_bersih_financial }}</span>
                                         </div>
 
                                     </td>

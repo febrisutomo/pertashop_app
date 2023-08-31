@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('test_pumps', function (Blueprint $table) {
+        Schema::create('admins', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained();
             $table->foreignId('shop_id')->constrained();
-            $table->foreignId('operator_id')->constrained();
-            $table->foreignId('daily_report_id')->nullable()->constrained();
-            $table->unsignedDecimal('totalisator_awal', 10, 2);
-            $table->unsignedDecimal('totalisator_akhir', 10, 2);
+            $table->string('no_hp')->nullable();
+            $table->string('alamat')->nullable();
+            $table->string('no_rekening')->nullable();
+            $table->string('atas_nama_rekening')->nullable();
+            $table->string('bank_rekening')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('test_pumps');
+        Schema::dropIfExists('admins');
     }
 };

@@ -11,6 +11,7 @@ use App\Http\Controllers\TestPumpController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DailyReportController;
+use App\Models\Incoming;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,13 +38,14 @@ Route::middleware('auth')->group(function () {
         'incomings' => IncomingController::class,
         'test-pumps' => TestPumpController::class,
         'daily-reports' => DailyReportController::class,
+        'spendings' => SpendingController::class,
     ]);
 
-    Route::prefix('spending')->group(function(){
-        Route::get('/', [SpendingController::class, 'index'])->name('spendings.index');
-        Route::get('/create', [SpendingController::class, 'create'])->name('spendings.create');
-        Route::get('/{shop_id}/{year_month}', [SpendingController::class, 'edit'])->name('spendings.edit');
-    });
+    // Route::prefix('spendings')->group(function () {
+    //     Route::get('/', [SpendingController::class, 'index'])->name('spendings.index');
+    //     Route::get('/create', [SpendingController::class, 'create'])->name('spendings.create');
+    //     Route::get('/{shop_id}/{year_month}', [SpendingController::class, 'edit'])->name('spendings.edit');
+    // });
 
     Route::prefix('data')->group(function () {
         Route::resources([

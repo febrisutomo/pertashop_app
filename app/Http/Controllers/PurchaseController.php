@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Price;
-use App\Models\Purchase;
 use App\Models\Shop;
+use App\Models\Purchase;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class PurchaseController extends Controller
@@ -17,9 +17,13 @@ class PurchaseController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $shop_id = $request->input('shop_id', 1);
+            if (Auth::user()->role == 'admin') {
+                $shop_id = Auth::user()->admin->shop_id;
+            } else {
+                $shop_id = $request->input('shop_id', 1);
+            }
 
-            $data = Purchase::where('shop_id', $shop_id)->with(['supplier', 'price'])->latest()->get();
+            $data = Purchase::where('shop_id', $shop_id)->with(['supplier'])->latest()->get();
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -41,11 +45,10 @@ class PurchaseController extends Controller
      */
     public function create()
     {
-        $harga = Price::latest()->first()->harga_beli;
         $suppliers = Supplier::all();
         $shops = Shop::all();
 
-        return view('purchase.create', compact('harga', 'suppliers', 'shops'));
+        return view('purchase.create', compact('suppliers', 'shops'));
     }
 
     /**
@@ -59,19 +62,18 @@ class PurchaseController extends Controller
 
         $validatedData = $request->validate([
             'created_at' => 'required|date',
-            'shop_id' => 'required|numeric',
             'supplier_id' => 'required|numeric',
-            'jumlah' => 'required|numeric',
+            'no_so' => 'required|string',
+            'volume' => 'required|numeric',
+            'total_bayar' => 'required|numeric',
 
         ], $customMessages);
 
-
-        $validatedData['price_id'] =  Price::latest()->first()->id;
-
+        $validatedData['shop_id'] = Auth::user()->admin->shop->id;
 
         Purchase::create($validatedData);
 
-        return to_route('purchases.index')->with('success', 'Data pembelian telah berhasil disimpan.');
+        return to_route('purchases.index')->with('success', 'Data pembelian berhasil disimpan.');
     }
 
     /**
@@ -87,10 +89,9 @@ class PurchaseController extends Controller
      */
     public function edit(Purchase $purchase)
     {
-        $harga = $purchase->price->harga_beli;
         $suppliers = Supplier::all();
         $shops = Shop::all();
-        return view('purchase.edit', compact('harga', 'suppliers', 'shops', 'purchase'));
+        return view('purchase.edit', compact('suppliers', 'shops', 'purchase'));
     }
 
     /**
@@ -104,15 +105,16 @@ class PurchaseController extends Controller
 
         $validatedData = $request->validate([
             'created_at' => 'required|date',
-            'shop_id' => 'required|numeric',
             'supplier_id' => 'required|numeric',
-            'jumlah' => 'required|numeric',
+            'no_so' => 'required|string',
+            'volume' => 'required|numeric',
+            'total_bayar' => 'required|numeric',
 
         ], $customMessages);
 
         $purchase->update($validatedData);
 
-        return to_route('purchases.index')->with('success', 'Data pembelian telah berhasil diupdate.');
+        return to_route('purchases.index')->with('success', 'Data pembelian berhasil diubah.');
     }
 
     /**

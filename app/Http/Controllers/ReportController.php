@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Sale;
+use App\Models\DailyReport;
 use App\Models\Shop;
 use App\Models\Price;
-use App\Models\Incoming;
 use App\Models\Spending;
-use App\Models\TestPump;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Yajra\DataTables\Facades\DataTables;
@@ -15,81 +13,59 @@ use Yajra\DataTables\Facades\DataTables;
 class ReportController extends Controller
 {
 
-    public static function calcLabaKotor($shop_id = 1, $start = null, $end = null)
+
+    public static function calcLabaKotor($shop_id = 1, $year_month = null)
     {
-        if ($start == null) {
-            $start = '2021-01-01';
-        }
-        if ($end == null) {
-            $end = Carbon::now();
+        if ($year_month == null) {
+            $year_month = Carbon::now()->format('Y-m');
         }
 
-        $sales_group = Sale::where('shop_id', $shop_id)->whereBetween('created_at', [$start, $end])->get()->groupBy('price_id');
+        list($year, $month) = explode("-", $year_month);
+
+        $daily_reports_group = DailyReport::where('shop_id', $shop_id)->whereMonth('created_at', $month)->whereYear('created_at', $year)->get()->groupBy('price_id');
 
         $reports = [];
-        $price_ids = $sales_group->keys();
         $i = 0;
-        $stok_awal = 142.85 * 21;
-        foreach ($sales_group as $price_id => $sales) {
+        $stok_awal = Shop::find($shop_id)->kapasitas;
+        foreach ($daily_reports_group as $price_id => $daily_reports) {
 
             $harga = Price::find($price_id);
             $harga_beli = $harga->harga_beli;
             $harga_jual = $harga->harga_jual;
 
-            $penjualan_pertama = $sales->first();
-            $penjualan_terakhir = $sales->last();
-
             // SISA STOK AKHIR 
-            $stik_akhir = $penjualan_terakhir->stik_akhir;
+            $stik_akhir = $daily_reports->last()->stik_akhir;
 
-            $incomings = Incoming::where('shop_id', $shop_id)
-                ->whereBetween('created_at', [$start, $end])
-                ->whereRelation('purchase', 'price_id', $price_id)->get();
-
-            if ($incomings->where('created_at', '>',  $penjualan_terakhir->created_at)->count() > 0) {
-                $stik_akhir = $incomings->last()['stik_akhir'];
-            }
-
-            $sisa_stok_akhir = $stik_akhir * 21;
+            $sisa_stok_akhir = $daily_reports->last()->stok_akhir_aktual;
 
             // PEMBELIAN 
             if ($i == 0) {
-                $penjualan_sebelumnya = Sale::where('shop_id', $shop_id)
-                    ->where('created_at', '<', $start)
+                $daily_report_sebelumnya = DailyReport::where('shop_id', $shop_id)
+                    ->whereYear('created_at', $year)
+                    ->whereMonth('created_at', '<', $month)
                     ->latest()->first();
-                $stik_sebelumya = $penjualan_sebelumnya ?  $penjualan_sebelumnya->stik_akhir * 21 : 142.85;
-                $stok_awal =  $stik_sebelumya * 21;
-                $stok_awal_harga_beli = floatval($penjualan_sebelumnya ?  $penjualan_sebelumnya->price->harga_beli : Price::where('created_at', '<', $penjualan_pertama->created_at)->latest()->first()->harga_beli);
-                $stok_awal_rp = $stok_awal * $stok_awal_harga_beli;
+                $stok_awal = $daily_report_sebelumnya ? $daily_report_sebelumnya->stok_akhir_aktual : Shop::find($shop_id)->kapasitas;
+                $stok_awal_harga_beli = $daily_report_sebelumnya ?  $daily_report_sebelumnya->price->harga_beli : Price::where('created_at', '<', $daily_reports->first()->created_at)->latest()->first()->harga_beli;
             } else {
-                $stok_awal_harga_beli = floatval(Price::find($price_ids[$i - 1])->harga_beli);
-                $stok_awal_rp = $stok_awal *  $stok_awal_harga_beli;
+                $stok_awal_harga_beli = Price::where('created_at', '<', $daily_reports->first()->created_at)->latest()->first()->harga_beli;
             }
 
+            $stok_awal_rp = $stok_awal *  $stok_awal_harga_beli;
 
-            $count_datang =  $incomings->count();
-            $datang = $incomings->sum('jumlah');
+            $count_datang =  $daily_reports->count('penerimaan');
+            $datang = $daily_reports->sum('penerimaan');
             $jumlah_pembelian = $stok_awal + $datang;
             $jumlah_pembelian_rp = $stok_awal_rp + $datang * $harga_beli;
 
             // PENJUALAN 
-            $totalisator_awal = floatval($penjualan_pertama->totalisator_awal); //a
-            $totalisator_akhir = floatval($penjualan_terakhir->totalisator_akhir); //b
+            $totalisator_awal = $daily_reports->first()->totalisator_awal; //a
+            $totalisator_akhir = $daily_reports->last()->totalisator_akhir; //b
 
-            $testPumps = TestPump::where('shop_id', $shop_id)
-                ->where('created_at', '>', $penjualan_sebelumnya ? $penjualan_sebelumnya->created_at : '2020-01-01')
-                ->where('created_at', '<=', $i == count($sales_group) - 1 ? $end : $penjualan_terakhir->created_at)
-                ->get();
+            $test_pump = $daily_reports->sum('test_pump'); //d
 
-            $test_pump = $testPumps->sum('jumlah'); //d
-
-            if ($testPumps->where('created_at', '>',  $penjualan_terakhir->created_at)->count() > 0) {
-                $totalisator_akhir = $testPumps->last()['totalisator_akhir'];
-            }
 
             $total_penjualan = $totalisator_akhir - $totalisator_awal; //c: (a-b)
-            // $total_penjualan = $sales->sum('jumlah');
-
+            // $total_penjualan = $daily_reports->sum('jumlah');
 
             $jumlah_penjualan = $total_penjualan - $test_pump; //B: (c-d)
             $jumlah_penjualan_rp = $jumlah_penjualan * $harga_jual;
@@ -101,16 +77,14 @@ class ReportController extends Controller
 
             $persen_losses_gain = $jumlah_penjualan != 0 ? $losses_gain / $jumlah_penjualan * 100 : 0;
 
-
             $losses_gain_rp = $losses_gain * $harga_beli;
 
             $jumlah_penjualan_bersih_rp = $jumlah_penjualan_rp + $sisa_stok_rp + $losses_gain_rp;
 
             $laba_kotor = $jumlah_penjualan_bersih_rp - $jumlah_pembelian_rp;
 
-            $jumlah_hari = $sales->groupBy(function ($item) {
-                return $item->created_at->format('d/m/Y');
-            })->count();
+            //get total days in certain month
+            $jumlah_hari = Carbon::createFromFormat('Y-m', $year_month)->daysInMonth;
 
             $rata_rata_omset_harian = $jumlah_hari > 0 ? $jumlah_penjualan / $jumlah_hari : 0;
 
@@ -148,10 +122,8 @@ class ReportController extends Controller
     public function laba_kotor()
     {
 
-        $now = Carbon::now();
-        $startOfMonth = $now->startOfMonth()->format('Y-m-d');
-        $endOfMonth = $now->endOfMonth()->format('Y-m-d');
-        $reports = self::calcLabaKotor(1, $startOfMonth, $endOfMonth);
+        $year_month = Carbon::now()->format('Y-m');
+        $reports = self::calcLabaKotor(1, $year_month);
 
         $data = [
             'reports' => $reports
@@ -160,17 +132,20 @@ class ReportController extends Controller
         return view('report.laba_kotor', $data);
     }
 
-    public static function getSummary($shop_id, $month)
+    public static function getSummary($shop_id, $year_month = null)
     {
-        $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->format('Y-m-d');
-        $end = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->format('Y-m-d');
 
-        $reports = ReportController::calcLabaKotor($shop_id, $start, $end);
+        if ($year_month == null) {
+            $year_month = Carbon::now()->format('Y-m');
+        }
+
+        $reports = ReportController::calcLabaKotor($shop_id, $year_month);
+
         $summary = [
-            'jumlah_penjualan_bersih' => $reports->sum('jumlah_penjualan_bersih_rp'),
-            'jumlah_pembelian' => $reports->sum('jumlah_pembelian_rp'),
+            'jumlah_penjualan_bersih_rp' => $reports->sum('jumlah_penjualan_bersih_rp'),
+            'jumlah_pembelian_rp' => $reports->sum('jumlah_pembelian_rp'),
             'laba_kotor' => $reports->sum('laba_kotor'),
-            'omset_harian' => $reports->count() > 0 ? $reports->sum('rata_rata_omset_harian') / $reports->count() : 0,
+            'rata_rata_omset_harian' => $reports->count() > 0 ? $reports->sum('rata_rata_omset_harian') / $reports->count() : 0,
         ];
 
         return $summary;
@@ -182,7 +157,7 @@ class ReportController extends Controller
         if ($request->ajax()) {
             $shop_id = $request->input('shop_id', 1);
 
-            $sales = Sale::where('shop_id', $shop_id)->get()->groupBy(function ($item) {
+            $sales = DailyReport::where('shop_id', $shop_id)->get()->groupBy(function ($item) {
                 return $item->created_at->format('Y-m');
             });
 
@@ -191,14 +166,12 @@ class ReportController extends Controller
 
                 // hitung laba bersih financial
                 list($year, $month) = explode("-", $key);
-                $spendings = Spending::with(['shop'])
-                    ->where('shop_id', $shop_id)
+                $total_biaya = DailyReport::where('shop_id', $shop_id)
                     ->whereMonth('created_at', $month)
                     ->whereYear('created_at', $year)
-                    ->get();
-        
-                $total_biaya = $spendings->sum('jumlah');
-                $laba_bersih = $summary['laba_kotor']- $total_biaya;
+                    ->get()->sum('pengeluaran');
+
+                $laba_bersih = $summary['laba_kotor'] - $total_biaya;
                 $alokasi_dana_tak_terduga = 10 / 100 * $laba_bersih;
                 $laba_bersih_financial = $laba_bersih - $alokasi_dana_tak_terduga;
 
@@ -229,22 +202,17 @@ class ReportController extends Controller
     public function labaKotor(string $shop_id, string $year_month)
     {
 
-        $start = Carbon::createFromFormat('Y-m', $year_month)->startOfMonth();
-        $end = Carbon::createFromFormat('Y-m', $year_month)->endOfMonth();
-
-        $reports = self::calcLabaKotor($shop_id, $start, $end);
+        $reports = self::calcLabaKotor($shop_id, $year_month);
 
         $shop = Shop::find($shop_id);
 
-        return view('report.laba_kotor', compact('shop', 'reports', 'start', 'end', 'year_month'));
+        $date = Carbon::createFromFormat('Y-m', $year_month);
+
+        return view('report.laba_kotor', compact('shop', 'reports', 'date'));
     }
 
     public function labaBersih(string $shop_id, string $year_month)
     {
-
-        $start = Carbon::createFromFormat('Y-m', $year_month)->startOfMonth();
-        $end = Carbon::createFromFormat('Y-m', $year_month)->endOfMonth();
-
         $summary = self::getSummary($shop_id, $year_month);
 
         $laba_kotor = $summary['laba_kotor'];
@@ -263,6 +231,8 @@ class ReportController extends Controller
         $alokasi_dana_tak_terduga = 10 / 100 * $laba_bersih;
         $laba_bersih_financial = $laba_bersih - $alokasi_dana_tak_terduga;
 
-        return view('report.laba_bersih', compact('shop', 'laba_kotor', 'start', 'end', 'year_month', 'spendings', 'total_biaya', 'laba_bersih', 'alokasi_dana_tak_terduga', 'laba_bersih_financial'));
+        $date = Carbon::createFromFormat('Y-m', $year_month);
+
+        return view('report.laba_bersih', compact('shop', 'laba_kotor', 'date', 'spendings', 'total_biaya', 'laba_bersih', 'alokasi_dana_tak_terduga', 'laba_bersih_financial'));
     }
 }

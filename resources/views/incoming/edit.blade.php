@@ -6,12 +6,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Edit Kedatangan</h1>
+                    <h1>Edit Penerimaan</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('incomings.index') }}">Kedatangan</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('incomings.index') }}">Penerimaan</a></li>
                         <li class="breadcrumb-item active">Edit</li>
                     </ol>
                 </div>
@@ -24,116 +24,167 @@
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <div class=" d-flex justify-content-between align-items-center">
-                        <h3 class="card-title">Edit Kedatangan</h3>
+                        <h3 class="card-title">Penerimaan</h3>
                     </div>
 
                 </div>
                 <form id="insertForm" action="{{ route('incomings.update', $incoming->id) }}" method="POST"
                     class="needs-validation" novalidate>
                     @csrf
-                    @method('PATCH')
+                    @method('PUT')
                     <div class="card-body">
+
+                        <div class="form-group row">
+                            <label for="created_at" class="col-sm-4 col-form-label">Tanggal</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control @error('created_at') is-invalid @enderror"
+                                    id="created_at" name="created_at"
+                                    value="{{ old('created_at', date_format(date_create($incoming->created_at), 'Y-m-d')) }}"
+                                    readonly>
+                                @error('created_at')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
                         @if (Auth::user()->role != 'operator')
-                            <div class="row">
-                                <div class="form-group col-lg-6">
-                                    <label for="date">Tanggal</label>
-                                    <input type="date" class="form-control @error('date') is-invalid @enderror"
-                                        id="date" name="date" value="{{ old('date', $incoming->created_at->format('Y-m-d')) }}" required>
-                                    @error('date')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                            <div class="form-group row">
+                                <label for="operator" class="col-sm-4 col-form-label">Operator</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="operator" name="operator"
+                                        value="{{ $incoming->operator->user->name }}" readonly>
                                 </div>
-
-                                <div class="form-group col-lg-6">
-                                    <label for="time">Jam</label>
-                                    <input type="time" class="form-control @error('time') is-invalid @enderror"
-                                        id="time" name="time" value="{{ old('time', $incoming->created_at->format('H:i')) }}" required>
-                                    @error('time')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="shop_id">Pertashop</label>
-                                <select name="shop_id" id="shop_id"
-                                    class="form-control @error('shop_id') is-invalid @enderror">
-                                    <option value="">--Pilih Pertashop--</option>
-                                    @foreach ($shops as $shop)
-                                        <option value="{{ $shop->id }}" @selected($shop->id == old('shop_id', $incoming->shop_id))>
-                                            {{ $shop->kode . ' ' . $shop->nama }}</option>
-                                    @endforeach
-                                </select>
-                                @error('shop_id')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group">
-                                <label for="operator_id">Operator</label>
-                                <select name="operator_id" id="operator_id"
-                                    class="form-control @error('operator_id') is-invalid @enderror">
-                                    <option value="">--Pilih Operator--</option>
-                                </select>
-                                @error('operator_id')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
                             </div>
                         @endif
 
-                        <div class="form-group">
-                            <label for="purchase_id">Pembelian</label>
-                            <select name="purchase_id" id="purchase_id"
-                                class="form-control @error('purchase_id') is-invalid @enderror">
-                                <option value="">--Pilih Pembelian--</option>
-                            </select>
-                            @error('purchase_id')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
+                        <div class="form-group row">
+                            <label for="no_so" class="col-sm-4 col-form-label">No. SO</label>
+                            <div class="col-sm-8">
+                                <select name="purchase_id" id="purchase_id"
+                                    class="form-control @error('purchase_id') is-invalid @enderror">
+                                    <option value="">--Pilih No. SO--</option>
+                                    @foreach ($purchases as $purchase)
+                                        <option value="{{ $purchase->id }}" @selected($purchase->id == old('purchase_id', $incoming->purchase_id))
+                                            data-purchase='@json($purchase)'>
+                                            {{ $purchase->no_so }}</option>
+                                    @endforeach
+                                </select>
+                                @error('purchase_id')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="sopir" class="col-sm-4 col-form-label">Sopir</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control @error('sopir') is-invalid @enderror"
+                                    id="sopir" name="sopir" value="{{ old('sopir', $incoming->sopir) }}">
+                                @error('sopir')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="no_polisi" class="col-sm-4 col-form-label">No. Polisi</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control @error('no_polisi') is-invalid @enderror"
+                                    id="no_polisi" name="no_polisi" value="{{ old('no_polisi', $incoming->no_polisi) }}">
+                                @error('no_polisi')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="jumlah">Jumlah</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control @error('jumlah') is-invalid @enderror"
-                                    id="jumlah" name="jumlah" value="{{ old('jumlah', $incoming->jumlah) }}" required>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">&ell;</span>
+                        <div class="form-group row">
+                            <label for="volume" class="col-sm-4 col-form-label">Volume Pemesanan</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="volume" name="volume"
+                                        value="{{ old('volume', $incoming->volume) }}" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">&ell;</span>
+                                    </div>
                                 </div>
                             </div>
-                            @error('jumlah')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
                         </div>
 
-                        <div class="form-group">
-                            <label for="stik_awal">Stik Awal</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control @error('stik_awal') is-invalid @enderror"
-                                    id="stik_awal" name="stik_awal" value="{{ old('stik_awal', $incoming->stik_awal) }}" required>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">cm</span>
+                        <div class="form-group row">
+                            <label for="stik_awal" class="col-sm-4 col-form-label">Pengukuran Awal</label>
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="input-group">
+                                            <input type="number"
+                                                class="form-control @error('stik_awal') is-invalid @enderror" id="stik_awal"
+                                                name="stik_awal" value="{{ old('stik_awal', $incoming->stik_awal) }}">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">cm</span>
+                                            </div>
+                                        </div>
+                                        @error('stik_awal')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="stok_awal" name="stok_awal"
+                                                value="{{ old('stok_awal', $incoming->stik_awal * $shop->skala) }}"
+                                                readonly>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">&ell;</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            @error('stik_awal')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
                         </div>
 
-                        <div class="form-group">
-                            <label for="stik_akhir">Stik Akhir</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control @error('stik_akhir') is-invalid @enderror"
-                                    id="stik_akhir" name="stik_akhir" value="{{ old('stik_akhir', $incoming->stik_akhir) }}" required>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">cm</span>
+                        <div class="form-group row">
+                            <label for="stik_akhir" class="col-sm-4 col-form-label">Pengukuran Akhir</label>
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="input-group">
+                                            <input type="number"
+                                                class="form-control @error('stik_akhir') is-invalid @enderror"
+                                                id="stik_akhir" name="stik_akhir"
+                                                value="{{ old('stik_akhir', $incoming->stik_akhir) }}">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">cm</span>
+                                            </div>
+                                        </div>
+                                        @error('stik_akhir')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="stok_akhir" name="stok_akhir"
+                                                value="{{ old('stok_akhir', $incoming->stik_akhir * $shop->skala) }}"
+                                                readonly>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">&ell;</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            @error('stik_akhir')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
                         </div>
 
+                        <div class="form-group row">
+                            <label for="volume_aktual" class="col-sm-4 col-form-label">Volume Aktual</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <input type="number"
+                                        class="form-control @error('volume_aktual') is-invalid @enderror"
+                                        id="volume_aktual" name="volume_aktual"
+                                        value="{{ old('volume_aktual', $incoming->volume_aktual) }}" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">&ell;</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
                     <div class="card-footer">
@@ -149,52 +200,29 @@
 
 @push('script')
     <script>
-        function getData() {
-            var shop_id = $('select[name=shop_id]').val();
-
-            @if (Auth::user()->role == 'operator')
-                shop_id = @json(Auth::user()->operator->shop_id);
-            @endif
-
-            var operator_id = @json(old('operator_id', $incoming->operator_id));
-            var purchase_id = @json(old('purchase_id', $incoming->purchase_id));
-
-            if (shop_id) {
-                $.ajax({
-                    url: "{{ route('incomings.edit', $incoming->id) }}",
-                    method: 'GET',
-                    data: {
-                        shop_id
-                    },
-                    success: function(data) {
-                        var operator_options = `<option value=''>--Pilih Operator--</option>`;
-                        data.operators.forEach(operator => {
-                            operator_options +=
-                                `<option value='${operator.id}' ${operator.id == operator_id ? 'selected' : ''}>${operator.user.name}</option>`
-                        });
-
-                        $('select[name=operator_id]').html(operator_options);
-
-                        var purchase_options = `<option value=''>--Pilih Pembelian--</option>`;
-                        data.purchases.forEach(purchase => {
-                            purchase_options +=
-                                `<option value='${purchase.id}' ${purchase.id == purchase_id ? 'selected' : ''}>${purchase.id} - ${purchase.supplier.nama} (${parseInt(purchase.jumlah)/1000}KL)</option>`
-                        });
-
-                        $('select[name=purchase_id]').html(purchase_options);
-
-                        $('input[name=totalisator_awal]').val(data.totalisator_awal)
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(error);
-                    }
-                });
-            }
-        }
         $(document).ready(function() {
-            getData()
-            $('select[name=shop_id]').on('change', getData)
-        });
+            $('#purchase_id').on('change', function() {
+                let volume = 0;
+                let purchase = $(this).find(':selected').data('purchase');
+                if (purchase) {
+                    volume = purchase.volume * 1;
+                }
+                $('#volume').val(volume.toFixed(2));
+            });
+
+            //calculate volume aktual (stok akhir - stok awal)
+            $('#stik_akhir, #stik_awal').on('input', function() {
+                let stik_akhir = $('#stik_akhir').val();
+                let stik_awal = $('#stik_awal').val();
+                let skala = {{ $shop->skala }};
+                let stok_akhir = stik_akhir * skala;
+                let stok_awal = stik_awal * skala;
+                let volume_aktual = stok_akhir - stok_awal;
+                $('#stok_awal').val(stok_awal.toFixed(2))
+                $('#stok_akhir').val(stok_akhir.toFixed(2));
+                $('#volume_aktual').val(volume_aktual.toFixed(2));
+            });
+
+        })
     </script>
 @endpush

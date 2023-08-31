@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Price;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -13,40 +11,30 @@ class Purchase extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['tanggal', 'total_harga', 'datang', 'sisa'];
-
-    public function price()
-    {
-        return $this->belongsTo(Price::class);
-    }
+    protected $appends = ['harga', 'diterima', 'sisa'];
 
     public function incomings()
     {
         return $this->hasMany(Incoming::class);
     }
 
-    public function getSisaAttribute()
+    public function getHargaAttribute()
     {
-        return $this->jumlah - $this->incomings->sum('jumlah');
+        return $this->total_bayar / $this->volume;
     }
 
-    public function getDatangAttribute()
+    public function getSisaAttribute()
     {
-        return $this->jumlah - $this->sisa;
+        return $this->volume - $this->incomings->sum('volume');
+    }
+
+    public function getDiterimaAttribute()
+    {
+        return $this->volume - $this->sisa;
     }
 
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
-    }
-
-    public function getTanggalAttribute()
-    {
-        return Carbon::createFromFormat('Y-m-d H:i:s', $this->created_at)->format('d/m/Y');
-    }
-
-    public function getTotalHargaAttribute()
-    {
-        return $this->jumlah * $this->price->harga_beli;
     }
 }

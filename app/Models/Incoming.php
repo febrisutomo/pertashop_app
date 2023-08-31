@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Shop;
 use App\Models\Operator;
 use App\Models\Purchase;
 use Illuminate\Support\Carbon;
@@ -14,19 +15,25 @@ class Incoming extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['tanggal'];
-
-    public function getTanggalAttribute()
-    {
-        return Carbon::parse($this->created_at)->format('d/m/Y H:i');
-    }
+    protected $appends = ['volume_aktual'];
 
     public function operator()
     {
         return $this->belongsTo(Operator::class);
     }
+
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class);
+    }
+
     public function purchase()
     {
         return $this->belongsTo(Purchase::class);
+    }
+
+    public function getVolumeAktualAttribute()
+    {
+        return ($this->stik_akhir - $this->stik_awal) * $this->shop->skala;
     }
 }

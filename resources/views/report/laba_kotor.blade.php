@@ -6,7 +6,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Laba Kotor {{ $end->monthName . ' ' . $end->year }}</h1>
+                    <h1>Laba Kotor {{ $date->monthName . ' ' . $date->year }}</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -26,16 +26,17 @@
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <div class=" d-flex justify-content-between align-items-center">
-                        <h3 class="card-title text-uppercase">Pertashop {{ $shop->kode. ' '.$shop->nama }}</h3>
+                        <h3 class="card-title text-uppercase">Pertashop {{ $shop->kode . ' ' . $shop->nama }}</h3>
                         <div class="d-flex justify-content-between align-items-center">
                             <button class="btn btn-primary mr-2">Laba Kotor</button>
-                            <a href="{{ route('reports.laba_bersih', ['shop_id' => $shop->id, 'year_month' => $year_month]) }}"
+                            <a href="{{ route('reports.laba_bersih', ['shop_id' => $shop->id, 'year_month' => $date->format('Y-m')]) }}"
                                 class="btn btn-link mr-2">Laba Bersih</a>
                             <button class="btn btn-link">Modal Kerja</button>
                         </div>
                     </div>
 
                 </div>
+
                 <div class="card-body">
 
                     <div class="laba-kotor container-fluid text-sm" id="section-to-print">
@@ -43,8 +44,8 @@
                             <h3 class="card-title font-weight-bold text-uppercase text-center">Laporan Stock, Penjualan &
                                 Laba
                                 Kotor
-                                {{ $start->format('d') }} s/d
-                                {{ $end->format('d') . ' ' . $end->monthName . ' ' . $end->year }}
+                                {{ $date->startOfMonth()->format('d') }} s/d
+                                {{ $date->endOfMonth()->format('d') . ' ' . $date->monthName . ' ' . $date->year }}
                                 <br>PERTASHOP {{ $shop->kode }} {{ $shop->alamat }} <br> {{ $shop->corporation->nama }}
                             </h3>
                         </div>

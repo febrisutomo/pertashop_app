@@ -24,7 +24,7 @@
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <div class=" d-flex justify-content-between align-items-center">
-                        <h3 class="card-title">Tambah Pembelian</h3>
+                        <h3 class="card-title">Pembelian</h3>
                     </div>
 
                 </div>
@@ -41,7 +41,7 @@
                             @enderror
                         </div>
 
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="shop_id">Pertashop</label>
                             <select name="shop_id" id="shop_id"
                                 class="form-control @error('shop_id') is-invalid @enderror">
@@ -54,7 +54,7 @@
                             @error('shop_id')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
-                        </div>
+                        </div> --}}
 
                         <div class="form-group">
                             <label for="supplier_id">Supplier</label>
@@ -72,15 +72,43 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="jumlah">Jumlah</label>
+                            <label for="no_so">No. SO</label>
                             <div class="input-group">
-                                <input type="number" class="form-control @error('jumlah') is-invalid @enderror"
-                                    id="jumlah" name="jumlah" value="{{ old('jumlah') }}" required>
+                                <input type="text" class="form-control @error('no_so') is-invalid @enderror"
+                                    id="no_so" name="no_so" value="{{ old('no_so') }}" required>
                                 <div class="input-group-append">
                                     <span class="input-group-text">&ell;</span>
                                 </div>
                             </div>
-                            @error('jumlah')
+                            @error('no_so')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="volume">Volume</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control @error('volume') is-invalid @enderror"
+                                    id="volume" name="volume" value="{{ old('volume') }}" required>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">&ell;</span>
+                                </div>
+                            </div>
+                            @error('volume')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="total_bayar">Total Bayar</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control @error('total_bayar') is-invalid @enderror"
+                                    id="total_bayar" name="total_bayar" value="{{ old('total_bayar') }}" required>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">&ell;</span>
+                                </div>
+                            </div>
+                            @error('total_bayar')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
@@ -91,23 +119,11 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">Rp</span>
                                 </div>
-                                <input type="text" class="form-control @error('harga') is-invalid @enderror"
-                                    id="harga" name="harga" value="{{ old('harga', $harga) }}" readonly>
-                            </div>
-                            @error('harga')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="total_harga">Total Harga</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">Rp</span>
-                                </div>
-                                <input type="text" class="form-control" id="total_harga" name="total_harga"
-                                    value="{{ old('total_harga') }}" readonly>
+                                <input type="text" class="form-control" id="harga" name="harga"
+                                    value="{{ old('harga') }}" readonly>
                             </div>
                         </div>
+
                     </div>
 
                     <div class="card-footer">
@@ -124,19 +140,14 @@
 @push('script')
     <script>
         $(document).ready(function() {
-            function calculateValues() {
-                var jumlah = parseFloat($("#jumlah").val()) || 0;
-                var harga = @json($harga);
-
-                var total_harga = jumlah * harga
-
-                $("#total_harga").val(formatNumber(total_harga));
-            }
-
-            $("#jumlah, #harga, #shop_id").on("input", calculateValues);
-
-            var harga = $('#harga').val()
-            $('#harga').val(formatNumber(harga))
+            //calculate harga per liter
+            //total bayar / volume
+            $('#volume, #total_bayar').on('keyup', function() {
+                let total_bayar = $('#total_bayar').val() * 1;
+                let volume = $('#volume').val() * 1;
+                let harga = total_bayar / volume;
+                $('#harga').val(harga);
+            });
         });
     </script>
 @endpush

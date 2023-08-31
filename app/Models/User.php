@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Admin;
 use App\Models\Investor;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -49,6 +50,11 @@ class User extends Authenticatable
     public function operator()
     {
         return $this->hasOne(Operator::class);
+    }
+
+    public function admin()
+    {
+        return $this->hasOne(Admin::class);
     }
 
     public function investor()

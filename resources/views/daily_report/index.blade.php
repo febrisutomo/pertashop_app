@@ -5,12 +5,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Penerimaan</h1>
+                    <h1>Laporan Harian</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item active">Penerimaan</li>
+                        <li class="breadcrumb-item active">Laporan Harian</li>
                     </ol>
                 </div>
             </div>
@@ -39,9 +39,9 @@
 
                         </div>
                         @if (Auth::user()->role == 'operator')
-                            <a href="{{ route('incomings.create') }}" class="btn btn-primary"><i
+                            <a href="{{ route('daily-reports.create') }}" class="btn btn-primary"><i
                                     class="fa fa-plus mr-2"></i>Tambah
-                                Penerimaan</a>
+                                Laporan Harian</a>
                         @endif
                     </div>
 
@@ -50,7 +50,6 @@
 
                     <div class="table-responsive-lg">
                         <table id="table" class="table table-bordered">
-
                         </table>
                     </div>
                 </div>
@@ -66,7 +65,7 @@
             var dataTable = $('#table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('incomings.index') }}",
+                ajax: "{{ route('daily-reports.index') }}",
                 columns: [
                     // {
                     //     title: '#',
@@ -86,44 +85,125 @@
                         }
                     },
                     {
-                        title: 'No. SO',
-                        data: 'purchase.no_so',
-                        name: 'purchase.no_so',
+                        title: 'Operator',
+                        data: 'operator.user.name',
+                        name: 'operator',
+                    },
+                    // {
+                    //     title: 'Totalisator Awal',
+                    //     data: 'totalisator_awal',
+                    //     name: 'totalisator_awal',
+                    // },
+                    // {
+                    //     title: 'Totalisator Akhir',
+                    //     data: 'totalisator_akhir',
+                    //     name: 'totalisator_akhir',
+                    // },
+                    // {
+                    //     title: 'Test Pump (&ell;)',
+                    //     data: 'test_pump',
+                    //     name: 'test_pump',
+                    // },
+                    {
+                        title: 'Penerimaan (&ell;)',
+                        data: 'penerimaan',
+                        name: 'penerimaan',
                     },
                     {
-                        title: 'Supplier',
-                        data: 'purchase.supplier.nama',
-                        name: 'supplier',
+                        title: 'Volume Penjualan (&ell;)',
+                        data: 'volume_penjualan',
+                        name: 'volume_penjualan',
                     },
                     {
-                        title: 'Sopir',
-                        data: 'sopir',
-                        name: 'sopir',
-                    },
-                    {
-                        title: 'No. Polisi',
-                        data: 'no_polisi',
-                        name: 'no_polisi',
-                    },
-
-                    {
-                        title: 'Volume (&ell;)',
-                        data: 'volume',
-                        name: 'volume',
-                        className: 'text-right',
+                        title: 'Rupiah Penjualan',
+                        data: 'rupiah_penjualan',
+                        name: 'rupiah_penjualan',
                         render: function(data, type) {
                             if (type === 'display') {
-                                return formatNumber(data)
+                                return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
+                            }
+                            return data;
+                        }
+                    },
+                    // {
+                    //     title: 'Stok Awal (&ell;)',
+                    //     data: 'stok_awal',
+                    //     name: 'stok_awal',
+                    // },
+
+                    // {
+                    //     title: 'Stok Akhir Teoritis (&ell;)',
+                    //     data: 'stok_akhir_teoritis',
+                    //     name: 'stok_akhir_teoritis',
+                    // },
+                    {
+                        title: 'Stok Akhir (&ell;)',
+                        data: 'stok_akhir_aktual',
+                        name: 'stok_akhir_aktual',
+                    },
+                    {
+                        title: 'Losses / Gain (&ell;)',
+                        data: 'losses_gain',
+                        name: 'losses_gain',
+                    },
+                    {
+                        title: 'Pengeluaran',
+                        data: 'pengeluaran',
+                        name: 'pengeluaran',
+                        render: function(data, type) {
+                            if (type === 'display') {
+                                return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
                             }
                             return data;
                         }
                     },
 
                     {
-                        title: 'Operator',
-                        data: 'operator.user.name',
-                        name: 'operator',
+                        title: 'Pendapatan',
+                        data: 'pendapatan',
+                        name: 'pendapatan',
+                        render: function(data, type) {
+                            if (type === 'display') {
+                                return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
+                            }
+                            return data;
+                        }
                     },
+
+                    // {
+                    //     title: 'Disetorkan',
+                    //     data: 'disetorkan',
+                    //     name: 'disetorkan',
+                    //     render: function(data, type) {
+                    //         if (type === 'display') {
+                    //             return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
+                    //         }
+                    //         return data;
+                    //     }
+                    // },
+
+                    // {
+                    //     title: 'Selisih Setoran',
+                    //     data: 'selisih_setoran',
+                    //     name: 'selisih_setoran',
+                    //     render: function(data, type) {
+                    //         if (type === 'display') {
+                    //             return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
+                    //         }
+                    //         return data;
+                    //     }
+                    // },
+                    // {
+                    //     title: 'Belum Disetorkan',
+                    //     data: 'belum_disetorkan',
+                    //     name: 'belum_disetorkan',
+                    //     render: function(data, type) {
+                    //         if (type === 'display') {
+                    //             return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
+                    //         }
+                    //         return data;
+                    //     }
+                    // },
 
                     {
                         title: 'Aksi',
@@ -150,7 +230,7 @@
                         display: DataTable.Responsive.display.modal({
                             header: function(row) {
                                 var data = row.data();
-                                return 'Detail Penerimaan';
+                                return 'Detail Laporan Harian';
                             }
                         }),
                         renderer: DataTable.Responsive.renderer.tableAll({
@@ -166,11 +246,11 @@
 
 
             $('#table').on('click', '.btn-delete', function() {
-                var saleId = $(this).data('id');
+                var id = $(this).data('id');
 
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
-                    text: "Data barang Masuk akan dihapus secara permanen!",
+                    text: "Data laporan akan dihapus secara permanen!",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -181,7 +261,7 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "DELETE",
-                            url: "{{ url('') }}" + "/incomings/" + saleId,
+                            url: "{{ url('') }}" + "/daily-reports/" + id,
                             success: function(response) {
                                 dataTable.ajax.reload();
                                 Swal.fire(

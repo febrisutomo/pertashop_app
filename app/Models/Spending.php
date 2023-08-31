@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Operator;
+use App\Models\SpendingCategory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Spending extends Model
 {
@@ -14,5 +16,15 @@ class Spending extends Model
     public function shop()
     {
         return $this->belongsTo(Shop::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(SpendingCategory::class, 'spending_category_id');
+    }
+
+    public function operator()
+    {
+        return $this->belongsTo(Operator::class);
     }
 }

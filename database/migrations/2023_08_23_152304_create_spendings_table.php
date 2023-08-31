@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('spendings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('shop_id')->constrained();
-            $table->string('keterangan');
+            $table->foreignId('operator_id')->nullable()->constrained();
+            $table->foreignId('daily_report_id')->nullable()->constrained();
+            $table->foreignId('spending_category_id')->constrained();
+            $table->string('keterangan')->nullable();
             $table->decimal('jumlah', 10, 2);
             $table->timestamps();
         });

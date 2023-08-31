@@ -12,6 +12,9 @@
                     @if (Auth::user()->role == 'operator')
                         <h3 class="text-right text-md font-weight-bold">
                             {{ Auth::user()->operator->shop->kode . ' ' . Auth::user()->operator->shop->nama }}</h3>
+                    @elseif (Auth::user()->role == 'admin')
+                        <h3 class="text-right text-md font-weight-bold">
+                            {{ Auth::user()->admin->shop->kode . ' ' . Auth::user()->admin->shop->nama }}</h3>
                     @else
                         <select name="shop_id" class="form-control">
                             <option value="">Semua Pertashop</option>
@@ -32,59 +35,7 @@
 
     <section class="content">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 col-sm-6 col-md-3">
-                    <div class="info-box">
-                        <span class="info-box-icon bg-info elevation-1"><i class="fas fa-upload"></i></span>
-
-                        <div class="info-box-content">
-                            <span class="info-box-text">Penjualan Bersih</span>
-                            <span class="info-box-number" id="jumlahPenjualanBersih"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-sm-6 col-md-3">
-                    <div class="info-box mb-3">
-                        <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-download"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Pembelian</span>
-                            <span class="info-box-number" id="jumlahPembelian">
-                                {{-- <small>&ell;</small> --}}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="clearfix hidden-md-up"></div>
-                <div class="col-12 col-sm-6 col-md-3">
-                    <div class="info-box mb-3">
-                        <span class="info-box-icon bg-success elevation-1"><i class="fas fa-wallet"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Laba Kotor</span>
-                            <span class="info-box-number" id="labaKotor">
-                            </span>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-12 col-sm-6 col-md-3">
-                    <div class="info-box mb-3">
-                        <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-chart-bar"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Omset Harian</span>
-                            <span class="info-box-number">
-                                <span id="omsetHarian">
-                                </span>
-                                &ell;</span>
-                        </div>
-
-                    </div>
-
-                </div>
+            <div id="summary">
 
             </div>
             <div class="row">
@@ -92,7 +43,7 @@
                     <div class="card">
                         <div class="card-header">
                             <div class=" d-flex justify-content-between align-items-center">
-                                <h3 class="card-title"><i class="fas fa-chart-line mr-1"></i>Penjualan (&ell;)</h3>
+                                <h3 class="card-title"><i class="fas fa-chart-line mr-1"></i>Grafik Penjualan</h3>
                                 <input name="filter" type="text" value="day" hidden>
                                 <div class="">
                                     <button class="btn btn-sm btn-primary btn-filter filter-day">Harian</button>
@@ -197,7 +148,7 @@
                         },
                         y: {
                             min: 0,
-                            max: 3000, // totalStock harus diisi dengan total stok produk
+                            max: 3500, // totalStock harus diisi dengan total stok produk
                             stacked: true,
                         }
                     },
@@ -228,11 +179,76 @@
                     showSalesChart(sales);
                     showStocks(stocks);
 
-                    var summary = data.summary;
-                    $('#jumlahPenjualanBersih').text(formatCurrency(summary.jumlah_penjualan_bersih, 0));
-                    $('#jumlahPembelian').text(formatCurrency(summary.jumlah_pembelian, 0));
-                    $('#labaKotor').text(formatCurrency(summary.laba_kotor, 0));
-                    $('#omsetHarian').text(formatNumber(summary.omset_harian));
+                    let html_summary = '';
+                    data.summaries.forEach(function(summary) {
+                        console.log(summary)
+                        html_summary +=
+                            `<h6>${summary.shop.kode} ${summary.shop.nama}</h6>
+                            <div class="row">
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-info elevation-1"><i class="fas fa-upload"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Penjualan Bersih</span>
+                            <span class="info-box-number">
+                                ${formatCurrency(summary.jumlah_penjualan_bersih_rp, 0)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box mb-3">
+                        <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-download"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Pembelian</span>
+                            <span class="info-box-number">
+                                ${formatCurrency(summary.jumlah_pembelian_rp, 0)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="clearfix hidden-md-up"></div>
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box mb-3">
+                        <span class="info-box-icon bg-success elevation-1"><i class="fas fa-wallet"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Laba Kotor</span>
+                            <span class="info-box-number">
+                                ${formatCurrency(summary.laba_kotor, 0)}
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box mb-3">
+                        <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-chart-bar"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Omset Harian</span>
+                            <span class="info-box-number">
+                                    ${formatNumber(summary.rata_rata_omset_harian)} &ell;
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>`;
+                    })
+
+
+                    $('#summary').html(html_summary);
+                    // $('#jumlahPembelian').text(formatCurrency(summaries.jumlah_pembelian,
+                    //     0));
+                    // $('#labaKotor').text(formatCurrency(summaries.laba_kotor, 0));
+                    // $(
+                    //     '#omsetHarian').text(formatNumber(summaries.omset_harian));
 
                 },
                 error: function(xhr, status, error) {
