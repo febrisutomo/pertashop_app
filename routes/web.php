@@ -2,10 +2,11 @@
 
 use App\Models\Incoming;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\IncomingController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SpendingController;
 use App\Http\Controllers\TestPumpController;
@@ -13,9 +14,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LabaKotorController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\LabaBersihController;
+use App\Http\Controllers\RekapModalController;
 use App\Http\Controllers\CorporationController;
 use App\Http\Controllers\DailyReportController;
-use App\Http\Controllers\RekapModalController;
 use App\Http\Controllers\ProfitSharingController;
 
 /*
@@ -33,6 +34,11 @@ use App\Http\Controllers\ProfitSharingController;
 Route::get('login', [LoginController::class, 'index'])->name('login');
 Route::post('login', [LoginController::class, 'authenticate'])->name('authenticate');
 Route::delete('logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/key-generate', function() {
+    Artisan::call('key:generate');
+    return 'Application key generated!';
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
