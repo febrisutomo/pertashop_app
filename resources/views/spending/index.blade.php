@@ -26,7 +26,7 @@
                         <div class="d-flex align-items-center">
                             @if (Auth::user()->role == 'operator')
                                 <h3 class="card-title mr-2">
-                                    {{ Auth::user()->operator->shop->kode . ' ' . Auth::user()->operator->shop->nama }}</h3>
+                                    {{ Auth::user()->shop->kode . ' ' . Auth::user()->shop->nama }}</h3>
                             @elseif(Auth::user()->role == 'admin')
                                 <h3 class="card-title mr-2">
                                     {{ Auth::user()->admin->shop->kode . ' ' . Auth::user()->admin->shop->nama }}</h3>
@@ -39,6 +39,7 @@
                             @endif
 
                         </div>
+
                         @if (Auth::user()->role == 'operator' || Auth::user()->role == 'admin')
                             <button class="btn btn-primary btn-add"><i class="fa fa-plus mr-2"></i>Tambah
                                 Pengeluaran</button>

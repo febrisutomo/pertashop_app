@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Shop;
+use App\Models\User;
 use App\Models\Price;
 use App\Models\Incoming;
 use App\Models\Operator;
@@ -22,7 +23,7 @@ class DailyReport extends Model
         'stik_awal',
         'stok_awal',
         'stok_akhir_aktual',
-        'test_pump',
+        'percobaan',
         'penerimaan',
         'volume_penjualan',
         'stok_akhir_teoritis',
@@ -31,26 +32,27 @@ class DailyReport extends Model
         'rupiah_penjualan',
         'pendapatan',
         'selisih_setoran',
-        'belum_disetorkan'
+        'tabungan',
+        'tanggal_panjang',
     ];
 
     public function operator()
     {
-        return $this->belongsTo(Operator::class);
+        return $this->belongsTo(User::class);
     }
     public function shop()
     {
         return $this->belongsTo(Shop::class);
     }
 
-    public function incomings()
+    public function incoming()
     {
-        return $this->hasMany(Incoming::class);
+        return $this->hasOne(Incoming::class);
     }
 
-    public function testPumps()
+    public function testPump()
     {
-        return $this->hasMany(TestPump::class);
+        return $this->hasOne(TestPump::class);
     }
 
     public function spendings()
@@ -68,9 +70,19 @@ class DailyReport extends Model
         return $this->where('shop_id', $this->shop->id)->where('created_at', '<', $this->created_at)->latest()->first();
     }
 
+    protected function yesterday()
+    {
+        return $this->where('shop_id', $this->shop->id)->whereDate('created_at', '<', $this->created_at->format('Y-m-d'))->latest()->first();
+    }
+
     protected function latestByOperator()
     {
         return $this->where('operator_id', $this->operator->id)->where('created_at', '<', $this->created_at)->latest()->first();
+    }
+
+    protected function today()
+    {
+        return $this->where('shop_id', $this->shop->id)->whereDate('created_at', $this->created_at->format('Y-m-d'))->get();
     }
 
     public function getTotalisatorAwalAttribute()
@@ -80,7 +92,7 @@ class DailyReport extends Model
 
     public function getStikAwalAttribute()
     {
-        return  $this->latestByShop() ?  $this->latestByShop()->stik_akhir : $this->shop->stik_awal;
+        return  $this->yesterday() ?  $this->yesterday()->stik_akhir : $this->shop->stik_awal;
     }
 
     public function getStokAwalAttribute()
@@ -90,32 +102,32 @@ class DailyReport extends Model
 
     public function getStokAkhirAktualAttribute()
     {
-        return $this->stik_akhir * $this->shop->skala;
+        return $this->stik_akhir ? round($this->stik_akhir * $this->shop->skala, 2) : null;
     }
 
-    public function getTestPumpAttribute()
+    public function getPercobaanAttribute()
     {
-        return $this->testPumps->sum('volume');
+        return $this->testPump?->volume_test;
     }
 
     public function getPenerimaanAttribute()
     {
-        return $this->incomings->sum('volume');
+        return $this->incoming?->purchase?->volume;
     }
 
     public function getVolumePenjualanAttribute()
     {
-        return $this->totalisator_akhir - $this->totalisator_awal - $this->test_pump;
+        return round($this->totalisator_akhir - $this->totalisator_awal - $this->percobaan, 2);
     }
 
     public function getStokAkhirTeoritisAttribute()
     {
-        return round($this->stok_awal + $this->penerimaan - $this->volume_penjualan, 2);
+        return $this->stik_akhir ? round($this->stok_awal + $this->today()->sum('penerimaan') - $this->today()->sum('volume_penjualan'), 2) : round($this->stok_awal + $this->penerimaan - $this->volume_penjualan, 2);
     }
 
     public function getLossesGainAttribute()
     {
-        return round($this->stok_akhir_aktual - $this->stok_akhir_teoritis, 3);
+        return $this->stik_akhir ? round($this->stok_akhir_aktual - $this->stok_akhir_teoritis, 3) : null;
     }
 
     public function getPengeluaranAttribute()
@@ -125,21 +137,36 @@ class DailyReport extends Model
 
     public function getPendapatanAttribute()
     {
-        return $this->rupiah_penjualan - $this->pengeluaran;
+        return round($this->rupiah_penjualan - $this->pengeluaran);
     }
 
     public function getRupiahPenjualanAttribute()
     {
-        return $this->price->harga_jual * $this->volume_penjualan;
+        return round($this->price->harga_jual * ($this->totalisator_akhir - $this->totalisator_awal - $this->percobaan));
+    }
+
+    public function getDisetorkanAttribute()
+    {
+        return round($this->attributes['disetorkan']);
     }
 
     public function getSelisihSetoranAttribute()
     {
-        return $this->disetorkan - $this->pendapatan;
+        return round($this->disetorkan - $this->pendapatan);
     }
 
-    public function getBelumDisetorkanAttribute()
+    public function getTabunganAttribute()
     {
-        return $this->latestByOperator() ? $this->latestByOperator()->belum_disetorkan + $this->selisih_setoran : $this->selisih_setoran;
+        return round($this->latestByOperator() ? $this->latestByOperator()->tabungan + $this->selisih_setoran : $this->selisih_setoran);
+    }
+
+    public function getTanggalPanjangAttribute()
+    {
+        return $this->created_at->dayName . ", " . $this->created_at->format('d') . " " . $this->created_at->monthName . " " . $this->created_at->format('Y');
+    }
+    
+    public function getTanggalAttribute()
+    {
+        return $this->created_at->format('d/m/Y');
     }
 }

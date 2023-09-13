@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('investor_shop', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('investor_id')->constrained();
+            $table->foreignId('user_id')->constrained();
             $table->foreignId('shop_id')->constrained();
-            $table->unsignedDecimal('percentage', 5, 2);
+            $table->unsignedDecimal('persentase', 5, 2);
+            $table->string('no_rekening')->nullable();
+            $table->string('pemilik_rekening')->nullable();
+            $table->string('nama_bank')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('investor_shops');
+        Schema::dropIfExists('investor_shop');
     }
 };

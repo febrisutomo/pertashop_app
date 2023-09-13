@@ -19,9 +19,7 @@ class SpendingController extends Controller
     {
         if ($request->ajax()) {
             if (Auth::user()->role == 'admin') {
-                $shop_id = Auth::user()->admin->shop_id;
-            } elseif (Auth::user()->role == 'operator') {
-                $shop_id = Auth::user()->operator->shop_id;
+                $shop_id = Auth::user()->shop_id;
             } else {
                 $shop_id = $request->input('shop_id', 1);
             }
@@ -29,6 +27,13 @@ class SpendingController extends Controller
             $spendings = Spending::with(['category', 'operator.user'])->where('shop_id', $shop_id)
                 ->latest()
                 ->get();
+
+            if (Auth::user()->role == 'operator') {
+                $spendings = Spending::with(['category', 'operator.user'])->where('shop_id', $shop_id)
+                    ->where('operator_id', '!=', null)
+                    ->latest()
+                    ->get();
+            }
 
             return DataTables::of($spendings)
                 ->addIndexColumn()
@@ -53,7 +58,7 @@ class SpendingController extends Controller
         }
 
         // if ($request->ajax()) {
-        //     $shop_id = Auth::user()->operator->shop_id;
+        //     $shop_id = Auth::user()->shop_id;
 
         //     $spendingsByDate = Spending::with(['shop'])
         //         ->where('shop_id', $shop_id)
@@ -106,6 +111,9 @@ class SpendingController extends Controller
 
         $shops = Shop::all();
         $spendingCategories = SpendingCategory::all();
+        if (Auth::user()->role == 'operator') {
+            $spendingCategories = SpendingCategory::where('id', '>', 2)->get();
+        }
         return view('spending.index', compact('shops', 'spendingCategories'));
     }
 
@@ -125,7 +133,7 @@ class SpendingController extends Controller
         if (Auth::user()->role == 'admin') {
             $shop_id = Auth::user()->admin->shop_id;
         } elseif (Auth::user()->role == 'operator') {
-            $shop_id = Auth::user()->operator->shop_id;
+            $shop_id = Auth::user()->shop_id;
         }
 
         $validated = $request->validate([

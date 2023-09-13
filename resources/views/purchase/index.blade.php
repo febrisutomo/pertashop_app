@@ -22,33 +22,166 @@
         <div class="container-fluid">
             <div class="card card-primary card-outline">
                 <div class="card-header">
-                    <div class=" d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            @if (Auth::user()->role == 'admin')
-                                <h3 class="card-title mr-2">
-                                    {{ Auth::user()->admin->shop->kode . ' ' . Auth::user()->admin->shop->nama }}</h3>
-                            @else
-                                <select name="shop_id" class="form-control mr-2" style="width: 200px">
-                                    @foreach ($shops as $shop)
-                                        <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
+                    <div class="row justify-content-between align-items-center">
+                        @if (Auth::user()->shop)
+                            <h3 class="card-title mr-2">
+                                {{ Auth::user()->shop->kode . ' ' . Auth::user()->shop->nama }}</h3>
+                        @else
+                            <div class="col-md-6 d-flex justify-content-between">
+                                <select id="shop_id" name="shop_id" class="form-control mr-2">
+                                    <option value="" disabled>--Pilih Pertashop--</option>
+                                    @foreach ($shops as $s)
+                                        <option value="{{ $s->id }}" @selected(Request::query('shop_id') == $s->id)>
+                                            {{ $s->kode . ' ' . $s->nama }}</option>
                                     @endforeach
                                 </select>
-                            @endif
-
-                        </div>
-                        @if (Auth::user()->role == 'admin')
-                            <a href="{{ route('purchases.create') }}" class="btn btn-primary"><i
-                                    class="fa fa-plus mr-2"></i>Tambah
-                                Pembelian</a>
+                                <select id="year_month" name="year_month" class="form-control">
+                                    <option value="" disabled>--Pilih Bulan--</option>
+                                    @php
+                                        $currentYear = date('Y');
+                                        $currentMonth = date('n');
+                                    @endphp
+                                    @for ($tahun = $currentYear; $tahun >= 2021; $tahun--)
+                                        @php
+                                            $lastMonth = $tahun == $currentYear ? $currentMonth : 12;
+                                        @endphp
+                                        @for ($bulan = $lastMonth; $bulan >= 1; $bulan--)
+                                            @php
+                                                $date = Carbon\Carbon::create($tahun, $bulan, 1);
+                                                $value = $date->format('Y-m');
+                                                $label = $date->monthName . ' ' . $date->year;
+                                            @endphp
+                                            <option value="{{ $value }}" @selected(Request::query('year_month') == $value)>
+                                                {{ $label }}</option>
+                                        @endfor
+                                    @endfor
+                                </select>
+                            </div>
                         @endif
 
+                        @if (Auth::user()->role == 'admin' || Auth::user()->role == 'super-admin')
+                            <div class="col-md-3 d-flex justify-content-end order-first order-md-last mb-2 mb-md-0">
+                                <a href="{{ route('purchases.create', Auth::user()->role == 'super-admin' ? ['shop_id' => Request::query('shop_id', 1)] : null) }}"
+                                    class="btn btn-primary"><i class="fa fa-plus mr-2"></i>Tambah</a>
+                            </div>
+                        @endif
                     </div>
 
                 </div>
                 <div class="card-body">
 
-                    <div class="table-responsive-lg">
-                        <table id="purchase-table" class="table table-bordered">
+                    <div class="table-responsive">
+                        <table class="table table-bordered data-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Tanggal Order</th>
+                                    <th class="text-center">No. SO</th>
+                                    <th class="text-center">Suppiler</th>
+                                    <th class="text-center">Volume Order (&ell;)</th>
+                                    <th class="text-center">Harga / (&ell;) </th>
+                                    <th class="text-center">Total Bayar</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($purchases as $purchase)
+                                    <tr>
+                                        <td>{{ $purchase->tanggal }}</td>
+                                        <td>{{ $purchase->no_so }}</td>
+                                        <td>{{ $purchase->supplier->nama }}</td>
+                                        <td class="text-right number-float">{{ $purchase->volume }}</td>
+                                        <td class="text-right currency-decimal">{{ $purchase->harga_per_liter }}</td>
+                                        <td class="text-right currency">{{ $purchase->total_bayar }}</td>
+                                        <td>
+                                            @if ($purchase->status == 'Diterima')
+                                                <button class="btn text-success btn-link" data-toggle="modal"
+                                                    data-target="#modalPenerimaan{{ $purchase->id }}">Diterima</button>
+                                                <div class="modal fade" id="modalPenerimaan{{ $purchase->id }}"
+                                                    tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Penerimaan</h5>
+                                                                <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <table class="table">
+                                                                    <tr>
+                                                                        <td>No. SO</td>
+                                                                        <td>{{ $purchase->incoming->purchase->no_so }}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Supplier</td>
+                                                                        <td>{{ $purchase->incoming->purchase->supplier->nama }}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Sopir</td>
+                                                                        <td>{{ $purchase->incoming->sopir }}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>No. Polisi</td>
+                                                                        <td>{{ $purchase->incoming->no_polisi }}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Volume Order</td>
+                                                                        <td><span
+                                                                                class="number-float">{{ $purchase->incoming->purchase->volume }}</span>
+                                                                            &ell;
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Stik Sebelum Curah</td>
+                                                                        <td><span
+                                                                                class="number-float">{{ $purchase->incoming->stik_sebelum_curah }}</span>
+                                                                            cm (<span
+                                                                                class="number-float">{{ $purchase->incoming->stok_sebelum_curah }}</span>
+                                                                            &ell;
+                                                                            )</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Stik Setelah Curah</td>
+                                                                        <td><span
+                                                                                class="number-float">{{ $purchase->incoming->stik_setelah_curah }}</span>
+                                                                            cm (<span
+                                                                                class="number-float">{{ $purchase->incoming->stok_setelah_curah }}</span>
+                                                                            &ell;
+                                                                            )</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Penerimaan Real</td>
+                                                                        <td><span
+                                                                                class="number-float">{{ $purchase->incoming->penerimaan_real }}</span>
+                                                                            &ell;
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-dismiss="modal">Close</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <button class="btn text-warning btn-link">Dipesan</button>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('purchases.edit', $purchase->id) }}"
+                                                class="btn btn-sm btn-link"><i class="fas fa-edit"></i></a>
+                                            <button class="btn btn-sm text-danger btn-link btn-delete"
+                                                data-id="{{ $purchase->id }}"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -61,141 +194,21 @@
 @push('script')
     <script>
         $(document).ready(function() {
-            var dataTable = $('#purchase-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "/purchases",
-                columns: [
-                    // {
-                    //     data: 'DT_RowIndex',
-                    //     name: 'DT_RowIndex'
-                    // }, 
 
-                    {
-                        title: 'Tanggal',
-                        data: 'created_at',
-                        name: 'created_at',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatDate(data);
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        title: 'No. SO',
-                        data: 'no_so',
-                        name: 'no_so',
-                    },
-                    {
-                        title: 'Supplier',
-                        data: 'supplier.nama',
-                        name: 'supplier.nama',
-                    },
+            $('.data-table').dataTable()
 
-                    {
-                        title: 'Volume (&ell;)',
-                        data: 'volume',
-                        name: 'volume',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatNumber(data)
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        title: 'Diterima (&ell;)',
-                        data: 'diterima',
-                        name: 'diterima',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatNumber(data)
-                            }
-                            return data;
-                        }
-                    },
-                    // {
-                    //     title: 'Sisa (&ell;)',
-                    //     data: 'sisa',
-                    //     name: 'sisa',
-                    //     className: 'text-right',
-                    //     render: function(data, type) {
-                    //         if (type === 'display') {
-                    //             return formatNumber(data)
-                    //         }
-                    //         return data;
-                    //     }
-                    // },
 
-                    {
-                        title: 'Harga per Liter (Rp)',
-                        data: 'harga',
-                        name: 'harga',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatNumber(data);
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        title: 'Total Bayar (Rp)',
-                        data: 'total_bayar',
-                        name: 'total_bayar',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatNumber(data, 0);
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        title: 'Aksi',
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },
-                ],
-                order: [
-                    [0, 'desc']
-                ],
-                columnDefs: [{
-                        responsivePriority: 1,
-                        targets: 0
-                    },
-                    {
-                        responsivePriority: 2,
-                        targets: -1
-                    }
-                ],
-                responsive: {
-                    details: {
-                        display: DataTable.Responsive.display.modal({
-                            header: function(row) {
-                                var data = row.data();
-                                return 'Detail Pembelian';
-                            }
-                        }),
-                        renderer: DataTable.Responsive.renderer.tableAll({
-                            tableClass: 'table'
-                        })
-                    }
-                }
-            });
-
-            $('select[name=shop_id]').on('change', function() {
-                dataTable.ajax.url(`?shop_id=${this.value}`).load();
+            $('#shop_id, #year_month').on('change', function() {
+                const shop_id = $('#shop_id').val();
+                const year_month = $('#year_month').val();
+                window.location.replace(
+                    `{{ route('purchases.index') }}?shop_id=${shop_id}&year_month=${year_month}`
+                );
             });
 
 
-            $('#purchase-table').on('click', '.btn-delete', function() {
-                var saleId = $(this).data('id');
+            $('.btn-delete').on('click', function() {
+                var id = $(this).data('id');
 
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
@@ -210,17 +223,17 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "DELETE",
-                            url: "{{ url('') }}" + "/purchases/" + saleId,
-                            data: {
-                                "_token": "{{ csrf_token() }}"
-                            },
+                            url: `{{ route('purchases.index') }}/${id}`,
                             success: function(response) {
-                                dataTable.ajax.reload();
-                                Swal.fire(
-                                    'Terhapus!',
-                                    response.message,
-                                    'success'
-                                );
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then((result) => {
+                                    window.location.reload()
+                                });
                             }
                         });
                     }

@@ -37,13 +37,14 @@
 </head>
 
 <body
-    class="hold-transition {{ Auth::user()->role == 'operator' ? 'layout-top-nav' : 'sidebar-mini layout-fixed layout-navbar-fixed' }}">
+    class="hold-transition {{ Auth::user()->role == 'operator' ? 'layout-top-nav' : 'sidebar-mini layout-fixed layout-navbar-fixed sidebar-collapse' }}">
 
     @if (Auth::user()->role == 'operator')
-        @include('layouts._operator')
+        @include('layouts.top-nav')
     @else
-        @include('layouts._admin')
+        @include('layouts.sidebar')
     @endif
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
         integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
@@ -69,6 +70,14 @@
             }
         })
 
+        function formatYearMonth(year_month) {
+            const date = new Date(year_month + '-01');
+            const options = {
+                year: 'numeric',
+                month: 'long',
+            };
+            return date.toLocaleDateString('id-ID', options);
+        }
 
         function formatDate(inputDate) {
             const date = new Date(inputDate);
@@ -81,7 +90,7 @@
             return date.toLocaleDateString('id-ID', options);
         }
 
-        function formatNumber(data, fractionDigit = 2) {
+        function formatNumber(data, fractionDigit = 0) {
             return parseFloat(data).toLocaleString('id-ID', {
                 minimumFractionDigits: fractionDigit,
                 maximumFractionDigits: fractionDigit
@@ -106,6 +115,14 @@
                 }
             });
 
+            $('.currency-decimal').each(function() {
+                var value = parseFloat($(this).text());
+                if (!isNaN(value)) {
+                    var formattedValue = formatCurrency(value, 2);
+                    $(this).text(formattedValue);
+                }
+            });
+
             $('.number').each(function() {
                 var value = parseFloat($(this).text());
                 if (!isNaN(value)) {
@@ -114,13 +131,22 @@
                 }
             });
 
-            $('.number-int').each(function() {
+            $('.number-float').each(function() {
                 var value = parseFloat($(this).text());
                 if (!isNaN(value)) {
-                    var formattedValue = formatNumber(value, 0);
+                    var formattedValue = formatNumber(value, 2);
                     $(this).text(formattedValue);
                 }
             });
+
+            $('.liter').each(function() {
+                var value = parseFloat($(this).text());
+                if (!isNaN(value)) {
+                    var formattedValue = `${formatNumber(value, 2)} &ell;`;
+                    $(this).html(formattedValue);
+                }
+            });
+
             $('.number-abs').each(function() {
                 var value = Math.abs(parseFloat($(this).text()));
                 if (!isNaN(value)) {
@@ -162,6 +188,19 @@
                 });
             }
             sessionStorage.setItem('shown-' + popupId, '1');
+        @endif
+
+        //if session error
+        @if (session('error'))
+            var errorId = "{{ uniqid() }}";
+            if (!sessionStorage.getItem('shown-' + errorId)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: '{{ session('error') }}',
+                });
+            }
+            sessionStorage.setItem('shown-' + errorId, '1');
         @endif
     </script>
 

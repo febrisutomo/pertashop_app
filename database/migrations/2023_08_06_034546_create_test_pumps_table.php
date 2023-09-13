@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('test_pumps', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shop_id')->constrained();
-            $table->foreignId('operator_id')->constrained();
-            $table->foreignId('daily_report_id')->nullable()->constrained();
-            $table->unsignedDecimal('totalisator_awal', 10, 2);
-            $table->unsignedDecimal('totalisator_akhir', 10, 2);
+            $table->foreignId('daily_report_id')->constrained()->cascadeOnDelete();
+            $table->unsignedDecimal('volume_test', 10, 2);
+            $table->unsignedDecimal('volume_aktual', 10, 2);
             $table->timestamps();
         });
     }

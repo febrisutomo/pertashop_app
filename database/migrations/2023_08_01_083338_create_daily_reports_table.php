@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('daily_reports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('shop_id')->constrained();
-            $table->foreignId('operator_id')->constrained();
+            $table->foreignId('operator_id')->constrained('users');
             $table->foreignId('price_id')->constrained();
             $table->unsignedDecimal('totalisator_akhir', 10, 3);
-            $table->unsignedDecimal('stik_akhir', 10, 2);
+            $table->unsignedDecimal('stik_akhir', 10, 2)->nullable();
             $table->unsignedDecimal('disetorkan', 10, 2);
             $table->boolean('diverifikasi')->default(false);
             $table->timestamps();

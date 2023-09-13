@@ -1,17 +1,22 @@
 <?php
 
+use App\Models\Incoming;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SaleController;
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ShopController;
+use App\Http\Controllers\PriceController;
 use App\Http\Controllers\IncomingController;
-use App\Http\Controllers\OperatorController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SpendingController;
 use App\Http\Controllers\TestPumpController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LabaKotorController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\LabaBersihController;
+use App\Http\Controllers\CorporationController;
 use App\Http\Controllers\DailyReportController;
-use App\Models\Incoming;
+use App\Http\Controllers\RekapModalController;
+use App\Http\Controllers\ProfitSharingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,13 +38,24 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resources([
-        'sales' => SaleController::class,
         'purchases' => PurchaseController::class,
-        'incomings' => IncomingController::class,
-        'test-pumps' => TestPumpController::class,
         'daily-reports' => DailyReportController::class,
         'spendings' => SpendingController::class,
+
+        'corporations' => CorporationController::class,
+        'prices' => PriceController::class,
+        'shops' => ShopController::class,
+        'users' => UserController::class,
     ]);
+
+    Route::get('/daily-reports/{shop_id}/{date}/detail', [DailyReportController::class, 'detail'])->name('daily-reports.detail');
+
+    Route::get('/daily-reports/create/shop-data', [DailyReportController::class, 'getShopData'])->name('daily-reports.shop-data');
+
+    Route::get('/shops/{shop}/investors', [ShopController::class, 'investor'])->name('shops.investors');
+    Route::post('/shops/{shop}/investors', [ShopController::class, 'investorStore'])->name('shops.investors.store');
+    Route::put('/shops/{shop}/investors', [ShopController::class, 'investorUpdate'])->name('shops.investors.update');
+    Route::delete('/shops/{shop}/investors', [ShopController::class, 'investorDestroy'])->name('shops.investors.destroy');
 
     // Route::prefix('spendings')->group(function () {
     //     Route::get('/', [SpendingController::class, 'index'])->name('spendings.index');
@@ -47,17 +63,26 @@ Route::middleware('auth')->group(function () {
     //     Route::get('/{shop_id}/{year_month}', [SpendingController::class, 'edit'])->name('spendings.edit');
     // });
 
-    Route::prefix('data')->group(function () {
-        Route::resources([
-            'operators' => OperatorController::class,
-        ]);
+    Route::prefix('laba-kotor')->group(function () {
+        Route::get('/', [LabaKotorController::class, 'index'])->name('laba-kotor.index');
+        Route::get('/{shop_id}/{year_month}', [LabaKotorController::class, 'edit'])->name('laba-kotor.edit');
     });
-    Route::prefix('reports')->group(function () {
-        Route::prefix('bulanan')->group(function () {
-            Route::get('/', [ReportController::class, 'index'])->name('reports.index');
-            Route::get('/{shop_id}/{year_month}/laba-kotor', [ReportController::class, 'labaKotor'])->name('reports.laba_kotor');
-            Route::get('/{shop_id}/{year_month}/laba-bersih', [ReportController::class, 'labaBersih'])->name('reports.laba_bersih');
-            // Route::get('/laba-kotor', [ReportController::class, 'laba_kotor'])->name('reports.laba_kotor');
-        });
+
+    Route::prefix('laba-bersih')->group(function () {
+        Route::get('/', [LabaBersihController::class, 'index'])->name('laba-bersih.index');
+        Route::get('/{shop_id}/{year_month}', [LabaBersihController::class, 'edit'])->name('laba-bersih.edit');
+        Route::post('/{shop_id}/{year_month}/alokasi_modal', [LabaBersihController::class, 'alokasi_modal'])->name('laba-bersih.alokasi-modal');
+    });
+
+    Route::prefix('rekap-modal')->group(function () {
+        Route::get('/', [RekapModalController::class, 'index'])->name('rekap-modal.index');
+        Route::post('/store', [RekapModalController::class, 'store'])->name('rekap-modal.store');
+        Route::delete('/{id}', [RekapModalController::class, 'destroy'])->name('rekap-modal.destroy');
+        Route::get('/{shop_id}/{year_month}', [RekapModalController::class, 'edit'])->name('rekap-modal.edit');
+    });
+
+    Route::prefix('profit-sharing')->group(function () {
+        Route::get('/', [ProfitSharingController::class, 'index'])->name('profit-sharing.index');
+        Route::get('/{shop_id}/{year_month}', [ProfitSharingController::class, 'edit'])->name('profit-sharing.edit');
     });
 });

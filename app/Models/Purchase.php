@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Incoming;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -11,30 +12,34 @@ class Purchase extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['harga', 'diterima', 'sisa'];
+    protected $append = ['harga_per_liter', 'tanggal', 'status'];
 
-    public function incomings()
+    public function incoming()
     {
-        return $this->hasMany(Incoming::class);
+        return $this->hasOne(Incoming::class);
     }
 
-    public function getHargaAttribute()
+    public function getHargaPerLiterAttribute()
     {
         return $this->total_bayar / $this->volume;
-    }
-
-    public function getSisaAttribute()
-    {
-        return $this->volume - $this->incomings->sum('volume');
-    }
-
-    public function getDiterimaAttribute()
-    {
-        return $this->volume - $this->sisa;
     }
 
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function getTanggalAttribute()
+    {
+        return $this->created_at->format('d') . " " . $this->created_at->monthName . " " . $this->created_at->format('Y');
+    }
+
+    public function getStatusAttribute()
+    {
+        if ($this->incoming) {
+            return "Diterima";
+        } else {
+            return "Dipesan";
+        }
     }
 }

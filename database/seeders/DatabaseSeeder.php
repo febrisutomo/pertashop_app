@@ -4,24 +4,18 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-use App\Models\Sale;
 use App\Models\Shop;
 use App\Models\User;
 use App\Models\Price;
-use App\Models\Incoming;
-use App\Models\Investor;
 use App\Models\Purchase;
+use App\Models\Spending;
 use App\Models\Supplier;
 use App\Models\TestPump;
+use App\Models\RekapModal;
 use App\Models\Corporation;
-use App\Models\Pengeluaran;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
-use App\Http\Controllers\ReportController;
-use App\Models\Admin;
-use App\Models\Operator;
-use App\Models\Spending;
 use App\Models\SpendingCategory;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -30,133 +24,280 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
 
+        //create corporation
         $SAL = Corporation::factory()->create([
             'nama' => 'PT Serayu Agung Mandiri',
+            'alamat' => 'JL Kulon 674 RT 002 RW 003 Kel.Sudagaran Kec. Banyumas Kec. Banyumas Kab. Banyumas Prov. Jawa Tengah 53192'
         ]);
 
         $SPA = Corporation::factory()->create([
             'nama' => 'PT Sinergy Petrajaya Abadi',
+            'alamat' => 'Desa Kalibenda RT2/1 kec. Ajibarang kab banyumas'
         ]);
 
         $KKB = Corporation::factory()->create([
-            'nama' => 'KPRI Kokanaba Baturraden',
+            'nama' => 'KPRI Kokarnaba Baturraden',
+            'alamat' => 'JL Raya Kemutug Lor Baturraden'
         ]);
 
+        //create shop
         $kalitapen = Shop::factory()->for($SAL)->create([
             'nama' => 'Kalitapen',
             'kode' => '4P.53119',
+            'short_name' => 'KLT',
             'alamat' => 'Kel. Kalitapen Kec. Purwojati Kab. Banyumas',
+            'totalisator_awal' => 311404.970,
+            'stik_awal' => 113,
+            'modal_awal' => 60000000,
         ]);
 
-        $user1 = User::factory()->create([
-            'name' => 'Andi',
-            'role' => 'operator',
-            'email' => 'operator1@kalitapen.com'
-        ]);
-
-        $user2 = User::factory()->create([
-            'name' => 'Budi',
-            'role' => 'operator',
-            'email' => 'operator2@kalitapen.com'
-        ]);
-
-        $user3 = User::factory()->create(
-            [
-                'name' => 'Caca',
-                'role' => 'admin',
-                'email' => 'admin@kalitapen.com'
-            ]
-        );
-
-        Operator::factory()->for($kalitapen)->for($user1)->create();
-        Operator::factory()->for($kalitapen)->for($user2)->create();
-        Admin::factory()->for($kalitapen)->for($user3)->create();
-
-        $kalibenda = Shop::factory()->for($SAL)->hasOperators(2)->create([
+        $kalibenda = Shop::factory()->for($SAL)->create([
             'nama' => 'Kalibenda',
+            'short_name' => 'KLB',
             'kode' => '4P.53134',
             'alamat' => 'Kel. Kalibenda Kec. Ajibarang Kab. Banyumas',
+            'totalisator_awal' => 303328.590,
+            'stik_awal' => 120,
         ]);
-        $pageralang = Shop::factory()->for($SAL)->hasOperators(2)->create([
+
+        $pageralang = Shop::factory()->for($SAL)->create([
             'nama' => 'Pageralang',
+            'short_name' => 'PGL',
             'kode' => '4P.53164',
             'alamat' => 'Kel. Pageralang Kec. Kemranjen Kab. Banyumas',
+            'totalisator_awal' => 58543.424,
+            'stik_awal' => 64,
+            'skala' => 21.46
         ]);
 
-        $gumelar = Shop::factory()->for($SPA)->hasOperators(2)->create([
+        $gumelar = Shop::factory()->for($SPA)->create([
+            'corporation_id' => $SPA->id,
             'nama' => 'Gumelar',
+            'short_name' => 'GML',
             'kode' => '4P.53158',
             'alamat' => 'Kel. Gumelar Kec. Gumelar Kab. Banyumas',
+            'totalisator_awal' => 113644.88,
+            'stik_awal' => 98.20,
+            'modal_awal' => 120000000
         ]);
 
-        $kemutug = Shop::factory()->for($KKB)->hasOperators(2)->create([
+
+        $kemutug = Shop::factory()->for($KKB)->create([
             'nama' => 'Kemutug Lor',
+            'short_name' => 'KML',
             'kode' => '4P.53143',
             'alamat' => 'Kel. Kemutug Lor Kec. Baturraden Kab. Banyumas',
+            'totalisator_awal' => 166491.170,
+            'stik_awal' => 39.10,
+            'skala' => 21.49
         ]);
 
+        //create user with role super-admin
         User::factory()->create([
             'name' => 'Febri Sutomo',
-            'email' => 'super-admin@gmail.com',
+            'email' => 'super-admin@pertashop.com',
             'role' => 'super-admin'
         ]);
 
+        //create user with role admin
+        User::factory()->for($kalitapen)->create([
+            'name' => 'Dwi Yuliarto',
+            'email' => 'admin@kalitapen.com',
+            'role' => 'admin'
+        ]);
+
+        //create user with role operator
+        User::factory()->for($kalitapen)->create([
+            'name' => 'Muhammad Aulia Perdana',
+            'email' => 'ardan@kalitapen.com',
+            'role' => 'operator',
+            'no_hp' => '085842539509',
+            'alamat' => 'Kalitapen',
+            'nama_bank' => 'BRI',
+            'no_rekening' => '376001035647535',
+            'pemilik_rekening' => 'Muhammad Aulia Perdana',
+        ]);
+
+        User::factory()->for($kalibenda)->create([
+            'name' => 'Febriansah Saputra',
+            'email' => 'febri@kalibenda.com',
+            'role' => 'operator',
+            'no_hp' => '0882007093173',
+            'alamat' => 'Kalibenda',
+            'nama_bank' => 'BRI',
+            'no_rekening' => '660101016957538',
+            'pemilik_rekening' => 'FEBRIANSAH SAPUTRA',
+        ]);
+
+        User::factory()->for($pageralang)->create([
+            'name' => 'Rian Rizqy Milliarto',
+            'email' => 'rian@pageralang.com',
+            'role' => 'operator',
+            'no_hp' => '085848184884',
+            'alamat' => 'Pageralang',
+            'nama_bank' => 'BRI',
+            'no_rekening' => '682701018889533',
+            'pemilik_rekening' => 'Rian Rizqy Milliarto',
+        ]);
+
+        User::factory()->for($gumelar)->create([
+            'name' => 'Wiki Triono',
+            'email' => 'wiki@gumelar.com',
+            'role' => 'operator',
+            'no_hp' => '08990840781',
+            'alamat' => 'Gumelar',
+            'nama_bank' => 'BRI',
+            'no_rekening' => '376001006128530',
+            'pemilik_rekening' => 'RUSWAN',
+        ]);
+
+        User::factory()->for($gumelar)->create([
+            'name' => 'Dika Dwi Pratama',
+            'email' => 'dika@gumelar.com',
+            'role' => 'operator',
+            'no_hp' => '0895322458546',
+            'alamat' => 'Gumelar',
+            'nama_bank' => 'BRI',
+            'no_rekening' => '376001035647535',
+            'pemilik_rekening' => 'DIKA DWI PRATAMA',
+        ]);
+
+        User::factory()->for($kemutug)->create([
+            'name' => 'Suwitno',
+            'email' => 'witno@kemutuglor.com',
+            'role' => 'operator',
+            'no_hp' => '85604234591',
+            'alamat' => 'Kemutug Lor',
+            'nama_bank' => 'BRI',
+            'no_rekening' => '660501012523537',
+            'pemilik_rekening' => 'Suwitno',
+        ]);
+
         #create user with role investor
-        $koko = User::create([
-            'name' => 'Koko Aribowo',
-            'email' => 'koko@gmail.com',
+        $ptsam  = User::factory()->create([
+            'name' => 'PT. Serayu Agung Mandiri',
+            'email' => 'ptsam@pertashop.com',
             'role' => 'investor',
-            'password' => Hash::make('123'),
-        ]);
-
-        $adlai = User::create([
-            'name' => 'R. Adlai BT Kalapaaking',
-            'email' => 'adlai@gmail.com',
-            'role' => 'investor',
-            'password' => Hash::make('123'),
-        ]);
-
-        $eko = User::create([
-            'name' => 'Eko Cahyonoo',
-            'email' => 'eko@gmail.com',
-            'role' => 'investor',
-            'password' => Hash::make('123'),
-        ]);
-
-        #create investor for user with role investor
-        $investor_koko = $koko->investor()->create([
-            'bank_rekening' => 'BCA',
-            'no_rekening' => '7510 6699 96',
-            'atas_nama_rekening' => 'PT. TRIMITRA CIPTA KREASI',
-            'no_hp' => '08123456789',
-        ]);
-        $investor_adlai = $adlai->investor()->create([
-            'bank_rekening' => 'Mandiri',
+            'nama_bank' => 'Mandiri',
             'no_rekening' => '13900 2109 0000',
-            'atas_nama_rekening' => 'R. ADLAI BT KALAPAAKING',
-            'no_hp' => '08123456789',
+            'pemilik_rekening' => 'ADLAI BUDIARTO TJIPTO',
         ]);
-        $investor_eko = $eko->investor()->create([
-            'bank_rekening' => 'BCA',
-            'no_rekening' => '4240 2645 82',
-            'atas_nama_rekening' => 'EKO CAHYONO',
-            'no_hp' => '08123456789',
+
+        $victor = User::factory()->create([
+            'name' => 'Victor Edward Asrikin',
+            'email' => 'victor@pertashop.com',
+            'role' => 'investor',
+            'nama_bank' => 'Mandiri',
+            'no_rekening' => '13900 1724 2391',
+            'pemilik_rekening' => 'MARLINA NATALIA SETIAWAN',
         ]);
+
+        $koko = User::factory()->create([
+            'name' => 'Koko Aribowo',
+            'email' => 'koko@pertashop.com',
+            'role' => 'investor',
+        ]);
+
+        $kosim = User::factory()->create([
+            'name' => 'Sugiyanto Kosim',
+            'email' => 'kosim@pertashop.com',
+            'role' => 'investor',
+        ]);
+
+        $kaswari = User::factory()->create([
+            'name' => 'Kaswari',
+            'email' => 'kaswari@pertashop.com',
+            'role' => 'investor',
+        ]);
+
+        $adlai = User::factory()->create([
+            'name' => 'R. Adlai BT Kalapaaking',
+            'email' => 'adlai@pertashop.com',
+            'role' => 'investor',
+        ]);
+
+        $eko = User::factory()->create([
+            'name' => 'Eko Cahyonoo',
+            'email' => 'eko@pertashop.com',
+            'role' => 'investor',
+        ]);
+
 
         #attach investor to shop
         #attach to shop kalitapen
-        $investor_koko->shops()->attach($kalitapen, ['percentage' => 75]);
-        $investor_adlai->shops()->attach($kalitapen, ['percentage' => 15]);
-        $investor_eko->shops()->attach($kalitapen, ['percentage' => 10]);
-        #attach to shop kalibenda
+        $ptsam->investments()->attach($kalitapen, [
+            'persentase' => 70,
+            'nama_bank' => 'Mandiri',
+            'no_rekening' => '13900 2109 0000',
+            'pemilik_rekening' => 'ADLAI BUDIARTO TJIPTO',
+        ]);
+
+        $victor->investments()->attach($kalitapen, [
+            'persentase' => 15,
+            'nama_bank' => 'Mandiri',
+            'no_rekening' => '13900 1724 2391',
+            'pemilik_rekening' => 'MARLINA NATALIA SETIAWAN',
+        ]);
+
+        $koko->investments()->attach($kalitapen, [
+            'persentase' => 5,
+            'nama_bank' => 'Mandiri',
+            'no_rekening' => '90000 0679 3138',
+            'pemilik_rekening' => 'KOKO ARIBOWO',
+        ]);
+
+        $kosim->investments()->attach($kalitapen, [
+            'persentase' => 5,
+            'nama_bank' => 'Mandiri',
+            'no_rekening' => '13900 9204 6840',
+            'pemilik_rekening' => 'SUGIYANTO KOSIM SINDU',
+        ]);
+
+        $kaswari->investments()->attach($kalitapen, [
+            'persentase' => 5,
+            'nama_bank' => 'BNI',
+            'no_rekening' => '0436 8454 88',
+            'pemilik_rekening' => 'KASWARI',
+        ]);
+
+        #attach to shop gumelar
+        $koko->investments()->attach($gumelar, [
+            'persentase' => 75,
+            'nama_bank' => 'BCA',
+            'no_rekening' => '7510 6699 96',
+            'pemilik_rekening' => 'PT. TRIMITRA CIPTA KREASI',
+        ]);
+
+        $adlai->investments()->attach($gumelar, [
+            'persentase' => 15,
+            'nama_bank' => 'Mandiri',
+            'no_rekening' => '13900 2109 0000',
+            'pemilik_rekening' => 'R. ADLAI BT KALAPAAKING',
+        ]);
+
+        $eko->investments()->attach($gumelar, [
+            'persentase' => 10,
+            'nama_bank' => 'BCA',
+            'no_rekening' => '4240 2645 82',
+            'pemilik_rekening' => 'EKO CAHYONO',
+        ]);
 
         Price::insert([
             [
+                'harga_beli' => 8173.50,
+                'harga_jual' => 9000,
+                'created_at' => "2021-01-01"
+            ],
+            [
+                'harga_beli' => 11682.30,
+                'harga_jual' => 12500,
+                'created_at' => "2021-04-01"
+            ],
+            [
                 'harga_beli' => 13687.50,
                 'harga_jual' => 14500,
-                'created_at' => "2022-04-01"
+                'created_at' => "2022-03-09"
             ],
             [
                 'harga_beli' => 13085.95,
@@ -182,6 +323,11 @@ class DatabaseSeeder extends Seeder
                 'harga_beli' => 11676.94,
                 'harga_jual' => 12500,
                 'created_at' => "2023-06-01"
+            ],
+            [
+                'harga_beli' => 12478.66,
+                'harga_jual' => 13300,
+                'created_at' => "2023-09-01"
             ]
         ]);
 
@@ -189,29 +335,31 @@ class DatabaseSeeder extends Seeder
         Supplier::factory(3)->create();
 
 
-        $purchase = Purchase::create([
-            'no_so' => 123456,
-            'shop_id' => $kalitapen->id,
-            'supplier_id' => 1,
-            'volume' => 2000,
-            'created_at' => "2023-08-28",
-            'total_bayar' => 2000 * Price::latest()->first()->harga_beli,
-        ]);
+        // $purchase = Purchase::create([
+        //     'no_so' => 123456,
+        //     'shop_id' => $kalitapen->id,
+        //     'supplier_id' => 1,
+        //     'volume' => 2000,
+        //     'created_at' => "2023-08-28",
+        //     'total_bayar' => 2000 * Price::latest()->first()->harga_beli,
+        // ]);
 
 
-        Incoming::create([
-            'shop_id' => 1,
-            'purchase_id' => $purchase->id,
-            'operator_id' => 1,
-            'sopir' => 'Andi',
-            'no_polisi' => 'R 3242 JK',
-            'volume' => 2000,
-            'stik_awal' => 60,
-            'stik_akhir' => 155.3,
-            'created_at' => now()
-        ]);
+        // Incoming::create([
+        //     'shop_id' => 1,
+        //     'purchase_id' => $purchase->id,
+        //     'operator_id' => 1,
+        //     'sopir' => 'Andi',
+        //     'no_polisi' => 'R 3242 JK',
+        //     'volume' => 2000,
+        //     'stik_awal' => 60,
+        //     'stik_akhir' => 155.3,
+        //     'created_at' => now()
+        // ]);
 
         SpendingCategory::insert([
+            ['nama' => 'Gaji Operator'],
+            ['nama' => 'Gaji Admin'],
             ['nama' => 'Ongkos Bongkar'],
             ['nama' => 'Biaya Transfer'],
             ['nama' => 'Fotocopy & ATK'],
@@ -223,45 +371,251 @@ class DatabaseSeeder extends Seeder
 
         SpendingCategory::create(['id' => 99, 'nama' => 'Lain-lain']);
 
-        Spending::insert([
-            [
-                'shop_id' => $kalitapen->id,
-                'operator_id' => 1,
-                'created_at' => now(),
-                'spending_category_id' => 1,
-                'jumlah' => 10000
-            ],
-            [
-                'shop_id' => $kalitapen->id,
-                'operator_id' => 1,
-                'created_at' => now(),
-                'spending_category_id' => 3,
-                'jumlah' => 1800
-            ],
-            [
-                'shop_id' => $kalitapen->id,
-                'operator_id' => 1,
-                'created_at' => now(),
-                'spending_category_id' => 4,
-                'jumlah' => 105000
-            ],
-        ]);
+        // Spending::insert([
+        //     [
+        //         'shop_id' => $kalitapen->id,
+        //         'operator_id' => 1,
+        //         'created_at' => now(),
+        //         'spending_category_id' => 3,
+        //         'jumlah' => 10000
+        //     ],
+        //     [
+        //         'shop_id' => $kalitapen->id,
+        //         'operator_id' => 1,
+        //         'created_at' => now(),
+        //         'spending_category_id' => 5,
+        //         'jumlah' => 1800
+        //     ],
+        //     [
+        //         'shop_id' => $kalitapen->id,
+        //         'operator_id' => 1,
+        //         'created_at' => now(),
+        //         'spending_category_id' => 6,
+        //         'jumlah' => 105000
+        //     ],
+        // ]);
 
-        Spending::create([
-            'shop_id' => $kalitapen->id,
-            'operator_id' => 1,
-            'created_at' => now(),
-            'spending_category_id' => 99,
-            'keterangan' => 'Seragam',
-            'jumlah' => 110000
-        ]);
+        // Spending::create([
+        //     'shop_id' => $kalitapen->id,
+        //     'operator_id' => 1,
+        //     'created_at' => now(),
+        //     'spending_category_id' => 99,
+        //     'keterangan' => 'Seragam',
+        //     'jumlah' => 110000
+        // ]);
 
-        TestPump::create([
-            'created_at' => now(),
-            'totalisator_awal' => 120000,
-            'totalisator_akhir' => 120010,
-            'operator_id' => 1,
-            'shop_id' => $kalitapen->id
-        ]);
+        // TestPump::create([
+        //     'created_at' => now(),
+        //     'totalisator_awal' => 120000,
+        //     'totalisator_akhir' => 120010,
+        //     'operator_id' => 1,
+        //     'shop_id' => $kalitapen->id
+        // ]);
+
+        $rekapModal = [
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2021-06-30',
+                'rugi' => 0,
+                'pajak_bank' => 0,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 0,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2021-07-31',
+                'rugi' => 0,
+                'pajak_bank' => 9675,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 15875,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2021-08-31',
+                'rugi' => 0,
+                'pajak_bank' => 20232,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 8659,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2021-09-30',
+                'rugi' => 0,
+                'pajak_bank' => 20549,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 10244,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2021-10-31',
+                'rugi' => 0,
+                'pajak_bank' => 9230,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 11149,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2021-11-30',
+                'rugi' => 0,
+                'pajak_bank' => 5883,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 9414,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2021-12-31',
+                'rugi' => 0,
+                'pajak_bank' => 2230,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 11150,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2022-02-28',
+                'rugi' => 5476183, // Merubah nilai negatif menjadi positif
+                'pajak_bank' => 11983, // Merubah nilai negatif menjadi positif
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 7417,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2022-03-31',
+                'rugi' => 0,
+                'pajak_bank' => 5437,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 7185,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2022-04-30',
+                'rugi' => 0,
+                'pajak_bank' => 8841,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 9205,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2022-05-31',
+                'rugi' => 0,
+                'pajak_bank' => 11564,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 10319,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2022-06-30',
+                'rugi' => 0,
+                'pajak_bank' => 9675,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 8783,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2022-07-31',
+                'rugi' => 0,
+                'pajak_bank' => 5410,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 7048,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2022-08-31',
+                'rugi' => 0,
+                'pajak_bank' => 10277,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 6385,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2022-09-30',
+                'rugi' => 0,
+                'pajak_bank' => 4443,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 7215,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2022-10-31',
+                'rugi' => 1654207, // Merubah nilai negatif menjadi positif
+                'pajak_bank' => 2710, // Merubah nilai negatif menjadi positif
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 13503,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2022-11-30',
+                'rugi' => 0,
+                'pajak_bank' => 2124,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 10620,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2022-12-31',
+                'rugi' => 0,
+                'pajak_bank' => 1709,
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 8543,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2023-01-31',
+                'rugi' => 949043, // Merubah nilai negatif menjadi positif
+                'pajak_bank' => 6191, // Merubah nilai negatif menjadi positif
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 10954,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2023-02-28',
+                'rugi' => 0,
+                'pajak_bank' => 2089,
+                'alokasi_keuntungan' => 169469,
+                'bunga_bank' => 10444,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2023-03-31',
+                'rugi' => 0,
+                'pajak_bank' => 5873,
+                'alokasi_keuntungan' => 240952,
+                'bunga_bank' => 9366,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2023-04-30',
+                'rugi' => 125970, // Merubah nilai negatif menjadi positif
+                'pajak_bank' => 2103, // Merubah nilai negatif menjadi positif
+                'alokasi_keuntungan' => 0,
+                'bunga_bank' => 10515,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2023-05-31',
+                'rugi' => 0,
+                'pajak_bank' => 1863,
+                'alokasi_keuntungan' => 122400,
+                'bunga_bank' => 9314,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2023-06-30',
+                'rugi' => 0,
+                'pajak_bank' => 5895,
+                'alokasi_keuntungan' => 54135,
+                'bunga_bank' => 9473,
+            ],
+            [
+                'shop_id' => $kalitapen->id,
+                'created_at' => '2023-07-31',
+                'rugi' => 0,
+                'pajak_bank' => 1405,
+                'alokasi_keuntungan' => 571077,
+                'bunga_bank' => 7024,
+            ],
+        ];
+
+        RekapModal::insert($rekapModal);
+        RekapModal::where('shop_id', $kalitapen->id)->update(['kas_kecil' => 600000]);
     }
 }

@@ -3,8 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\Admin;
-use App\Models\Investor;
+use App\Models\Shop;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,11 +18,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $guarded = ['id'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -45,25 +40,21 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    protected $appends = ['short_name'];
+    protected $appends = ['first_name'];
 
-    public function operator()
+    public function shop()
     {
-        return $this->hasOne(Operator::class);
+        return $this->belongsTo(Shop::class);
     }
 
-    public function admin()
+    public function investments()
     {
-        return $this->hasOne(Admin::class);
+        return $this->belongsToMany(Shop::class, 'investor_shop')->withPivot(['persentase', 'no_rekening', 'pemilik_rekening', 'nama_bank']);
     }
 
-    public function investor()
-    {
-        return $this->hasOne(Investor::class);
-    }
 
-    #accessor to get short name
-    public function getShortNameAttribute()
+    //getFirstName
+    public function getFirstNameAttribute()
     {
         return explode(' ', $this->name)[0];
     }

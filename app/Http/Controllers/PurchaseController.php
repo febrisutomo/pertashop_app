@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Shop;
 use App\Models\Purchase;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
 
 class PurchaseController extends Controller
 {
@@ -16,37 +17,30 @@ class PurchaseController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            if (Auth::user()->role == 'admin') {
-                $shop_id = Auth::user()->admin->shop_id;
-            } else {
-                $shop_id = $request->input('shop_id', 1);
-            }
 
-            $data = Purchase::where('shop_id', $shop_id)->with(['supplier'])->latest()->get();
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    $button = '<a href="' . route('purchases.edit', $row->id) . '" class="btn btn-sm btn-info" title="Edit"><i class="fa fa-edit"></i></a>';
-                    $button .= ' <button class="btn btn-sm btn-danger btn-delete" title="hapus" data-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
-                    return $button;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
+        if (Auth::user()->role == 'super-admin') {
+            $shop_id = $request->input('shop_id', 1);
+        } else {
+            $shop_id = Auth::user()->shop_id;
         }
 
+        $year_month = $request->input('year_month', Carbon::now()->format('Y-m'));
+        list($year, $month) = explode('-', $year_month);
+
+        $purchases = Purchase::with('supplier', 'incoming')->where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
 
         $shops = Shop::all();
-        return view('purchase.index', compact('shops'));
+
+        return view('purchase.index', compact('shops', 'purchases'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $suppliers = Supplier::all();
         $shops = Shop::all();
+        $suppliers = Supplier::all();
 
         return view('purchase.create', compact('suppliers', 'shops'));
     }
@@ -62,14 +56,21 @@ class PurchaseController extends Controller
 
         $validatedData = $request->validate([
             'created_at' => 'required|date',
+            'shop_id' =>   [
+                Rule::requiredIf(function () {
+                    return Auth::user()->role == 'super-admin';
+                }),
+            ],
             'supplier_id' => 'required|numeric',
-            'no_so' => 'required|string',
+            'no_so' => 'required|string|unique:purchases',
             'volume' => 'required|numeric',
             'total_bayar' => 'required|numeric',
 
         ], $customMessages);
 
-        $validatedData['shop_id'] = Auth::user()->admin->shop->id;
+        if (Auth::user()->role == 'admin') {
+            $validatedData['shop_id'] = Auth::user()->shop_id;
+        }
 
         Purchase::create($validatedData);
 
@@ -106,7 +107,7 @@ class PurchaseController extends Controller
         $validatedData = $request->validate([
             'created_at' => 'required|date',
             'supplier_id' => 'required|numeric',
-            'no_so' => 'required|string',
+            'no_so' => 'required|string|unique:purchases,no_so,' . $purchase->id . ',id',
             'volume' => 'required|numeric',
             'total_bayar' => 'required|numeric',
 

@@ -21,35 +21,399 @@
         <div class="container-fluid">
             <div class="card card-primary card-outline">
                 <div class="card-header">
-                    <div class=" d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            @if (Auth::user()->role == 'operator')
-                                <h3 class="card-title mr-2">
-                                    {{ Auth::user()->operator->shop->kode . ' ' . Auth::user()->operator->shop->nama }}</h3>
-                            @elseif(Auth::user()->role == 'admin')
-                                <h3 class="card-title mr-2">
-                                    {{ Auth::user()->admin->shop->kode . ' ' . Auth::user()->admin->shop->nama }}</h3>
-                            @else
-                                <select name="shop_id" class="form-control mr-2" style="width: 200px">
-                                    @foreach ($shops as $shop)
-                                        <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
+                    <div class="row justify-content-between align-items-center">
+                        @if (Auth::user()->shop)
+                            <h3 class="card-title mr-2">
+                                {{ Auth::user()->shop->kode . ' ' . Auth::user()->shop->nama }}</h3>
+                        @else
+                            <div class="col-md-6 d-flex justify-content-between">
+                                <select id="shop_id" name="shop_id" class="form-control mr-2">
+                                    <option value="" disabled>--Pilih Pertashop--</option>
+                                    @foreach ($shops as $s)
+                                        <option value="{{ $s->id }}" @selected(Request::query('shop_id') == $s->id)>
+                                            {{ $s->kode . ' ' . $s->nama }}</option>
                                     @endforeach
                                 </select>
-                            @endif
+                                <select id="year_month" name="year_month" class="form-control">
+                                    <option value="" disabled>--Pilih Bulan--</option>
+                                    @php
+                                        $currentYear = date('Y');
+                                        $currentMonth = date('n');
+                                    @endphp
+                                    @for ($tahun = $currentYear; $tahun >= 2021; $tahun--)
+                                        @php
+                                            $lastMonth = $tahun == $currentYear ? $currentMonth : 12;
+                                        @endphp
+                                        @for ($bulan = $lastMonth; $bulan >= 1; $bulan--)
+                                            @php
+                                                $date = Carbon\Carbon::create($tahun, $bulan, 1);
+                                                $value = $date->format('Y-m');
+                                                $label = $date->monthName . ' ' . $date->year;
+                                            @endphp
+                                            <option value="{{ $value }}" @selected(Request::query('year_month') == $value)>
+                                                {{ $label }}</option>
+                                        @endfor
+                                    @endfor
+                                </select>
+                            </div>
+                        @endif
 
-                        </div>
-                        @if (Auth::user()->role == 'operator')
-                            <a href="{{ route('daily-reports.create') }}" class="btn btn-primary"><i
-                                    class="fa fa-plus mr-2"></i>Tambah
-                                Laporan Harian</a>
+                        @if (Auth::user()->role == 'operator' || Auth::user()->role == 'super-admin')
+                            <div class="col-md-3 d-flex justify-content-end order-first order-md-last mb-2 mb-md-0">
+                                <a href="{{ route('daily-reports.create', Auth::user()->role == 'super-admin' ? ['shop_id' => Request::query('shop_id', 1)] : null) }}"
+                                    class="btn btn-primary"><i class="fa fa-plus mr-2"></i>Tambah</a>
+                            </div>
                         @endif
                     </div>
 
                 </div>
                 <div class="card-body">
-
-                    <div class="table-responsive-lg">
+                    <div class="table-responsive">
                         <table id="table" class="table table-bordered">
+                            <thead class="table-success">
+                                <tr>
+                                    <th rowspan="2" class="text-center align-middle">Tanggal</th>
+                                    <th rowspan="2" class="text-center align-middle">Operator</th>
+                                    <th rowspan="2" class="text-center align-middle">Totalisator Akhir</th>
+                                    <th colspan="2" class="text-center align-middle">Penjualan</th>
+                                    @if ($shop->operators->count() > 1)
+                                        <th colspan="2" class="text-center align-middle">Total Penjualan</th>
+                                    @endif
+                                    <th rowspan="2" class="text-center align-middle">Test Pump (&ell;)</th>
+                                    <th rowspan="2" class="text-center align-middle">Curah (&ell;)</th>
+                                    <th rowspan="2" class="text-center align-middle">Stik Akhir (cm)</th>
+                                    <th rowspan="2" class="text-center align-middle">Stok Aktual (&ell;)</th>
+                                    <th rowspan="2" class="text-center align-middle">Gain / Loss (&ell;)</th>
+                                    <th rowspan="2" class="text-center align-middle">Pengeluaran</th>
+                                    <th rowspan="2" class="text-center align-middle">Pendapatan</th>
+                                    @if ($shop->operators->count() > 1)
+                                        <th rowspan="2" class="text-center align-middle">Total Pendapatan</th>
+                                    @endif
+                                    <th rowspan="2" class="text-center align-middle">Disetorkan</th>
+                                    <th rowspan="2" class="text-center align-middle">Selisih</th>
+                                    <th rowspan="2" class="text-center align-middle">Aksi</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center align-middle">Volume (&ell;)</th>
+                                    <th class="text-center align-middle">Rupiah</th>
+                                    @if ($shop->operators->count() > 1)
+                                        <th class="text-center align-middle">Volume (&ell;)</th>
+                                        <th class="text-center align-middle">Rupiah</th>
+                                    @endif
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $prevDate = null;
+                                    $countDays = $reports->groupBy('tanggal')->count() == 0 ? 1 : $reports->groupBy('tanggal')->count();
+                                @endphp
+                                @foreach ($reports as $report)
+                                    @if ($report->tanggal != $prevDate)
+                                        @php
+                                            $date = Carbon\Carbon::create($report->created_at);
+                                            $now = Carbon\Carbon::now();
+                                            $diff = $date->diffInDays($now);
+                                        @endphp
+                                        <tr>
+                                            <td rowspan="{{ $reports->where('tanggal', $report->tanggal)->count() }}"
+                                                class="align-middle table-warning">
+                                                {{ $report->tanggal }}
+                                            </td>
+                                            <td class="align-middle">{{ $report->operator->first_name }}</td>
+                                            <td class="align-middle text-right number-float">
+                                                {{ $report->totalisator_akhir }}
+                                            </td>
+                                            <td class="align-middle text-right number-float">
+                                                {{ $report->volume_penjualan }}
+                                            </td>
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="mr-1">Rp</span>
+                                                    <span class="number">{{ $report->rupiah_penjualan }}</span>
+                                                </div>
+                                            </td>
+                                            @if ($shop->operators->count() > 1)
+                                                <td rowspan="{{ $reports->where('tanggal', $report->tanggal)->count() }}"
+                                                    class="align-middle text-right number-float">
+                                                    {{ $reports->where('tanggal', $report->tanggal)->sum('volume_penjualan') }}
+                                                </td>
+                                                <td rowspan="{{ $reports->where('tanggal', $report->tanggal)->count() }}"
+                                                    class="align-middle">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span class="mr-1">Rp</span>
+                                                        <span
+                                                            class="number">{{ $reports->where('tanggal', $report->tanggal)->sum('rupiah_penjualan') }}</span>
+                                                    </div>
+                                                </td>
+                                            @endif
+                                            <td class="align-middle text-right number-float">
+                                                {{ $report->percobaan ?? 0 }}
+                                            </td>
+                                            <td class="align-middle text-right number-float">
+                                                {{ $report->penerimaan ?? 0 }}
+                                            </td>
+                                            @if ($shop->operators->count() > 1)
+                                                <td rowspan="{{ $reports->where('tanggal', $report->tanggal)->count() }}"
+                                                    class="align-middle text-right number-float">
+                                                    {{ $reports->where('tanggal', $report->tanggal)->last()->stik_akhir }}
+                                                </td>
+                                            @else
+                                                <td class="align-middle text-right number-float">
+                                                    {{ $report->stik_akhir }}
+                                                </td>
+                                            @endif
+                                            @if ($shop->operators->count() > 1)
+                                                <td rowspan="{{ $reports->where('tanggal', $report->tanggal)->count() }}"
+                                                    class="align-middle text-right number-float {{ $reports->where('tanggal', $report->tanggal)->last()->stok_akhir_aktual <= 1500 ? 'table-danger' : '' }}">
+                                                    {{ $reports->where('tanggal', $report->tanggal)->last()->stok_akhir_aktual }}
+                                                </td>
+                                            @else
+                                                <td
+                                                    class="align-middle text-right number-float {{ $report->stok_akhir_aktual <= 1500 ? 'table-danger' : '' }}">
+                                                    {{ $report->stok_akhir_aktual }}
+                                                </td>
+                                            @endif
+                                            @if ($shop->operators->count() > 1)
+                                                <td rowspan="{{ $reports->where('tanggal', $report->tanggal)->count() }}"
+                                                    class="align-middle text-right number-float">
+                                                    {{ $reports->where('tanggal', $report->tanggal)->last()->losses_gain }}
+                                                </td>
+                                            @else
+                                                <td class="align-middle text-right number-float">
+                                                    {{ $report->losses_gain }}
+                                                </td>
+                                            @endif
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="mr-1">Rp</span>
+                                                    <span class="number">{{ $report->pengeluaran }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="mr-1">Rp</span>
+                                                    <span class="number">{{ $report->pendapatan }}</span>
+                                                </div>
+                                            </td>
+                                            @if ($shop->operators->count() > 1)
+                                                <td rowspan="{{ $reports->where('tanggal', $report->tanggal)->count() }}"
+                                                    class="align-middle">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span class="mr-1">Rp</span>
+                                                        <span
+                                                            class="number">{{ $reports->where('tanggal', $report->tanggal)->sum('pendapatan') }}</span>
+                                                    </div>
+                                                </td>
+                                            @endif
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="mr-1">Rp</span>
+                                                    <span class="number">{{ $report->disetorkan }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="mr-1">Rp</span>
+                                                    <span class="number">{{ $report->selisih_setoran }}</span>
+                                                </div>
+                                            </td>
+                                            <td rowspan="{{ $reports->where('tanggal', $report->tanggal)->count() }}"
+                                                class="align-middle text-center">
+                                                <a class="btn btn-sm btn-link" href="{{route('daily-reports.detail', ['shop_id' => $report->shop_id, 'date' => $report->created_at->format('Y-m-d')])}}">
+                                                    <i class="fas fa-list"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        @php
+                                            $prevDate = $report->tanggal;
+                                        @endphp
+                                    @else
+                                        <tr>
+                                            <td class="align-middle">{{ $report->operator->first_name }}</td>
+                                            <td class="align-middle text-right number-float">
+                                                {{ $report->totalisator_akhir }}
+                                            </td>
+                                            <td class="align-middle text-right number-float">
+                                                {{ $report->volume_penjualan }}
+                                            </td>
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="mr-1">Rp</span>
+                                                    <span class="number">{{ $report->rupiah_penjualan }}</span>
+                                                </div>
+
+                                            </td>
+                                            <td class="text-right number-float">
+                                                {{ $report->percobaan ?? 0 }}
+                                            </td>
+                                            <td class="text-right number-float">
+                                                {{ $report->penerimaan ?? 0 }}
+                                            </td>
+                                            @if ($shop->operators->count() == 1)
+                                                <td class="align-middle text-right number-float">
+                                                    {{ $report->stik_akhir }}
+                                                </td>
+                                            @endif
+                                            @if ($shop->operators->count() == 1)
+                                                <td
+                                                    class="align-middle text-right number-float  {{ $report->stok_akhir_aktual <= 1500 ? 'table-danger' : '' }}">
+                                                    {{ $report->stok_akhir_aktual }}
+                                                </td>
+                                            @endif
+                                            @if ($shop->operators->count() == 1)
+                                                <td class="align-middle text-right number-float">
+                                                    {{ $report->losses_gain }}
+                                                </td>
+                                            @endif
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="mr-1">Rp</span>
+                                                    <span class="number">{{ $report->pengeluaran }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="mr-1">Rp</span>
+                                                    <span class="number">{{ $report->pendapatan }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="mr-1">Rp</span>
+                                                    <span class="number">{{ $report->disetorkan }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="mr-1">Rp</span>
+                                                    <span class="number">{{ $report->selisih_setoran }}</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            </tbody>
+                            <tfoot class="table-success">
+                                <tr>
+                                    <th colspan="3" class="text-right">Jumlah</th>
+                                    @if ($shop->operators->count() > 1)
+                                        <th></th>
+                                        <th></th>
+                                        <th class="text-right number-float">{{ $reports->sum('volume_penjualan') }}</th>
+                                        <th>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="mr-1">Rp</span>
+                                                <span class="number">{{ $reports->sum('rupiah_penjualan') }}</span>
+                                            </div>
+                                        </th>
+                                    @else
+                                        <th class="text-right number-float">{{ $reports->sum('volume_penjualan') }}</th>
+                                        <th>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="mr-1">Rp</span>
+                                                <span class="number">{{ $reports->sum('rupiah_penjualan') }}</span>
+                                            </div>
+                                        </th>
+                                    @endif
+                                    <th class="text-right number-float">{{ $reports->sum('percobaan') }}</th>
+                                    <th class="text-right number-float">{{ $reports->sum('penerimaan') }}</th>
+                                    <th class="text-right number-float"></th>
+                                    <th class="text-right number-float"></th>
+                                    <th class="text-right number-float">{{ $reports->sum('losses_gain') }}</th>
+                                    <th>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="mr-1">Rp</span>
+                                            <span class="number">{{ $reports->sum('pengeluaran') }}</span>
+                                        </div>
+                                    </th>
+                                    @if ($shop->operators->count() > 1)
+                                        <th></th>
+                                        <th>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="mr-1">Rp</span>
+                                                <span class="number">{{ $reports->sum('pendapatan') }}</span>
+                                            </div>
+                                        </th>
+                                    @else
+                                        <th>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="mr-1">Rp</span>
+                                                <span class="number">{{ $reports->sum('pendapatan') }}</span>
+                                            </div>
+                                        </th>
+                                    @endif
+                                    <th rowspan="2" class="table-primary align-middle">
+                                        @foreach ($shop->operators as $operator)
+                                            <div class="text-right text-nowrap">Tbgn {{ $operator->first_name }}</div>
+                                        @endforeach
+                                    </th>
+                                    <th rowspan="2" class="table-primary align-middle">
+                                        @foreach ($shop->operators as $operator)
+                                            <div class="d-flex justify-content-between">
+                                                <span class="mr-1">Rp</span>
+                                                <span
+                                                    class="number">{{ $reports->where('operator_id', $operator->id)->sum('selisih_setoran') }}</span>
+                                            </div>
+                                        @endforeach
+
+                                    </th>
+                                    <th rowspan="2" class="table-primary"></th>
+                                </tr>
+                                <tr>
+                                    <th colspan="3" class="text-right">Rata-rata per hari</th>
+                                    @if ($shop->operators->count() > 1)
+                                        <th></th>
+                                        <th></th>
+                                        <th class="text-right number-float">
+                                            {{ $reports->sum('volume_penjualan') / $countDays }}</th>
+                                        <th>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="mr-1">Rp</span>
+                                                <span
+                                                    class="number">{{ $reports->sum('rupiah_penjualan') / $countDays }}</span>
+                                            </div>
+                                        </th>
+                                    @else
+                                        <th class="text-right number-float">
+                                            {{ $reports->sum('volume_penjualan') / $countDays }}</th>
+                                        <th>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="mr-1">Rp</span>
+                                                <span
+                                                    class="number">{{ $reports->sum('rupiah_penjualan') / $countDays }}</span>
+                                            </div>
+                                        </th>
+                                    @endif
+                                    <th></th>
+                                    <th class="text-right number">{{ $reports->sum('penerimaan') / 2000 }}</th>
+                                    <th class="text-right number-float"></th>
+                                    <th class="text-right number-float"></th>
+                                    <th class="text-right number-float">
+                                        {{ $reports->sum('losses_gain') / $countDays }}</th>
+                                    <th>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="mr-1">Rp</span>
+                                            <span class="number">{{ $reports->sum('pengeluaran') / $countDays }}</span>
+                                        </div>
+                                    </th>
+                                    @if ($shop->operators->count() > 1)
+                                        <th></th>
+                                        <th>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="mr-1">Rp</span>
+                                                <span class="number">{{ $reports->sum('pendapatan') / $countDays }}</span>
+                                            </div>
+                                        </th>
+                                    @else
+                                        <th>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="mr-1">Rp</span>
+                                                <span class="number">{{ $reports->sum('pendapatan') / $countDays }}</span>
+                                            </div>
+                                        </th>
+                                    @endif
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -62,188 +426,13 @@
 @push('script')
     <script>
         $(document).ready(function() {
-            var dataTable = $('#table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('daily-reports.index') }}",
-                columns: [
-                    // {
-                    //     title: '#',
-                    //     data: 'DT_RowIndex',
-                    //     name: 'DT_RowIndex',
-                    //     width: '20',
-                    // },
-                    {
-                        title: 'Tanggal',
-                        data: 'created_at',
-                        name: 'created_at',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatDate(data)
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        title: 'Operator',
-                        data: 'operator.user.name',
-                        name: 'operator',
-                    },
-                    // {
-                    //     title: 'Totalisator Awal',
-                    //     data: 'totalisator_awal',
-                    //     name: 'totalisator_awal',
-                    // },
-                    // {
-                    //     title: 'Totalisator Akhir',
-                    //     data: 'totalisator_akhir',
-                    //     name: 'totalisator_akhir',
-                    // },
-                    // {
-                    //     title: 'Test Pump (&ell;)',
-                    //     data: 'test_pump',
-                    //     name: 'test_pump',
-                    // },
-                    {
-                        title: 'Penerimaan (&ell;)',
-                        data: 'penerimaan',
-                        name: 'penerimaan',
-                    },
-                    {
-                        title: 'Volume Penjualan (&ell;)',
-                        data: 'volume_penjualan',
-                        name: 'volume_penjualan',
-                    },
-                    {
-                        title: 'Rupiah Penjualan',
-                        data: 'rupiah_penjualan',
-                        name: 'rupiah_penjualan',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
-                            }
-                            return data;
-                        }
-                    },
-                    // {
-                    //     title: 'Stok Awal (&ell;)',
-                    //     data: 'stok_awal',
-                    //     name: 'stok_awal',
-                    // },
-
-                    // {
-                    //     title: 'Stok Akhir Teoritis (&ell;)',
-                    //     data: 'stok_akhir_teoritis',
-                    //     name: 'stok_akhir_teoritis',
-                    // },
-                    {
-                        title: 'Stok Akhir (&ell;)',
-                        data: 'stok_akhir_aktual',
-                        name: 'stok_akhir_aktual',
-                    },
-                    {
-                        title: 'Losses / Gain (&ell;)',
-                        data: 'losses_gain',
-                        name: 'losses_gain',
-                    },
-                    {
-                        title: 'Pengeluaran',
-                        data: 'pengeluaran',
-                        name: 'pengeluaran',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
-                            }
-                            return data;
-                        }
-                    },
-
-                    {
-                        title: 'Pendapatan',
-                        data: 'pendapatan',
-                        name: 'pendapatan',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
-                            }
-                            return data;
-                        }
-                    },
-
-                    // {
-                    //     title: 'Disetorkan',
-                    //     data: 'disetorkan',
-                    //     name: 'disetorkan',
-                    //     render: function(data, type) {
-                    //         if (type === 'display') {
-                    //             return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
-                    //         }
-                    //         return data;
-                    //     }
-                    // },
-
-                    // {
-                    //     title: 'Selisih Setoran',
-                    //     data: 'selisih_setoran',
-                    //     name: 'selisih_setoran',
-                    //     render: function(data, type) {
-                    //         if (type === 'display') {
-                    //             return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
-                    //         }
-                    //         return data;
-                    //     }
-                    // },
-                    // {
-                    //     title: 'Belum Disetorkan',
-                    //     data: 'belum_disetorkan',
-                    //     name: 'belum_disetorkan',
-                    //     render: function(data, type) {
-                    //         if (type === 'display') {
-                    //             return `<div class="justify-content-between"><span class="mr-1">Rp</span><span>${formatNumber(data)}</span></div>`
-                    //         }
-                    //         return data;
-                    //     }
-                    // },
-
-                    {
-                        title: 'Aksi',
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },
-                ],
-                order: [
-                    [0, 'desc']
-                ],
-                columnDefs: [{
-                        responsivePriority: 1,
-                        targets: 0
-                    },
-                    {
-                        responsivePriority: 2,
-                        targets: -1
-                    }
-                ],
-                responsive: {
-                    details: {
-                        display: DataTable.Responsive.display.modal({
-                            header: function(row) {
-                                var data = row.data();
-                                return 'Detail Laporan Harian';
-                            }
-                        }),
-                        renderer: DataTable.Responsive.renderer.tableAll({
-                            tableClass: 'table'
-                        })
-                    }
-                }
+            $('#shop_id, #year_month').on('change', function() {
+                const shop_id = $('#shop_id').val();
+                const year_month = $('#year_month').val();
+                window.location.replace(
+                    `{{ route('daily-reports.index') }}?shop_id=${shop_id}&year_month=${year_month}`
+                );
             });
-
-            $('select[name=shop_id]').on('change', function() {
-                dataTable.ajax.url(`?shop_id=${this.value}`).load();
-            });
-
 
             $('#table').on('click', '.btn-delete', function() {
                 var id = $(this).data('id');
@@ -261,14 +450,17 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "DELETE",
-                            url: "{{ url('') }}" + "/daily-reports/" + id,
+                            url: `{{ route('daily-reports.index') }}/${id}`,
                             success: function(response) {
-                                dataTable.ajax.reload();
-                                Swal.fire(
-                                    'Terhapus!',
-                                    response.message,
-                                    'success'
-                                );
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then((result) => {
+                                    window.location.reload()
+                                });
                             }
                         });
                     }
