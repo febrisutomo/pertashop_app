@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Incoming;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ShopController;
@@ -9,7 +8,6 @@ use App\Http\Controllers\PriceController;
 use App\Http\Controllers\IncomingController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SpendingController;
-use App\Http\Controllers\TestPumpController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LabaKotorController;
 use App\Http\Controllers\Auth\LoginController;
