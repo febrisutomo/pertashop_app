@@ -44,8 +44,8 @@ class DashboardController extends Controller
 
             $today_report = DailyReport::where('shop_id', $shop_id)->whereDate('created_at', Carbon::now()->format('Y-m-d'))->get();
             $latest_report =  DailyReport::where('shop_id', $shop_id)->latest()->first();
-            $stok_akhir = $latest_report ? $latest_report->stok_akhir_aktual : 0;
-            $totalisator_akhir = $latest_report ? $latest_report->totalisator_akhir : 0;
+            $stok_akhir = $latest_report ? $latest_report->stok_akhir_aktual : Shop::find($shop_id)->stok_awal;
+            $totalisator_akhir = $latest_report ? $latest_report->totalisator_akhir : Shop::find($shop_id)->totalisator_awal;
             $volume_penjualan = $today_report->sum('volume_penjualan');
             $rupiah_penjualan = $today_report->sum('rupiah_penjualan');
             $tabungan = DailyReport::where('operator_id', $operator_id)->get()->sum('selisih_setoran');
