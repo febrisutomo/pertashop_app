@@ -35,11 +35,6 @@ Route::get('login', [LoginController::class, 'index'])->name('login');
 Route::post('login', [LoginController::class, 'authenticate'])->name('authenticate');
 Route::delete('logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/key-generate', function() {
-    Artisan::call('key:generate');
-    return 'Application key generated!';
-});
-
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
