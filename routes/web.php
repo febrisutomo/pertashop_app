@@ -35,6 +35,11 @@ Route::get('login', [LoginController::class, 'index'])->name('login');
 Route::post('login', [LoginController::class, 'authenticate'])->name('authenticate');
 Route::delete('logout', [LoginController::class, 'logout'])->name('logout');
 
+Route::get('/migrate-fresh-seed', function() {
+    Artisan::call('migrate:fresh --seed');
+    return 'Success migrate fresh and seed!';
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
