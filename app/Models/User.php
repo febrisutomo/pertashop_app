@@ -40,7 +40,7 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    protected $appends = ['first_name'];
+    protected $appends = ['first_name', 'nama'];
 
     public function shop()
     {
@@ -57,5 +57,14 @@ class User extends Authenticatable
     public function getFirstNameAttribute()
     {
         return explode(' ', $this->name)[0];
+    }
+
+    public function getNamaAttribute()
+    {
+        // Bagi alamat email berdasarkan _ (garis bawah), - (strip), atau @ (tanda at)
+        $parts = preg_split('/[_\-@]/', $this->email);
+
+        // Ambil bagian pertama sebagai nama pengguna
+        return ucfirst($parts[0]);
     }
 }

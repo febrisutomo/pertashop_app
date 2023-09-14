@@ -34,7 +34,7 @@
                                         Operator
                                     </div>
                                     <div class="col-6">
-                                        {{ $report->operator->first_name }}
+                                        {{ $report->operator->nama }}
                                     </div>
                                 </div>
                                 <div class="row">
@@ -85,7 +85,8 @@
                                         <div class="col-6">
                                             <span class="number-float">{{ $reportGroup->first()->stik_akhir }}</span>
                                             cm
-                                            (<span class="number-float">{{ $reportGroup->first()->stok_akhir_aktual }}</span>
+                                            (<span
+                                                class="number-float">{{ $reportGroup->first()->stok_akhir_aktual }}</span>
                                             &ell;)
                                         </div>
                                     </div>

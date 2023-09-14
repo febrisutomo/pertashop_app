@@ -71,7 +71,7 @@ class LabaKotorController extends Controller
             $sisa_stok = $reports->last()->stok_akhir_teoritis;
             $sisa_stok_rp = $sisa_stok * $harga_beli;
 
-            $losses_gain =  $sisa_stok_akhir - $sisa_stok;
+            $losses_gain =  $$reports->sum('losses_gain');
 
             $persen_losses_gain = $jumlah_penjualan == 0 ? 0 : $losses_gain / $jumlah_penjualan * 100;
 

@@ -116,10 +116,10 @@
                                         @endphp
                                         <tr>
                                             <td rowspan="{{ $reports->where('tanggal', $report->tanggal)->count() }}"
-                                                class="align-middle table-warning">
-                                                {{ $report->tanggal }}
+                                                class="align-middle table-warning text-nowrap">
+                                                {{ $report->tanggal_panjang }}
                                             </td>
-                                            <td class="align-middle">{{ $report->operator->first_name }}</td>
+                                            <td class="align-middle">{{ $report->operator->nama }}</td>
                                             <td class="align-middle text-right number-float">
                                                 {{ $report->totalisator_akhir }}
                                             </td>
@@ -229,7 +229,7 @@
                                         @endphp
                                     @else
                                         <tr>
-                                            <td class="align-middle">{{ $report->operator->first_name }}</td>
+                                            <td class="align-middle">{{ $report->operator->nama }}</td>
                                             <td class="align-middle text-right number-float">
                                                 {{ $report->totalisator_akhir }}
                                             </td>
@@ -344,7 +344,7 @@
                                     @endif
                                     <th rowspan="2" class="table-primary align-middle">
                                         @foreach ($shop->operators as $operator)
-                                            <div class="text-right text-nowrap">Tbgn {{ $operator->first_name }}</div>
+                                            <div class="text-right text-nowrap">Tbgn {{ $operator->nama }}</div>
                                         @endforeach
                                     </th>
                                     <th rowspan="2" class="table-primary align-middle">

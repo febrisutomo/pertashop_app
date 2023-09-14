@@ -33,6 +33,7 @@ class DailyReport extends Model
         'selisih_setoran',
         'tabungan',
         'tanggal_panjang',
+        'tanggal',
     ];
 
     public function operator()
@@ -168,4 +169,6 @@ class DailyReport extends Model
     {
         return $this->created_at->format('d/m/Y');
     }
+
+    
 }

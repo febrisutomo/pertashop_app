@@ -46,7 +46,7 @@
                                         Operator
                                     </div>
                                     <div class="col-6">
-                                        {{ $report->operator->first_name }}
+                                        {{ $report->operator->nama }}
                                     </div>
                                 </div>
                                 <div class="row">
@@ -91,7 +91,7 @@
                                         @if ($report->penerimaan > 0)
                                             <button class="btn btn-sm btn-link btn-penerimaan"
                                                 data-id="{{ $report->id }}"><i class="fa fa-info-circle"
-                                                aria-hidden="true"></i></button>
+                                                    aria-hidden="true"></i></button>
                                         @endif
                                     </div>
                                 </div>
@@ -233,7 +233,8 @@
                                                 <button class="btn btn-sm btn-link btn-pengeluaran"
                                                     data-id="{{ $report->id }}"><i
                                                         class="fa
-                                                    fa-info-circle" aria-hidden="true"></i></button>
+                                                    fa-info-circle"
+                                                        aria-hidden="true"></i></button>
                                             @endif
 
                                         </div>
