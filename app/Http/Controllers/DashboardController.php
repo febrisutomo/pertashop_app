@@ -142,7 +142,7 @@ class DashboardController extends Controller
             if (isset($dailyReports[$formattedDate])) {
                 $sales[$formattedDate] = $dailyReports[$formattedDate]->sum('volume_penjualan');
             } else {
-                $sales[$formattedDate] = 0;
+                $sales[$formattedDate] = null;
             }
             $currentDate->addDay();
         }

@@ -674,8 +674,8 @@
                 );
             });
 
-            let last_penerimaan_today = 0;
-            let last_volume_penjualan_today = 0;
+            let today_penerimaan = 0;
+            let today_penjualan = 0;
             //ajax get operators by shop_id
             $('#operator_id, #tanggal, #jam').on('change', function() {
                 let shop_id = $('#shop_id').val();
@@ -713,6 +713,8 @@
                         });
 
                         $('#skala').val(response.skala);
+                        today_penjualan = response.today_penjualan;
+                        today_penerimaan = response.today_penerimaan;
 
                     }
                 });
@@ -737,7 +739,10 @@
                     //hitung stok akhir teoritis
                     const stok_awal = $('#stok_awal').val() * 1;
                     const penerimaan = $('#penerimaan').val() * 1;
-                    const stok_akhir_teoritis = stok_awal + penerimaan - volume_penjualan;
+                    const old_penerimaan = "{{ old('penerimaan', $dailyReport->penerimaan) }}";
+                    const old_penjualan = "{{ old('volume_penjualan', $dailyReport->volume_penjualan) }}";
+                    const stok_akhir_teoritis = stok_awal + today_penerimaan + (penerimaan - old_penerimaan) -
+                        today_penjualan - (volume_penjualan - old_penjualan);
                     $('#stok_akhir_teoritis').val(stok_akhir_teoritis.toFixed(2));
 
                     const stik_akhir = $('#stik_akhir').val() * 1;
@@ -747,7 +752,7 @@
                         $('#stok_akhir_aktual').val(stok_akhir_aktual.toFixed(2));
                         // losses gain = stok akhir - stok akhir teoritis
                         const losses_gain = stok_akhir_aktual - stok_akhir_teoritis;
-                        $('#losses_gain').val(losses_gain.toFixed(3));
+                        $('#losses_gain').val(losses_gain.toFixed(2));
                     } else {
                         $('#stok_akhir_aktual').val('');
                         $('#losses_gain').val('');

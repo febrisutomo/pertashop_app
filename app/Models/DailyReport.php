@@ -6,7 +6,6 @@ use App\Models\Shop;
 use App\Models\User;
 use App\Models\Price;
 use App\Models\Incoming;
-use App\Models\Operator;
 use App\Models\Spending;
 use App\Models\TestPump;
 use Illuminate\Database\Eloquent\Model;
@@ -127,7 +126,7 @@ class DailyReport extends Model
 
     public function getLossesGainAttribute()
     {
-        return $this->stik_akhir ? round($this->stok_akhir_aktual - $this->stok_akhir_teoritis, 3) : null;
+        return $this->stik_akhir ? round($this->stok_akhir_aktual - $this->stok_akhir_teoritis, 2) : null;
     }
 
     public function getPengeluaranAttribute()
@@ -164,7 +163,7 @@ class DailyReport extends Model
     {
         return $this->created_at->dayName . ", " . $this->created_at->format('d') . " " . $this->created_at->monthName . " " . $this->created_at->format('Y');
     }
-    
+
     public function getTanggalAttribute()
     {
         return $this->created_at->format('d/m/Y');

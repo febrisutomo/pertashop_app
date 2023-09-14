@@ -206,6 +206,7 @@ class DailyReportController extends Controller
      */
     public function edit(Request $request, DailyReport $dailyReport)
     {
+        // dd($dailyReport->stik_akhir);
         $shops = Shop::all();
         $operators = User::where('role', 'operator')->where('shop_id', $dailyReport->shop_id)->get();
 
@@ -354,8 +355,8 @@ class DailyReportController extends Controller
         $stik_awal = 0;
         $skala = 21;
 
-        $last_penerimaan_today = 0;
-        $last_volume_penjualan_today = 0;
+        $today_penerimaan = 0;
+        $today_penjualan = 0;
 
         if ($shop_id) {
             $operators = User::where('role', 'operator')->where('shop_id', $shop_id)->get();
@@ -374,9 +375,12 @@ class DailyReportController extends Controller
             $skala = $shop->skala;
             $totalisator_awal =  $latest_report ? $latest_report->totalisator_akhir : $shop->totalisator_awal;
             $stik_awal =  $yesterday_report ? $yesterday_report->stik_akhir : $shop->stik_awal;
+            $today_report = DailyReport::where('shop_id', $shop->id)->whereDate('created_at', $date->format('Y-m-d'))->get();
+            $today_penjualan = $today_report->sum('volume_penjualan');
+            $today_penerimaan = $today_report->sum('penerimaan');
         }
 
-        return response()->json(compact('operators', 'totalisator_awal', 'stik_awal', 'skala', 'prices'));
+        return response()->json(compact('operators', 'totalisator_awal', 'stik_awal', 'skala', 'prices', 'today_penjualan', 'today_penerimaan'));
     }
 
     public function detail($shop_id, $date)
