@@ -184,15 +184,31 @@ class ShopController extends Controller
             'pemilik_rekening' => 'required',
         ]);
 
+        try {
+            DB::beginTransaction();
 
-        $shop->investors()->updateExistingPivot($request->investor_id, [
-            'persentase' => $request->persentase,
-            'nama_bank' => $request->nama_bank,
-            'no_rekening' => $request->no_rekening,
-            'pemilik_rekening' => $request->pemilik_rekening
-        ]);
+            $shop->investors()->updateExistingPivot($request->investor_id, [
+                'persentase' => $request->persentase,
+                'nama_bank' => $request->nama_bank,
+                'no_rekening' => $request->no_rekening,
+                'pemilik_rekening' => $request->pemilik_rekening
+            ]);
 
-        return redirect()->back()->with('success', 'Investor berhasil berhasil diupdate.');
+            $total_persentase = $shop->investors()->sum('persentase');
+
+            if ($total_persentase  > 100) {
+                DB::rollback();
+                return redirect()->back()->with('error', 'Total persentase investor melebihi 100%.');
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Investor berhasil berhasil diupdate.');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function investorDestroy(Request $request, Shop $shop)
