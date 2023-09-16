@@ -182,13 +182,13 @@
                                 </tr>
                                 <tr class="font-weight-bold">
                                     <td class="text-right">Alokasi Modal Dasar dari
-                                        <span class="number">{{ $report['persentase_alokasi_modal'] }}</span>% Profit
+                                        <span class="number-float">{{ $report['persentase_alokasi_modal'] }}</span>% Profit
                                     </td>
                                     <td width="20" class="px-2">=</td>
                                     <td width="150">
                                         <div class="line-bottom d-flex justify-content-between">
                                             <span>Rp</span>
-                                            <span class="number">{{ $report['alokasi_modal'] }}</span>
+                                            <span class="number-float">{{ $report['alokasi_modal'] }}</span>
                                         </div>
 
                                     </td>
@@ -396,7 +396,7 @@
                                 Modal</label>
                             <div class="col-8">
                                 <div class="input-group">
-                                    <input type="number"
+                                    <input type="number" step="any"
                                         class="form-control @error('persentase_alokasi_modal') is-invalid @enderror"
                                         id="persentase_alokasi_modal" name="persentase_alokasi_modal"
                                         value="{{ old('persentase_alokasi_modal', $report->persentase_alokasi_modal) }}"

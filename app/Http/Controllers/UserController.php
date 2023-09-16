@@ -31,7 +31,7 @@ class UserController extends Controller
         } else {
             $shop_id = $request->input('shop_id');
             if ($role && $shop_id) {
-                $users = $users->where('role', $role)->where('shop_id', $shop_id)->orWhereRelation('investments', 'id', $shop_id)->latest()->get();
+                $users = $users->where('role', $role)->where('shop_id', $shop_id)->orWhereRelation('investments', 'shop_id', $shop_id)->latest()->get();
             } elseif ($role) {
                 $users = $users->where('role', $role)->latest()->get();
             } elseif ($shop_id) {
@@ -75,13 +75,14 @@ class UserController extends Controller
             'no_rekening' => 'nullable',
             'nama_bank' => 'nullable',
             'pemilik_rekening' => 'nullable',
+            'password' => 'required',
         ]);
 
 
         if ($request->role == 'investor') {
             $validated['shop_id'] = null;
         }
-        $validated['password'] = Hash::make('123');
+        $validated['password'] = Hash::make($request->password);
         User::create($validated);
 
         return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan');
@@ -123,7 +124,6 @@ class UserController extends Controller
             'no_hp' => 'nullable',
             'no_rekening' => 'nullable',
             'nama_bank' => 'nullable',
-            'pasasword' => 'nullable',
             'pemilik_rekening' => 'nullable',
         ]);
 
@@ -131,14 +131,11 @@ class UserController extends Controller
             $validated['shop_id'] = null;
         }
 
-        $validated['password'] = Hash::make('123');
-        $user->update($validated);
-
         if ($request->password) {
-            $user->user->update([
-                'password' => Hash::make($request->password),
-            ]);
+            $validated['password'] = Hash::make($request->password);
         }
+
+        $user->update($validated);
 
         return redirect()->route('users.index')->with('success', 'User berhasil diupdate');
     }
@@ -152,5 +149,36 @@ class UserController extends Controller
         return response()->json([
             'message' => 'User berhasil dihapus.',
         ]);
+    }
+
+    public function profile()
+    {
+        $user = User::find(Auth::user()->id);
+
+        return view('users.profile', compact('user'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+
+        $validated = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . Auth::user()->id,
+            'alamat' => 'nullable',
+            'no_hp' => 'nullable',
+            'no_rekening' => 'nullable',
+            'nama_bank' => 'nullable',
+            'pemilik_rekening' => 'nullable',
+        ]);
+
+        if ($request->password) {
+            $validated['password'] = Hash::make($request->password);
+        }
+
+        $user = User::find(Auth::user()->id);
+
+        $user->update($validated);
+
+        return redirect()->route('profile')->with('success', 'Profile berhasil diupdate');
     }
 }

@@ -64,18 +64,18 @@
 
 
                         <div class="form-group row">
-                            <label for="supplier_id" class="col-4 col-form-label">Supplier</label>
+                            <label for="vendor_id" class="col-4 col-form-label">Vendor</label>
                             <div class="col-8">
-                                <select class="form-control @error('supplier_id') is-invalid @enderror" name="supplier_id"
-                                    id="supplier_id">
-                                    <option value="">--Pilih Supplier--</option>
-                                    @foreach ($suppliers as $supplier)
-                                        <option value="{{ $supplier->id }}" @selected(old('supplier_id', $purchase->supplier_id) == $supplier->id)>
-                                            {{ $supplier->nama }}
+                                <select class="form-control @error('vendor_id') is-invalid @enderror" name="vendor_id"
+                                    id="vendor_id">
+                                    <option value="">--Pilih Vendor--</option>
+                                    @foreach ($vendors as $vendor)
+                                        <option value="{{ $vendor->id }}" @selected(old('vendor_id', $purchase->vendor_id) == $vendor->id)>
+                                            {{ $vendor->nama }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('supplier_id')
+                                @error('vendor_id')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>

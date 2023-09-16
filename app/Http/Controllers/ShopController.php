@@ -136,6 +136,11 @@ class ShopController extends Controller
 
         //attach investors to shop
 
+        //check if investor already attached to shop
+        if ($shop->investors()->where('user_id', $request->investor_id)->exists()) {
+            return redirect()->back()->with('error', 'Investor sudah terdaftar di Pertashop.');
+        }
+
 
         $shop->investors()->attach([
             $request->investor_id =>
@@ -160,16 +165,12 @@ class ShopController extends Controller
             'pemilik_rekening' => 'required',
         ]);
 
-        $shop->investors()->detach($request->investor_id);
 
-        $shop->investors()->attach([
-            $request->investor_id =>
-            [
-                'persentase' => $request->persentase,
-                'nama_bank' => $request->nama_bank,
-                'no_rekening' => $request->no_rekening,
-                'pemilik_rekening' => $request->pemilik_rekening
-            ]
+        $shop->investors()->updateExistingPivot($request->investor_id, [
+            'persentase' => $request->persentase,
+            'nama_bank' => $request->nama_bank,
+            'no_rekening' => $request->no_rekening,
+            'pemilik_rekening' => $request->pemilik_rekening
         ]);
 
         return redirect()->back()->with('success', 'Investor berhasil berhasil diupdate.');

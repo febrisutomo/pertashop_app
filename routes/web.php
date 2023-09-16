@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PriceController;
+use App\Http\Controllers\VendorController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LabaKotorController;
@@ -55,13 +57,22 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [DailyReportController::class, 'store'])->name('daily-reports.store');
     });
     Route::middleware(['role:super-admin'])->group(function () {
-        Route::resources([
-            'corporations' => CorporationController::class,
-            'prices' => PriceController::class,
-            'shops' => ShopController::class,
-            'users' => UserController::class,
-        ]);
-        Route::prefix('shops')->group(function () {
+
+        Route::prefix('master')->group(function () {
+            Route::resources([
+                'corporations' => CorporationController::class,
+                'prices' => PriceController::class,
+                'shops' => ShopController::class,
+                'users' => UserController::class,
+                'vendors' => VendorController::class,
+                'documents' => DocumentController::class,
+            ]);
+        });
+
+        Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+        Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
+
+        Route::prefix('master/shops')->group(function () {
             Route::get('/{shop}/investors', [ShopController::class, 'investor'])->name('shops.investors');
             Route::post('/{shop}/investors', [ShopController::class, 'investorStore'])->name('shops.investors.store');
             Route::put('/{shop}/investors', [ShopController::class, 'investorUpdate'])->name('shops.investors.update');

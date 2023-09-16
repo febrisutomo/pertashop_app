@@ -23,7 +23,7 @@
                 <div class="card-header">
                     <div class="row justify-content-between align-items-center">
                         <div
-                            class="{{ Auth::user()->role == 'super-admin' ? 'col-6' : 'col-6 col-lg-3' }} d-flex justify-content-between align-items-center">
+                            class="{{ Auth::user()->role == 'super-admin' ? 'col-lg-6' : 'col-6 col-lg-3' }} d-flex justify-content-between align-items-center">
                             @if (Auth::user()->role == 'super-admin')
                                 <select id="shop_id" name="shop_id" class="form-control mr-2">
                                     <option value="" disabled>--Pilih Pertashop--</option>

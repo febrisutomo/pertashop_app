@@ -25,7 +25,7 @@
 
                     <div class="row justify-content-between align-items-center">
                         <div
-                            class="{{ Auth::user()->role != 'admin' ? 'col-6' : 'col-6 col-lg-3' }} d-flex justify-content-between align-items-center">
+                            class="{{ Auth::user()->role != 'admin' ? 'col-lg-6' : 'col-6 col-lg-3' }} d-flex justify-content-between align-items-center">
                             @if (Auth::user()->role != 'admin')
                                 <select id="shop_id" name="shop_id" class="form-control mr-2">
                                     <option value="" disabled>--Pilih Pertashop--</option>
@@ -44,10 +44,12 @@
                             </select>
                         </div>
 
-                        <button class="btn btn-warning" onclick="window.print()">
-                            <i class="fas fa-print mr-2 "></i>
-                            <span>Cetak</span>
-                        </button>
+                        <div class="col-md-3 d-flex justify-content-end order-first order-md-last mb-2 mb-md-0">
+                            <button class="btn btn-warning" onclick="window.print()">
+                                <i class="fas fa-print mr-2 "></i>
+                                <span>Cetak</span>
+                            </button>
+                        </div>
                     </div>
 
                 </div>
@@ -65,8 +67,13 @@
                                 {{ $shop->kode . ' ' . $shop->nama }} TAHUN {{ Request::query('year', date('Y')) }}</h5>
 
                             <table id="table" class="table table-bordered">
-                                <thead>
-                                    <tr class="table-warning">
+                                <thead class="table-warning">
+                                    <tr>
+                                        <th colspan="100%">Nilai Investasi: <span
+                                                class="currency">{{ $shop->nilai_investasi }}</span>
+                                        </th>
+                                    </tr>
+                                    <tr>
                                         <th class="align-middle text-center">Bulan</th>
                                         <th class="align-middle text-center">Nilai Profit Sharing</th>
                                         <th class="align-middle text-center">Alokasi Modal</th>
@@ -75,7 +82,8 @@
                                             <th
                                                 class="align-middle text-center {{ Auth::user()->id == $investor->id ? 'bg-warning' : '' }}">
                                                 {{ $investor->nama }}
-                                                <div>(<span class="number">{{ $investor->pivot->persentase }}</span>%)
+                                                <div>(<span
+                                                        class="number-float">{{ $investor->pivot->persentase }}</span>%)
                                                 </div>
                                             </th>
                                         @endforeach

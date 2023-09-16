@@ -344,8 +344,12 @@
                                                     <td>{{ $report->incoming->purchase->no_so }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Supplier</td>
-                                                    <td>{{ $report->incoming->purchase->supplier->nama }}</td>
+                                                    <td>Vendor Order</td>
+                                                    <td>{{ $report->incoming->purchase->vendor->nama }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Vendor Pengirim</td>
+                                                    <td>{{ $report->incoming->vendor->nama }}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Sopir</td>

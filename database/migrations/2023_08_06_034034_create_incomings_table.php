@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('daily_report_id')->constrained()->cascadeOnDelete();
             $table->foreignId('purchase_id')->constrained();
+            $table->foreignId('vendor_id')->constrained();
             $table->string('sopir');
             $table->string('no_polisi');
             $table->decimal('stik_sebelum_curah', 10, 2);

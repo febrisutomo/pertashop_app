@@ -47,7 +47,8 @@
                         class="img-circle elevation-2" alt="User Image">
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">{{ Auth::user()->name }}</a>
+                    <a href="{{ Auth::user()->role == 'super-admin' ? route('profile') : '' }}"
+                        class="d-block">{{ Auth::user()->name }}</a>
                     <span class="badge badge-pill badge-primary">{{ Auth::user()->role }}</span>
                 </div>
             </div>
@@ -172,7 +173,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('rekap-modal.index') }}"
-                                class="nav-link {{ Request::routeIs('modal.*') ? 'active' : '' }}">
+                                class="nav-link {{ Request::routeIs('rekap-modal.*') ? 'active' : '' }}">
                                 <i class="nav-icon fas">
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         class="icon icon-tabler icon-tabler-file-star" width="24" height="24"
@@ -216,66 +217,11 @@
                                 </p>
                             </a>
                         </li>
-                        {{-- <li class="nav-item {{ Request::routeIs('reports.*') ? 'menu-open' : '' }}">
-                            <a href="#" class="nav-link {{ Request::routeIs('reports.*') ? 'active' : '' }}">
-                                <i class="nav-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="icon icon-tabler icon-tabler-report" width="24" height="24"
-                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M8 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h5.697"></path>
-                                        <path d="M18 14v4h4"></path>
-                                        <path d="M18 11v-4a2 2 0 0 0 -2 -2h-2"></path>
-                                        <path
-                                            d="M8 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z">
-                                        </path>
-                                        <path d="M18 18m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
-                                        <path d="M8 11h4"></path>
-                                        <path d="M8 15h3"></path>
-                                    </svg>
-                                </i>
-                                <p>
-                                    Laporan Bulanan
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ route('reports.index') }}"
-                                        class="nav-link {{ Request::routeIs('reports.index') ? 'active' : '' }}">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Laba Kotor</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('reports.index') }}"
-                                        class="nav-link {{ Request::routeIs('reports.index') ? 'active' : '' }}">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Laba Bersih</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/docs/3.2/components/control-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Rekap Modal</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/docs/3.2/components/control-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Rekap Profit Sharing</p>
-                                    </a>
-                                </li>
-
-                            </ul>
-
-                        </li> --}}
                     @endif
 
                     @if (collect(['super-admin'])->contains(Auth::user()->role))
-                        <li class="nav-item {{ Request::is('data/*') ? 'menu-open' : '' }}">
-                            <a href="#" class="nav-link {{ Request::is('data/*') ? 'active' : '' }}">
+                        <li class="nav-item {{ Request::is('master/*') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link {{ Request::is('master/*') ? 'active' : '' }}">
                                 <i class="nav-icon">
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         class="icon icon-tabler icon-tabler-database" width="24" height="24"
@@ -293,35 +239,46 @@
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
-
-                                <li class="nav-item">
-                                    <a href="{{ route('corporations.index') }}"
-                                        class="nav-link {{ Request::routeIs('corporations.index') ? 'active' : '' }}">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Badan Usaha</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('shops.index') }}"
-                                        class="nav-link {{ Request::routeIs('shops.index') ? 'active' : '' }}">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Pertashop</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('users.index') }}"
-                                        class="nav-link {{ Request::routeIs('users.index') ? 'active' : '' }}">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>User</p>
-                                    </a>
-                                </li>
                                 <li class="nav-item">
                                     <a href="{{ route('prices.index') }}"
-                                        class="nav-link {{ Request::routeIs('prices.index') ? 'active' : '' }}">
+                                        class="nav-link {{ Request::routeIs('prices.*') ? 'active' : '' }}">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Harga</p>
                                     </a>
                                 </li>
+                                
+                                <li class="nav-item">
+                                    <a href="{{ route('users.index') }}"
+                                        class="nav-link {{ Request::routeIs('users.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>User</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('vendors.index') }}"
+                                        class="nav-link {{ Request::routeIs('vendors.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Vendor</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('shops.index') }}"
+                                        class="nav-link {{ Request::routeIs('shops.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Pertashop</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('corporations.index') }}"
+                                        class="nav-link {{ Request::routeIs('corporations.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Badan Usaha</p>
+                                    </a>
+                                </li>
+
 
                             </ul>
 

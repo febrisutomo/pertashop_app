@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Shop;
 use App\Models\Purchase;
-use App\Models\Supplier;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +27,7 @@ class PurchaseController extends Controller
         $year_month = $request->input('year_month', Carbon::now()->format('Y-m'));
         list($year, $month) = explode('-', $year_month);
 
-        $purchases = Purchase::with('supplier', 'incoming')->where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
+        $purchases = Purchase::with('vendor', 'incoming')->where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
 
         $shops = Shop::all();
 
@@ -40,9 +40,9 @@ class PurchaseController extends Controller
     public function create(Request $request)
     {
         $shops = Shop::all();
-        $suppliers = Supplier::all();
+        $vendors = Vendor::all();
 
-        return view('purchase.create', compact('suppliers', 'shops'));
+        return view('purchase.create', compact('vendors', 'shops'));
     }
 
     /**
@@ -61,7 +61,7 @@ class PurchaseController extends Controller
                     return Auth::user()->role == 'super-admin';
                 }),
             ],
-            'supplier_id' => 'required|numeric',
+            'vendor_id' => 'required|numeric',
             'no_so' => 'required|string|unique:purchases',
             'volume' => 'required|numeric',
             'total_bayar' => 'required|numeric',
@@ -72,9 +72,9 @@ class PurchaseController extends Controller
             $validatedData['shop_id'] = Auth::user()->shop_id;
         }
 
-        Purchase::create($validatedData);
+        $purchase = Purchase::create($validatedData);
 
-        return to_route('purchases.index')->with('success', 'Data pembelian berhasil disimpan.');
+        return to_route('purchases.index', ['shop_id' => $purchase->shop_id])->with('success', 'Data pembelian berhasil disimpan.');
     }
 
     /**
@@ -90,9 +90,9 @@ class PurchaseController extends Controller
      */
     public function edit(Purchase $purchase)
     {
-        $suppliers = Supplier::all();
+        $vendors = Vendor::all();
         $shops = Shop::all();
-        return view('purchase.edit', compact('suppliers', 'shops', 'purchase'));
+        return view('purchase.edit', compact('vendors', 'shops', 'purchase'));
     }
 
     /**
@@ -106,7 +106,7 @@ class PurchaseController extends Controller
 
         $validatedData = $request->validate([
             'created_at' => 'required|date',
-            'supplier_id' => 'required|numeric',
+            'vendor_id' => 'required|numeric',
             'no_so' => 'required|string|unique:purchases,no_so,' . $purchase->id . ',id',
             'volume' => 'required|numeric',
             'total_bayar' => 'required|numeric',

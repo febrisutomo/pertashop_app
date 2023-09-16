@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Price;
 use App\Models\Purchase;
 use App\Models\Spending;
-use App\Models\Supplier;
+use App\Models\Vendor;
 use App\Models\TestPump;
 use App\Models\RekapModal;
 use App\Models\Corporation;
@@ -17,7 +17,6 @@ use App\Models\InvestorProfit;
 use App\Models\ProfitSharing;
 use Illuminate\Database\Seeder;
 use App\Models\SpendingCategory;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -199,30 +198,43 @@ class DatabaseSeeder extends Seeder
             'name' => 'Koko Aribowo',
             'email' => 'koko@pertashop.com',
             'role' => 'investor',
+            'no_rekening' => '90000 0679 3138',
+            'pemilik_rekening' => 'KOKO ARIBOWO',
         ]);
 
         $kosim = User::factory()->create([
             'name' => 'Sugiyanto Kosim',
             'email' => 'kosim@pertashop.com',
             'role' => 'investor',
+            'nama_bank' => 'Mandiri',
+            'no_rekening' => '13900 9204 6840',
+            'pemilik_rekening' => 'SUGIYANTO KOSIM SINDU',
         ]);
 
         $kaswari = User::factory()->create([
             'name' => 'Kaswari',
             'email' => 'kaswari@pertashop.com',
             'role' => 'investor',
+            'nama_bank' => 'BNI',
+            'no_rekening' => '0436 8454 88',
+            'pemilik_rekening' => 'KASWARI',
         ]);
 
         $adlai = User::factory()->create([
             'name' => 'R. Adlai BT Kalapaaking',
             'email' => 'adlai@pertashop.com',
             'role' => 'investor',
+            'no_rekening' => '13900 2109 0000',
+            'pemilik_rekening' => 'R. ADLAI BT KALAPAAKING',
         ]);
 
         $eko = User::factory()->create([
             'name' => 'Eko Cahyonoo',
             'email' => 'eko@pertashop.com',
             'role' => 'investor',
+            'nama_bank' => 'BCA',
+            'no_rekening' => '4240 2645 82',
+            'pemilik_rekening' => 'EKO CAHYONO',
         ]);
 
 
@@ -334,13 +346,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        Supplier::factory(3)->create();
+        Vendor::factory(1)->create();
 
 
         // $purchase = Purchase::create([
         //     'no_so' => 123456,
         //     'shop_id' => $kalitapen->id,
-        //     'supplier_id' => 1,
+        //     'vendor_id' => 1,
         //     'volume' => 2000,
         //     'created_at' => "2023-08-28",
         //     'total_bayar' => 2000 * Price::latest()->first()->harga_beli,

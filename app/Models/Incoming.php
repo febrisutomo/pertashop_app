@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Shop;
 use App\Models\User;
+use App\Models\Vendor;
 use App\Models\Operator;
 use App\Models\Purchase;
 use App\Models\DailyReport;
@@ -22,6 +23,11 @@ class Incoming extends Model
     public function report()
     {
         return $this->belongsTo(DailyReport::class, 'daily_report_id');
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
     }
 
     public function purchase()

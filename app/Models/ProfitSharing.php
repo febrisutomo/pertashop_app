@@ -33,7 +33,7 @@ class ProfitSharing extends Model
     public function getRoiAttribute()
     {
 
-        return $this->lastByShop() ? $this->lastByShop()->roi - $this->nilai_profit_sharing : 460000000 - $this->nilai_profit_sharing;
+        return $this->lastByShop() ? $this->lastByShop()->roi - $this->nilai_profit_sharing : $this->shop->nilai_investasi - $this->nilai_profit_sharing;
     }
 
     public function getBulanAttribute()

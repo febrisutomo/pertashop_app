@@ -53,7 +53,7 @@
                                         <td class="text-center">{{ $loop->iteration }}</td>
                                         <td>{{ $investor->name }}</td>
                                         <td class="text-right"><span
-                                                class="number">{{ $investor->pivot->persentase }}</span> %</td>
+                                                class="number-float">{{ $investor->pivot->persentase }}</span> %</td>
                                         <td>{{ $investor->pivot->nama_bank . ' ' . $investor->pivot->no_rekening . ' a/n ' . $investor->pivot->pemilik_rekening }}
                                         </td>
                                         <td>
@@ -67,7 +67,7 @@
                                                 <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h4 class="modal-title">Tambah Investor</h4>
+                                                            <h4 class="modal-title">Edit Investor</h4>
                                                             <button type="button" class="close" data-dismiss="modal"
                                                                 aria-label="Close">
                                                                 <span aria-hidden="true">&times;</span>
@@ -85,7 +85,7 @@
                                                                         class="col-sm-4 col-form-label">Investor</label>
                                                                     <div class="col-sm-8">
                                                                         <select name="investor_id" id="investor_id"
-                                                                            class="form-control" required>
+                                                                            class="form-control" required @readonly(true)>
                                                                             <option value="">--Pilih Investor--
                                                                             </option>
                                                                             @foreach ($investors as $inv)
@@ -102,8 +102,9 @@
                                                                         class="col-sm-4 col-form-label">Persentase</label>
                                                                     <div class="col-sm-8">
                                                                         <div class="input-group">
-                                                                            <input type="number" class="form-control"
-                                                                                id="persentase" name="persentase"
+                                                                            <input type="number" step="any"
+                                                                                class="form-control" id="persentase"
+                                                                                name="persentase"
                                                                                 value="{{ old('persentase', $investor->pivot->persentase) }}"
                                                                                 required>
                                                                             <div class="input-group-append">
@@ -200,7 +201,7 @@
                     </button>
                 </div>
 
-                <form id="form_investor" action="{{ route('shops.investors.store', $shop->id) }}" method="POST">
+                <form id="formAdd" action="{{ route('shops.investors.store', $shop->id) }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="form-group row">
@@ -209,21 +210,18 @@
                                 <select name="investor_id" id="investor_id" class="form-control" required>
                                     <option value="">--Pilih Investor--</option>
                                     @foreach ($investors as $investor)
-                                        <option value="{{ $investor->id }}">
+                                        <option value="{{ $investor->id }}" data-investor='@json($investor)'>
                                             {{ $investor->name }}</option>
                                     @endforeach
                                 </select>
-
-                                <input type="hidden" id="investor_name" class="form-control" readonly>
-                                <input type="hidden" id="id" name="id">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="persentase" class="col-sm-4 col-form-label">Persentase</label>
                             <div class="col-sm-8">
                                 <div class="input-group">
-                                    <input type="number" class="form-control" id="persentase" name="persentase"
-                                        value="" required>
+                                    <input type="number" step="any" class="form-control" id="persentase"
+                                        name="persentase" value="" required>
                                     <div class="input-group-append">
                                         <span class="input-group-text">%</span>
                                     </div>
@@ -284,6 +282,16 @@
     <script>
         $(document).ready(function() {
 
+            $('#table').DataTable();
+
+            //fill form add if investor change
+            $('#formAdd select[name=investor_id]').on('change', function() {
+                var investor = $(this).find(':selected').data('investor');
+                console.log('$ ~ investor:', investor);
+                $('#formAdd #nama_bank').val(investor?.nama_bank);
+                $('#formAdd #no_rekening').val(investor?.no_rekening);
+                $('#formAdd #pemilik_rekening').val(investor?.pemilik_rekening);
+            });
 
             //delete investor
             $('.table').on('click', '.btn-delete', function() {

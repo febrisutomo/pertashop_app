@@ -72,9 +72,9 @@
                                         <td class="text-center">{{ $loop->iteration }}</td>
                                         <td>{{ $user->name }}</td>
                                         <td>{{ $user->email }}</td>
-                                        <td class="text-center">{{ Str::ucfirst($user->role) }}</td>
-                                        <td class="text-center">
-                                            @if ($user->role != 'investor')
+                                        <td>{{ Str::ucfirst($user->role) }}</td>
+                                        <td>
+                                            @if ($user->role != 'investor' && $user->role != 'super-admin')
                                                 {{ $user->shop->nama }}
                                             @else
                                                 @foreach ($user->investments as $s)

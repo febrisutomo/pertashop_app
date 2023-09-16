@@ -33,30 +33,6 @@
                     @csrf
                     <div class="card-body">
 
-
-
-                        <div class="form-group row">
-                            <label for="name" class="col-sm-4 col-form-label">Nama</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                    id="name" name="name" value="{{ old('name') }}">
-                                @error('name')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="email" class="col-sm-4 col-form-label">Email</label>
-                            <div class="col-sm-8">
-                                <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                    id="email" name="email" value="{{ old('email') }}">
-                                @error('email')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
                         <div class="form-group row">
                             <label for="role" class="col-sm-4 col-form-label">Role</label>
                             <div class="col-sm-8">
@@ -90,6 +66,30 @@
                                 @enderror
                             </div>
                         </div>
+
+                        <div class="form-group row">
+                            <label for="name" class="col-sm-4 col-form-label">Nama</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                    id="name" name="name" value="{{ old('name') }}">
+                                @error('name')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="email" class="col-sm-4 col-form-label">Email</label>
+                            <div class="col-sm-8">
+                                <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                    id="email" name="email" value="{{ old('email') }}">
+                                @error('email')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                       
 
                         <div class="form-group row">
                             <label for="no_hp" class="col-sm-4 col-form-label">No. HP</label>
@@ -144,6 +144,18 @@
                                 <input type="text" class="form-control @error('pemilik_rekening') is-invalid @enderror"
                                     id="pemilik_rekening" name="pemilik_rekening" value="{{ old('pemilik_rekening') }}">
                                 @error('pemilik_rekening')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <hr>
+                        <div class="form-group row">
+                            <label for="password" class="col-sm-4 col-form-label">Password</label>
+                            <div class="col-sm-8">
+                                <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                    id="password" name="password" value="{{ old('password') }}">
+                                @error('password')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>

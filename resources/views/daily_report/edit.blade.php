@@ -340,6 +340,21 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
+                                            <label for="vendor_id" class="col-4 col-form-label">Vendor Pengirim</label>
+                                            <div class="col-8">
+                                                <select name="vendor_id" id="vendor_id"
+                                                    class="form-control @error('vendor_id') is-invalid @enderror">
+                                                    <option value="">--Vendor Pengirim--</option>
+                                                    @foreach ($vendors as $vendor)
+                                                        <option value="{{ $vendor->id }}"
+                                                            data-vendor='@json($vendor)'
+                                                            @selected($vendor->id == old('vendor_id', $dailyReport->incoming?->vendor_id))>
+                                                            {{ $vendor->no_so }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
                                             <label for="volume_order" class="col-4 col-form-label">Volume Order</label>
                                             <div class="col-8">
                                                 <div class="input-group">
@@ -786,6 +801,7 @@
             })
 
             let last_purchase_id = @json(old('purchase_id', $dailyReport->incoming?->purchase_id));
+            let last_vendor_id = @json(old('vendor_id', $dailyReport->incoming?->vendor_id));
             let last_sopir = @json(old('sopir', $dailyReport->incoming?->sopir));
             let last_no_polisi = @json(old('no_polisi', $dailyReport->incoming?->no_polisi));
             let last_stik_sebelum_curah = @json(old('stik_sebelum_curah', $dailyReport->incoming?->stik_sebelum_curah));
@@ -798,12 +814,13 @@
             $('.btn-save-penerimaan').on('click', function() {
                 //validation all input formPenerimaan
                 const purchase_id = $('#purchase_id').val();
+                const vendor_id = $('#vendor_id').val();
                 const sopir = $('#sopir').val();
                 const no_polisi = $('#no_polisi').val();
                 const stik_sebelum_curah = $('#stik_sebelum_curah').val();
                 const stik_setelah_curah = $('#stik_setelah_curah').val();
                 const penerimaan_real = $('#penerimaan_real').val();
-                if (purchase_id == '' || sopir == '' || no_polisi == '' || stik_sebelum_curah == '' ||
+                if (purchase_id == '' || vendor_id == '' || sopir == '' || no_polisi == '' || stik_sebelum_curah == '' ||
                     stik_setelah_curah == '' ||
                     penerimaan_real == '') {
                     Swal.fire({
@@ -820,6 +837,7 @@
                 $('#penerimaan').trigger('input');
 
                 last_purchase_id = purchase_id;
+                last_vendor_id = vendor_id;
                 last_sopir = sopir;
                 last_no_polisi = no_polisi;
                 last_stik_sebelum_curah = stik_sebelum_curah;
@@ -836,6 +854,7 @@
             //reset all input formPenerimaan on close modal
             $('#modalPenerimaan').on('show.bs.modal', function() {
                 $('#purchase_id').val(last_purchase_id);
+                $('#vendor_id').val(last_vendor_id);
                 $('#sopir').val(last_sopir);
                 $('#no_polisi').val(last_no_polisi);
                 $('#stik_sebelum_curah').val(last_stik_sebelum_curah);

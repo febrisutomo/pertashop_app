@@ -29,7 +29,7 @@
 
                 </div>
                 <form id="insertForm" action="{{ route('corporations.store') }}" method="POST" class="needs-validation"
-                    novalidate>
+                    enctype="multipart/form-data">
                     @csrf
                     <div class="card-body">
 
@@ -39,6 +39,16 @@
                                 <input type="text" class="form-control @error('nama') is-invalid @enderror"
                                     id="nama" name="nama" value="{{ old('nama') }}">
                                 @error('nama')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="no_hp" class="col-sm-4 col-form-label">No Telepon</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control @error('no_hp') is-invalid @enderror"
+                                    id="no_hp" name="no_hp" value="{{ old('no_hp') }}">
+                                @error('no_hp')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -54,6 +64,75 @@
                             </div>
                         </div>
 
+                        <hr>
+                        <div class="form-group row">
+                            <label for="izin_dikeluarkan" class="col-sm-4 col-form-label">Izin Dikeluarkan</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control @error('izin_dikeluarkan') is-invalid @enderror"
+                                    id="izin_dikeluarkan" name="izin_dikeluarkan" value="{{ old('izin_dikeluarkan') }}">
+                                @error('izin_dikeluarkan')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="izin_berakhir" class="col-sm-4 col-form-label">Izin Berakhir</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control @error('izin_berakhir') is-invalid @enderror"
+                                    id="izin_berakhir" name="izin_berakhir" value="{{ old('izin_berakhir') }}">
+                                @error('izin_berakhir')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="documents" class="col-sm-4 col-form-label">Dokumen</label>
+                            <div class="col-sm-8">
+                                <div id="dynamic-form">
+
+                                </div>
+
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-info" id="add-row"><i
+                                            class="fas fa-plus"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group row">
+                            <label for="nama_bank" class="col-sm-4 col-form-label">Nama Bank</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control @error('nama_bank') is-invalid @enderror"
+                                    id="nama_bank" name="nama_bank" value="{{ old('nama_bank') }}">
+                                @error('nama_bank')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="no_rekening" class="col-sm-4 col-form-label">No. Rekening</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control @error('no_rekening') is-invalid @enderror"
+                                    id="no_rekening" name="no_rekening" value="{{ old('no_rekening') }}">
+                                @error('no_rekening')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="pemilik_rekening" class="col-sm-4 col-form-label">a/n Rekening</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control @error('pemilik_rekening') is-invalid @enderror"
+                                    id="pemilik_rekening" name="pemilik_rekening" value="{{ old('pemilik_rekening') }}">
+                                @error('pemilik_rekening')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
 
                     </div>
 
@@ -67,3 +146,32 @@
         </div>
     </section>
 @endsection
+
+
+@push('script')
+    <script>
+        //ready function
+        $(document).ready(function() {
+            //add row
+            $('#add-row').click(function() {
+                let html = `
+                <div class="d-flex justify-content-between form-group group-document">
+                    <div class="input-group">
+                        <input type="file" class="form-control" name="documents[]" required>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-danger remove-row"><i class="fas fa-minus"></i></button>
+                        </div>
+                    </div>
+                </div>
+                `;
+
+                $('#dynamic-form').append(html);
+            });
+
+            //remove row
+            $(document).on('click', '.remove-row', function() {
+                $(this).closest('.group-document').remove();
+            });
+        });
+    </script>
+@endpush

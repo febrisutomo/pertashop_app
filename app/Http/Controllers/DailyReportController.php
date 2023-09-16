@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Shop;
 use App\Models\User;
 use App\Models\Price;
+use App\Models\Vendor;
 use App\Models\Incoming;
 use App\Models\Purchase;
 use App\Models\Spending;
@@ -89,7 +90,9 @@ class DailyReportController extends Controller
 
         $categories = SpendingCategory::all();
 
-        return view('daily_report.create', compact('shops', 'operators', 'purchases', 'categories'));
+        $vendors = Vendor::all();
+
+        return view('daily_report.create', compact('shops', 'operators', 'purchases', 'categories', 'vendors'));
     }
 
     /**
@@ -152,6 +155,7 @@ class DailyReportController extends Controller
                 Incoming::create([
                     'daily_report_id' => $dailyReport->id,
                     'purchase_id' => $request->input('purchase_id'),
+                    'vendor_id' => $request->input('vendor_id'),
                     'sopir' => $request->input('sopir'),
                     'no_polisi' => $request->input('no_polisi'),
                     'stik_sebelum_curah' => $request->input('stik_sebelum_curah'),
@@ -211,14 +215,16 @@ class DailyReportController extends Controller
         $operators = User::where('role', 'operator')->where('shop_id', $dailyReport->shop_id)->get();
 
         //purcahses where doesnt have incoming or incoming id same with daily report incoming id
-        $purchases = Purchase::with(['supplier'])->where('shop_id', $dailyReport->shop_id)->where(function ($query) use ($dailyReport) {
+        $purchases = Purchase::with(['vendor'])->where('shop_id', $dailyReport->shop_id)->where(function ($query) use ($dailyReport) {
             $query->doesntHave('incoming')
                 ->orWhere('id', $dailyReport?->incoming?->purchase_id);
         })->get();
 
         $categories = SpendingCategory::all();
 
-        return view('daily_report.edit', compact('dailyReport', 'shops', 'operators', 'purchases', 'categories'));
+        $vendors = Vendor::all();
+
+        return view('daily_report.edit', compact('dailyReport', 'shops', 'operators', 'purchases', 'categories', 'vendors'));
     }
 
     /**
@@ -278,6 +284,7 @@ class DailyReportController extends Controller
                 Incoming::updateOrCreate([
                     'daily_report_id' => $dailyReport->id,
                     'purchase_id' => $request->input('purchase_id'),
+                    'vendor_id' => $request->input('vendor_id'),
                     'sopir' => $request->input('sopir'),
                     'no_polisi' => $request->input('no_polisi'),
                     'stik_sebelum_curah' => $request->input('stik_sebelum_curah'),

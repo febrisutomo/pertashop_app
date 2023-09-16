@@ -24,7 +24,7 @@
                 <div class="card-header">
                     <div class="row justify-content-between align-items-center">
                         <div
-                            class="{{ Auth::user()->role == 'super-admin' ? 'col-6' : 'col-6 col-lg-3' }} d-flex justify-content-between align-items-center">
+                            class="{{ Auth::user()->role == 'super-admin' ? 'col-lg-6' : 'col-6 col-lg-3' }} d-flex justify-content-between align-items-center">
                             @if (Auth::user()->role == 'super-admin')
                                 <select id="shop_id" name="shop_id" class="form-control mr-2">
                                     <option value="" disabled>--Pilih Pertashop--</option>
@@ -74,7 +74,7 @@
                                 <tr>
                                     <th class="text-center">Tanggal Order</th>
                                     <th class="text-center">No. SO</th>
-                                    <th class="text-center">Suppiler</th>
+                                    <th class="text-center">Vendor</th>
                                     <th class="text-center">Volume Order (&ell;)</th>
                                     <th class="text-center">Harga / (&ell;) </th>
                                     <th class="text-center">Total Bayar</th>
@@ -87,7 +87,7 @@
                                     <tr>
                                         <td>{{ $purchase->tanggal }}</td>
                                         <td>{{ $purchase->no_so }}</td>
-                                        <td>{{ $purchase->supplier->nama }}</td>
+                                        <td>{{ $purchase->vendor->nama }}</td>
                                         <td class="text-right number-float">{{ $purchase->volume }}</td>
                                         <td class="text-right currency-decimal">{{ $purchase->harga_per_liter }}</td>
                                         <td class="text-right currency">{{ $purchase->total_bayar }}</td>
@@ -114,8 +114,13 @@
                                                                         <td>{{ $purchase->incoming->purchase->no_so }}</td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td>Supplier</td>
-                                                                        <td>{{ $purchase->incoming->purchase->supplier->nama }}
+                                                                        <td>Vendor Order</td>
+                                                                        <td>{{ $purchase->incoming->purchase->vendor->nama }}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Vendor Pengirim</td>
+                                                                        <td>{{ $purchase->incoming->vendor->nama }}
                                                                         </td>
                                                                     </tr>
                                                                     <tr>

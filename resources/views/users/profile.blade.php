@@ -6,13 +6,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Edit User</h1>
+                    <h1>Profile</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('users.index') }}">User</a></li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">Profile</li>
                     </ol>
                 </div>
             </div>
@@ -28,47 +27,13 @@
                     </div>
 
                 </div>
-                <form id="insertForm" action="{{ route('users.update', $user->id) }}" method="POST"
+                <form id="insertForm" action="{{ route('profile.update', $user->id) }}" method="POST"
                     class="needs-validation" novalidate>
                     @csrf
                     @method('PUT')
                     <div class="card-body">
 
-                        <div class="form-group row">
-                            <label for="role" class="col-sm-4 col-form-label">Role</label>
-                            <div class="col-sm-8">
-                                <select name="role" id="role"
-                                    class="form-control @error('role') is-invalid @enderror">
-                                    <option value="">--Pilih Role--</option>
-                                    @foreach (['admin', 'operator', 'investor'] as $role)
-                                        <option value="{{ $role }}" @selected($role == old('role', $user->role))>
-                                            {{ Str::ucfirst($role) }}</option>
-                                    @endforeach
-                                </select>
-                                @error('role')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-
-                        <div id="formPertashop" class="form-group row">
-                            <label for="shop_id" class="col-sm-4 col-form-label">Pertashop</label>
-                            <div class="col-sm-8">
-                                <select name="shop_id" id="shop_id"
-                                    class="form-control @error('shop_id') is-invalid @enderror">
-                                    <option value="">--Pilih Pertashop--</option>
-                                    @foreach ($shops as $shop)
-                                        <option value="{{ $shop->id }}" @selected($shop->id == old('shop_id', $user->shop_id))>
-                                            {{ $shop->kode }} {{ $shop->nama }}</option>
-                                    @endforeach
-                                </select>
-                                @error('shop_id')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
+            
                         <div class="form-group row">
                             <label for="name" class="col-sm-4 col-form-label">Nama</label>
                             <div class="col-sm-8">
