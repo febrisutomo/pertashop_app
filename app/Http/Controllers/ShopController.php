@@ -57,6 +57,7 @@ class ShopController extends Controller
             'totalisator_awal' => 'required',
             'corporation_id' => 'required',
             'modal_awal' => 'required',
+            'nilai_investasi' => 'required',
             'kapasitas' => 'required',
             'skala' => 'required',
         ]);
@@ -96,6 +97,7 @@ class ShopController extends Controller
             'totalisator_awal' => 'required',
             'corporation_id' => 'required',
             'modal_awal' => 'required',
+            'nilai_investasi' => 'required',
             'kapasitas' => 'required',
             'skala' => 'required',
         ]);

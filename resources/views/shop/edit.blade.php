@@ -159,37 +159,24 @@
                             </div>
                         </div>
 
-                        {{-- <div class="form-group row">
-                            <label for="investors" class="col-sm-4 col-form-label">Investor</label>
+                        <div class="form-group row">
+                            <label for="nilai_investasi" class="col-sm-4 col-form-label">Nilai Investasi</label>
                             <div class="col-sm-8">
-                                <div class="row mb-3">
-                                    <div class="col-10">
-                                        <select name="investor[]" id="shop_id" class="form-control">
-                                            <option value="">--Pilih Investor--</option>
-                                        </select>
-
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
                                     </div>
-                                    <div class="col-2">
-                                        <input type="number" class="form-control" id="persentase" name="persentase[]"
-                                            placeholder="%" value="">
-                                    </div>
+                                    <input type="number"
+                                        class="form-control @error('nilai_investasi') is-invalid @enderror"
+                                        id="nilai_investasi" name="nilai_investasi"
+                                        value="{{ old('nilai_investasi', $shop->nilai_investasi) }}">
                                 </div>
-                                <div class="row mb-3">
-                                    <div class="col-10">
-                                        <select name="investor[]" id="shop_id" class="form-control">
-                                            <option value="">--Pilih Investor--</option>
-                                        </select>
-
-                                    </div>
-                                    <div class="col-2">
-                                        <input type="number" class="form-control" id="persentase" name="persentase[]"
-                                            placeholder="%" value="">
-                                    </div>
-                                </div>
-
+                                @error('nilai_investasi')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
                             </div>
+                        </div>
 
-                        </div> --}}
 
                     </div>
 
