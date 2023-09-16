@@ -153,15 +153,26 @@ class ShopController extends Controller
     public function investorUpdate(Request $request, Shop $shop)
     {
         $request->validate([
-            'id' => 'required',
-            'persentase' => 'required'
+            'investor_id' => 'required',
+            'persentase' => 'required',
+            'nama_bank' => 'required',
+            'no_rekening' => 'required',
+            'pemilik_rekening' => 'required',
         ]);
 
-        $shop->investors()->detach($request->id);
+        $shop->investors()->detach($request->investor_id);
 
-        $shop->investors()->attach([$request->id => ['persentase' => $request->persentase]]);
+        $shop->investors()->attach([
+            $request->investor_id =>
+            [
+                'persentase' => $request->persentase,
+                'nama_bank' => $request->nama_bank,
+                'no_rekening' => $request->no_rekening,
+                'pemilik_rekening' => $request->pemilik_rekening
+            ]
+        ]);
 
-        return response()->json(['message' => 'Persentase investasi berhasil diupdate.']);
+        return redirect()->back()->with('success', 'Investor berhasil berhasil diupdate.');
     }
 
     public function investorDestroy(Request $request, Shop $shop)

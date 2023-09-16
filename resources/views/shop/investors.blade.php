@@ -54,7 +54,7 @@
                                         <td>{{ $investor->name }}</td>
                                         <td class="text-right"><span
                                                 class="number">{{ $investor->pivot->persentase }}</span> %</td>
-                                        <td>{{ $investor->pivot->nama_bank . ' ' . $investor->pivot->no_rekening . ' a/n' . $investor->pivot->pemilik_rekening }}
+                                        <td>{{ $investor->pivot->nama_bank . ' ' . $investor->pivot->no_rekening . ' a/n ' . $investor->pivot->pemilik_rekening }}
                                         </td>
                                         <td>
                                             <button class="btn btn-sm btn-info btn-edit" data-toggle="modal"
@@ -63,7 +63,7 @@
                                             <button class="btn btn-sm btn-danger btn-delete"
                                                 data-id="{{ $investor->id }}"><i class="fa fa-trash"></i></button>
 
-                                            <div class="modal fade" id="modalEdit{{ $investor->pivot->id }}">
+                                            <div class="modal fade" id="modalEdit{{ $investor->id }}">
                                                 <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
@@ -78,6 +78,7 @@
                                                             action="{{ route('shops.investors.update', $shop->id) }}"
                                                             method="POST">
                                                             @csrf
+                                                            @method('PUT')
                                                             <div class="modal-body">
                                                                 <div class="form-group row">
                                                                     <label for="investor_id"
@@ -306,12 +307,15 @@
                                 id
                             },
                             success: function(response) {
-                                dataTable.ajax.reload();
-                                Swal.fire(
-                                    'Terhapus!',
-                                    response.message,
-                                    'success'
-                                );
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then((result) => {
+                                    location.reload();
+                                });
                             }
                         });
                     }
