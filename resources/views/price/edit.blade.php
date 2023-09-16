@@ -46,7 +46,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="jam" class="col-sm-4 col-form-label">Tanggal</label>
+                            <label for="jam" class="col-sm-4 col-form-label">Jam</label>
                             <div class="col-sm-8">
                                 <input type="time" class="form-control @error('jam') is-invalid @enderror" id="jam"
                                     name="jam" value="{{ old('jam', $price->created_at->format('H:i')) }}">
