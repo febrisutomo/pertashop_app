@@ -87,7 +87,7 @@ class DailyReportController extends Controller
         $operators = User::where('role', 'operator')->where('shop_id', $shop_id)->get();
         $purchases = Purchase::where('shop_id', $shop_id)->doesntHave('incoming')->get();
 
-        $categories = SpendingCategory::where('id', '>', 2)->get();
+        $categories = SpendingCategory::all();
 
         return view('daily_report.create', compact('shops', 'operators', 'purchases', 'categories'));
     }
@@ -216,7 +216,7 @@ class DailyReportController extends Controller
                 ->orWhere('id', $dailyReport?->incoming?->purchase_id);
         })->get();
 
-        $categories = SpendingCategory::where('id', '>', 2)->get();
+        $categories = SpendingCategory::all();
 
         return view('daily_report.edit', compact('dailyReport', 'shops', 'operators', 'purchases', 'categories'));
     }

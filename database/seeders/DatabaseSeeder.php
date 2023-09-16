@@ -13,6 +13,8 @@ use App\Models\Supplier;
 use App\Models\TestPump;
 use App\Models\RekapModal;
 use App\Models\Corporation;
+use App\Models\InvestorProfit;
+use App\Models\ProfitSharing;
 use Illuminate\Database\Seeder;
 use App\Models\SpendingCategory;
 use Illuminate\Support\Facades\Hash;
@@ -358,8 +360,6 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         SpendingCategory::insert([
-            ['nama' => 'Gaji Operator'],
-            ['nama' => 'Gaji Admin'],
             ['nama' => 'Ongkos Bongkar'],
             ['nama' => 'Biaya Transfer'],
             ['nama' => 'Fotocopy & ATK'],
@@ -617,5 +617,235 @@ class DatabaseSeeder extends Seeder
 
         RekapModal::insert($rekapModal);
         RekapModal::where('shop_id', $kalitapen->id)->update(['kas_kecil' => 600000]);
+
+        $profit_sharings = [
+            [
+                'id' => 1,
+                'created_at' => '2021-07-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 2128174,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 2,
+                'created_at' => '2021-08-30',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 6667094,
+                'alokasi_modal' => 0,
+            ],
+        ];
+
+
+        $investors = [
+            [
+                'investor_shop_id' => $ptsam->investments()->where('shop_id', $kalitapen->id)->first()->pivot->id,
+                'persentase' => 100,
+            ]
+        ];
+
+        ProfitSharing::insert($profit_sharings);
+
+        $investor_profits = [];
+
+        foreach ($profit_sharings as $profit_sharing) {
+            foreach ($investors as $investor) {
+                $investor_profit = [
+                    'profit_sharing_id' => $profit_sharing['id'],
+                    'investor_shop_id' => $investor['investor_shop_id'],
+                    'nilai_profit' => $profit_sharing['nilai_profit_sharing'] * ($investor['persentase'] / 100),
+                ];
+
+                $investor_profits[] = $investor_profit;
+            }
+        }
+
+        InvestorProfit::insert($investor_profits);
+
+        $profit_sharings = [
+            [
+                'id' => 3,
+                'created_at' => '2021-09-30',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 10641659,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 4,
+                'created_at' => '2021-10-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 9990141,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 5,
+                'created_at' => '2021-11-30',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 11202889,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 6,
+                'created_at' => '2021-12-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 13906102,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 7,
+                'created_at' => '2022-01-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 5183149,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 8,
+                'created_at' => '2022-02-28',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => -5476183,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 9,
+                'created_at' => '2022-03-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 5046982,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 10,
+                'created_at' => '2022-04-30',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 6648855,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 11,
+                'created_at' => '2022-05-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 7024491,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 12,
+                'created_at' => '2022-06-30',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 3584955,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 13,
+                'created_at' => '2022-07-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 2030129,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 14,
+                'created_at' => '2022-08-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 956151,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 15,
+                'created_at' => '2022-09-30',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 347415,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 16,
+                'created_at' => '2022-10-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => -1654207,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 17,
+                'created_at' => '2022-11-30',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 628484,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 18,
+                'created_at' => '2022-12-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 1647416,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 19,
+                'created_at' => '2023-01-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => -949043,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 20,
+                'created_at' => '2023-02-28',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 1694688,
+                'alokasi_modal' => 169469,
+            ],
+            [
+                'id' => 21,
+                'created_at' => '2023-03-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 2409518,
+                'alokasi_modal' => 240952,
+            ],
+            [
+                'id' => 22,
+                'created_at' => '2023-04-30',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => -125970,
+                'alokasi_modal' => 0,
+            ],
+            [
+                'id' => 23,
+                'created_at' => '2023-05-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 1224004,
+                'alokasi_modal' => 122400,
+            ],
+            [
+                'id' => 24,
+                'created_at' => '2023-06-30',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 541354,
+                'alokasi_modal' => 54135,
+            ],
+            [
+                'id' => 25,
+                'created_at' => '2023-07-31',
+                'shop_id' => 1,
+                'nilai_profit_sharing' => 571077,
+                'alokasi_modal' => 571077,
+            ],
+        ];
+
+
+        ProfitSharing::insert($profit_sharings);
+
+        $kalitapen = Shop::find($kalitapen->id);
+
+        $investor_profits = [];
+
+        foreach ($profit_sharings as $profit_sharing) {
+            foreach ($kalitapen->investors as $investor) {
+                $investor_profit = [
+                    'profit_sharing_id' => $profit_sharing['id'],
+                    'investor_shop_id' => $investor->pivot->id,
+                    'nilai_profit' => ($profit_sharing['nilai_profit_sharing'] - $profit_sharing['alokasi_modal']) * ($investor->pivot->persentase / 100),
+                ];
+
+                $investor_profits[] = $investor_profit;
+            }
+        }
+
+        // print($investor_profits);
+
+        InvestorProfit::insert($investor_profits);
     }
 }

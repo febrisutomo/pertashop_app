@@ -179,7 +179,7 @@
 @push('script')
     <script>
         $(document).ready(function() {
-            //hide formPertashop if role is investor
+            // hide formPertashop if role is investor
             $('#role').on('change', function() {
                 if ($(this).val() == 'investor') {
                     $('#formPertashop').hide();

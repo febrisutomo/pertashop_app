@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('laba_bersihs', function (Blueprint $table) {
+        Schema::create('profit_sharings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('shop_id')->constrained();
-            $table->unsignedDecimal('laba_kotor', 12, 0);
-            $table->unsignedDecimal('total_biaya', 12, 0);
-            $table->unsignedDecimal('gaji_operator', 10, 0)->nullable();
-            $table->unsignedDecimal('gaji_admin', 10, 0)->nullable();
-            $table->unsignedDecimal('persentase_alokasi_modal', 10, 2)->default(10);
+            $table->decimal('nilai_profit_sharing', 12, 0);
+            $table->decimal('alokasi_modal', 12, 0);
             $table->timestamps();
         });
     }
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('laba_bersihs');
+        Schema::dropIfExists('profit_sharings');
     }
 };

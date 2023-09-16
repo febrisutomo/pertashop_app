@@ -46,9 +46,12 @@ class PriceController extends Controller
     {
         $validated = $request->validate([
             'created_at' => 'required',
+            'jam' => 'required',
             'harga_beli' => 'required',
             'harga_jual' => 'required'
         ]);
+
+        $validated['created_at'] = $validated['created_at'] . ' ' . $validated['jam'];
 
         Price::create($validated);
 
@@ -78,9 +81,12 @@ class PriceController extends Controller
     {
         $validated = $request->validate([
             'created_at' => 'required',
+            'jam' => 'required',
             'harga_beli' => 'required',
             'harga_jual' => 'required'
         ]);
+
+        $validated['created_at'] = $validated['created_at'] . ' ' . $validated['jam'];
 
         $price->update($validated);
 

@@ -85,6 +85,7 @@ class LabaKotorController extends Controller
             $jumlah_hari = $reports->groupBy('tanggal')->count();
 
             $rata_rata_omset_harian = $jumlah_hari == 0 ? 0 : $jumlah_penjualan / $jumlah_hari;
+            $rata_rata_omset_harian_rp = $jumlah_hari == 0 ? 0 : $jumlah_penjualan_rp / $jumlah_hari;
 
 
             $data[] = [
@@ -110,6 +111,7 @@ class LabaKotorController extends Controller
                 'sisa_stok_akhir' => round($sisa_stok_akhir, 2),
                 'laba_kotor' => round($laba_kotor, 2),
                 'rata_rata_omset_harian' => round($rata_rata_omset_harian, 2),
+                'rata_rata_omset_harian_rp' => round($rata_rata_omset_harian_rp),
             ];
         }
         return collect($data);
@@ -130,6 +132,7 @@ class LabaKotorController extends Controller
             'jumlah_pembelian_rp' => $reports->sum('jumlah_pembelian_rp'),
             'laba_kotor' => $reports->sum('laba_kotor'),
             'rata_rata_omset_harian' => $reports->count() > 0 ? $reports->sum('rata_rata_omset_harian') / $reports->count() : 0,
+            'rata_rata_omset_harian_rp' => $reports->count() > 0 ? $reports->sum('rata_rata_omset_harian_rp') / $reports->count() : 0,
         ];
 
         return $data;
@@ -138,38 +141,32 @@ class LabaKotorController extends Controller
     public function index(Request $request)
     {
 
-        if ($request->ajax()) {
+        if (Auth::user()->role == 'admin') {
+            $shop_id = Auth::user()->shop_id;
+        } else {
             $shop_id = $request->input('shop_id', 1);
-
-            $sales = DailyReport::where('shop_id', $shop_id)->get()->groupBy(function ($item) {
-                return $item->created_at->format('Y-m');
-            });
-
-            $data = $sales->map(function ($value, $key) use ($shop_id) {
-                $labaKotor = self::getLabaKotorFinal($shop_id, $key);
-
-                $labaKotor['shop_id'] = $shop_id;
-                $labaKotor['bulan'] = $key;
-
-                return $labaKotor;
-            });
-
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    $button = '<a href="' . route('laba-kotor.edit', ['shop_id' => $row['shop_id'], 'year_month' => $row['bulan']]) . '" class="btn btn-sm btn-link" title="Detail"><i class="fa fa-list"></i></a>';
-                    return $button;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
         }
+
+        $sales = DailyReport::where('shop_id', $shop_id)->get()->groupBy(function ($item) {
+            return $item->created_at->format('Y-m');
+        });
+
+        $labaKotors = $sales->map(function ($value, $key) use ($shop_id) {
+            $labaKotor = self::getLabaKotorFinal($shop_id, $key);
+
+            $labaKotor['shop_id'] = $shop_id;
+            $labaKotor['bulan'] = $key;
+
+            return $labaKotor;
+        });
 
         $shops = Shop::all();
+
         if (Auth::user()->role == 'investor') {
-            $shops = Auth::user()->investor->shops;
+            $shops = Auth::user()->investments;
         }
 
-        return view('laba_kotor.index', compact('shops'));
+        return view('laba_kotor.index', compact('shops', 'labaKotors'));
     }
 
     public function edit(string $shop_id, string $year_month)

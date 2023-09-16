@@ -22,29 +22,75 @@
         <div class="container-fluid">
             <div class="card card-primary card-outline">
                 <div class="card-header">
-                    <div class=" d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
+                    <div class="row justify-content-between align-items-center">
+                        <div class="col-md-6 d-flex justify-content-between">
                             @if (Auth::user()->shop)
                                 <h3 class="card-title mr-2">
                                     {{ Auth::user()->shop->kode . ' ' . Auth::user()->shop->nama }}</h3>
                             @else
-                                <select name="shop_id" class="form-control mr-2" style="width: 200px">
-                                    <option value="">-- Semua Pertashop --</option>
-                                    @foreach ($shops as $shop)
-                                        <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
+                                <select id="shop_id" name="shop_id" class="form-control mr-2">
+                                    <option value="">Semua Petashop</option>
+                                    @foreach ($shops as $s)
+                                        <option value="{{ $s->id }}" @selected(Request::query('shop_id') == $s->id)>
+                                            {{ $s->kode . ' ' . $s->nama }}</option>
                                     @endforeach
                                 </select>
                             @endif
+                            <select id="role" name="role" class="form-control">
+                                <option value="">Semua Role</option>
+                                @foreach (['admin', 'operator', 'investor'] as $role)
+                                    <option value="{{ $role }}" @selected(Request::query('role') == $role)>
+                                        {{ Str::ucfirst($role) }}</option>
+                                @endforeach
 
+                            </select>
                         </div>
-                        <a href="{{ route('users.create') }}" class="btn btn-primary"><i class="fa fa-plus mr-2"></i>Tambah
-                            User</a>
+
+                        <div class="col-md-3 d-flex justify-content-end order-first order-md-last mb-2 mb-md-0">
+                            <a href="{{ route('users.create') }}" class="btn btn-primary"><i
+                                    class="fa fa-plus mr-2"></i>Tambah</a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
 
-                    <div class="table-responsive-lg">
+                    <div class="table-responsive">
                         <table id="table" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">No</th>
+                                    <th class="text-center">Nama</th>
+                                    <th class="text-center">Email</th>
+                                    <th class="text-center">Role</th>
+                                    <th class="text-center">Pertashop</th>
+                                    <th class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($users as $user)
+                                    <tr>
+                                        <td class="text-center">{{ $loop->iteration }}</td>
+                                        <td>{{ $user->name }}</td>
+                                        <td>{{ $user->email }}</td>
+                                        <td class="text-center">{{ Str::ucfirst($user->role) }}</td>
+                                        <td class="text-center">
+                                            @if ($user->role != 'investor')
+                                                {{ $user->shop->nama }}
+                                            @else
+                                                @foreach ($user->investments as $s)
+                                                    {{ $s->nama }}{{ $loop->iteration != $loop->count ? ',' : '' }}
+                                                @endforeach
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-info btn-sm"><i
+                                                    class="fa fa-edit"></i></a>
+                                            <button class="btn btn-danger btn-sm btn-delete" data-id="{{ $user->id }}">
+                                                <i class="fa fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -57,75 +103,17 @@
 @push('script')
     <script>
         $(document).ready(function() {
-            var dataTable = $('#table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('users.index') }}",
-                columns: [{
-                        title: '#',
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        width: '20',
-                    },
-                    {
-                        title: 'Nama',
-                        data: 'name',
-                        name: 'name',
-                    },
-                    {
-                        title: 'Email',
-                        data: 'email',
-                        name: 'email',
-                    },
-                    {
-                        title: 'Role',
-                        data: 'role',
-                        name: 'role',
-                    },
-                    {
-                        title: 'Pertashop',
-                        data: 'shop.nama',
-                        name: 'shop.nama',
-                    },
-                    {
-                        title: 'Aksi',
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },
-                ],
-                // order: [
-                //     [0, 'desc']
-                // ],
-                columnDefs: [{
-                        responsivePriority: 1,
-                        targets: 0
-                    },
-                    {
-                        responsivePriority: 2,
-                        targets: -1
-                    }
-                ],
-                responsive: {
-                    details: {
-                        display: DataTable.Responsive.display.modal({
-                            header: function(row) {
-                                var data = row.data();
-                                return 'Detail User';
-                            }
-                        }),
-                        renderer: DataTable.Responsive.renderer.tableAll({
-                            tableClass: 'table'
-                        })
-                    }
-                }
+
+            $('#shop_id, #role').on('change', function() {
+                const shop_id = $('#shop_id').val();
+                const role = $('#role').val();
+                window.location.replace(
+                    `{{ route('users.index') }}?shop_id=${shop_id}&role=${role}`
+                );
             });
 
-            $('select[name=shop_id]').on('change', function() {
-                dataTable.ajax.url(`?shop_id=${this.value}`).load();
-            });
-
+            //client data table
+            $('#table').dataTable();
 
             $('#table').on('click', '.btn-delete', function() {
                 var id = $(this).data('id');
@@ -145,12 +133,15 @@
                             type: "DELETE",
                             url: "{{ route('users.index') }}" + "/" + id,
                             success: function(response) {
-                                dataTable.ajax.reload();
-                                Swal.fire(
-                                    'Terhapus!',
-                                    response.message,
-                                    'success'
-                                );
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1500 // milliseconds
+                                }).then((result) => {
+                                    location.reload();
+                                });
                             }
                         });
                     }

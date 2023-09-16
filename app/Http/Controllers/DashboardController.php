@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\DailyReport;
+use App\Models\InvestorProfit;
+use App\Models\RekapModal;
 use App\Models\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -12,7 +14,24 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        if (collect(['super-admin', 'admin'])->contains(Auth::user()->role)) {
+        $currentTime = Carbon::now();
+
+        // Mendapatkan waktu saat ini dalam format 24 jam
+        $currentHour = $currentTime->format('H');
+
+        $sapaan = '';
+
+        if ($currentHour >= 5 && $currentHour < 12) {
+            $sapaan = 'Selamat Pagi';
+        } elseif ($currentHour >= 12 && $currentHour < 17) {
+            $sapaan = 'Selamat Siang';
+        } elseif ($currentHour >= 17 && $currentHour < 20) {
+            $sapaan = 'Selamat Sore';
+        } else {
+            $sapaan = 'Selamat Malam';
+        }
+
+        if (collect(['super-admin', 'admin', 'investor'])->contains(Auth::user()->role)) {
 
             if (Auth::user()->role == 'admin') {
                 $shop_id = Auth::user()->shop_id;
@@ -28,16 +47,22 @@ class DashboardController extends Controller
             $shops = Shop::all();
 
             $sales = $this->getSales($shop_id, $year_month);
+            $summary = LabaKotorController::getLabaKotorFinal($shop_id, Carbon::now()->format('Y-m'));
 
-            $summary = LabaKotorController::getLabaKotorFinal($shop_id, $year_month);
+            if (auth()->user()->role != 'investor') {
+                return view('dashboard.index', compact('shops', 'sales', 'stocks', 'summary', 'sapaan'));
+            } else {
+                $shops = Auth::user()->investments;
 
+                $posisi_modal = RekapModal::where('shop_id', $shop_id)->latest()->first()?->modal_akhir;
 
-            // if (Auth::user()->role == 'investor') {
-            //     $shops = Auth::user()->investor->shops;
-            // }
+                $total_profit_pertashop = InvestorProfit::whereRelation('profitSharing', 'shop_id', $shop_id)->sum('nilai_profit');
 
-            return view('dashboard.index', compact('shops', 'sales', 'stocks', 'summary'));
-        } elseif (Auth::user()->role === 'operator') {
+                $total_profit_anda = InvestorProfit::whereRelation('investorShop', 'user_id', Auth::user()->id)->sum('nilai_profit');
+
+                return view('dashboard.index-investor', compact('shops', 'sapaan', 'sales', 'summary', 'total_profit_anda', 'total_profit_pertashop', 'posisi_modal'));
+            }
+        } else {
 
             $operator_id = Auth::user()->id;
             $shop_id = Auth::user()->shop_id;
@@ -49,24 +74,6 @@ class DashboardController extends Controller
             $volume_penjualan = $today_report->sum('volume_penjualan');
             $rupiah_penjualan = $today_report->sum('rupiah_penjualan');
             $tabungan = DailyReport::where('operator_id', $operator_id)->get()->sum('selisih_setoran');
-
-            $currentTime = Carbon::now();
-
-            // Mendapatkan waktu saat ini dalam format 24 jam
-            $currentHour = $currentTime->format('H');
-
-            $sapaan = '';
-
-            if ($currentHour >= 5 && $currentHour < 12) {
-                $sapaan = 'Selamat Pagi';
-            } elseif ($currentHour >= 12 && $currentHour < 17) {
-                $sapaan = 'Selamat Siang';
-            } elseif ($currentHour >= 17 && $currentHour < 20) {
-                $sapaan = 'Selamat Sore';
-            } else {
-                $sapaan = 'Selamat Malam';
-            }
-
 
             return view('dashboard.index-operator', compact('sapaan', 'tabungan', 'stok_akhir', 'totalisator_akhir', 'volume_penjualan', 'rupiah_penjualan'));
         }

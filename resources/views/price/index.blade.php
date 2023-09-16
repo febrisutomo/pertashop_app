@@ -26,8 +26,8 @@
                         <div class="card-title">
                             Harga BBM
                         </div>
-                        <a href="{{ route('prices.create') }}" class="btn btn-primary"><i class="fa fa-plus mr-2"></i>Tambah
-                            Harga BBM</a>
+                        <a href="{{ route('prices.create') }}" class="btn btn-primary"><i
+                                class="fa fa-plus mr-2"></i>Tambah</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -68,25 +68,36 @@
                         }
                     },
                     {
-                        title: 'Harga Beli (Rp)',
-                        data: 'harga_beli',
-                        name: 'harga_beli',
-                        className: 'text-right',
+                        title: 'Jam',
+                        data: 'created_at',
+                        name: 'created_at',
                         render: function(data, type) {
                             if (type === 'display') {
-                                return formatNumber(data)
+                                return formatTime(data);
                             }
                             return data;
                         }
                     },
                     {
-                        title: 'Harga Jual (Rp)',
+                        title: 'Harga Beli',
+                        data: 'harga_beli',
+                        name: 'harga_beli',
+                        className: 'text-right',
+                        render: function(data, type) {
+                            if (type === 'display') {
+                                return formatCurrency(data)
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        title: 'Harga Jual',
                         data: 'harga_jual',
                         name: 'harga_jual',
                         className: 'text-right',
                         render: function(data, type) {
                             if (type === 'display') {
-                                return formatNumber(data)
+                                return formatCurrency(data)
                             }
                             return data;
                         }
@@ -96,6 +107,7 @@
                         title: 'Aksi',
                         data: 'action',
                         name: 'action',
+                        className: 'text-center',
                         orderable: false,
                         searchable: false
                     },
@@ -103,28 +115,6 @@
                 order: [
                     [0, 'desc']
                 ],
-                columnDefs: [{
-                        responsivePriority: 1,
-                        targets: 0
-                    },
-                    {
-                        responsivePriority: 2,
-                        targets: -1
-                    }
-                ],
-                responsive: {
-                    details: {
-                        display: DataTable.Responsive.display.modal({
-                            header: function(row) {
-                                var data = row.data();
-                                return 'Detail Harga BBM';
-                            }
-                        }),
-                        renderer: DataTable.Responsive.renderer.tableAll({
-                            tableClass: 'table'
-                        })
-                    }
-                }
             });
 
 
@@ -147,11 +137,13 @@
                             url: "{{ route('prices.index') }}" + "/" + id,
                             success: function(response) {
                                 dataTable.ajax.reload();
-                                Swal.fire(
-                                    'Terhapus!',
-                                    response.message,
-                                    'success'
-                                );
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1500 // milliseconds
+                                });
                             }
                         });
                     }

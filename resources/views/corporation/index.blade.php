@@ -27,12 +27,12 @@
                             Badan Usaha
                         </div>
                         <a href="{{ route('corporations.create') }}" class="btn btn-primary"><i
-                                class="fa fa-plus mr-2"></i>Tambah Badan Usaha</a>
+                                class="fa fa-plus mr-2"></i>Tambah</a>
                     </div>
                 </div>
                 <div class="card-body">
 
-                    <div class="table-responsive-lg">
+                    <div class="table-responsive">
                         <table id="table" class="table table-bordered">
                         </table>
                     </div>
@@ -71,6 +71,8 @@
                         title: 'Aksi',
                         data: 'action',
                         name: 'action',
+                        className: 'text-center',
+                        width: 100,
                         orderable: false,
                         searchable: false
                     },
@@ -78,28 +80,6 @@
                 order: [
                     [0, 'desc']
                 ],
-                columnDefs: [{
-                        responsivePriority: 1,
-                        targets: 0
-                    },
-                    {
-                        responsivePriority: 2,
-                        targets: -1
-                    }
-                ],
-                responsive: {
-                    details: {
-                        display: DataTable.Responsive.display.modal({
-                            header: function(row) {
-                                var data = row.data();
-                                return 'Detail Badan Usaha';
-                            }
-                        }),
-                        renderer: DataTable.Responsive.renderer.tableAll({
-                            tableClass: 'table'
-                        })
-                    }
-                }
             });
 
 
@@ -119,14 +99,17 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "DELETE",
-                            url: "{{ url('') }}" + "/corporations/" + id,
+                            url: "{{ route('corporations.index') }}" + "/" +
+                                id,
                             success: function(response) {
                                 dataTable.ajax.reload();
-                                Swal.fire(
-                                    'Terhapus!',
-                                    response.message,
-                                    'success'
-                                );
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1500 // milliseconds
+                                });
                             }
                         });
                     }

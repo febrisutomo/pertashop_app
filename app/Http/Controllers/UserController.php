@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Shop;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
@@ -16,35 +17,33 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $users = User::with(['shop'])->whereNot('role', 'super-admin');
 
-        if ($request->ajax()) {
-            if (Auth::user()->shop) {
-                $shop_id = Auth::user()->shop_id;
-                $users = User::with(['shop'])->where('shop_id', $shop_id)->latest()->get();
+        $role = $request->input('role');
+
+        if (Auth::user()->shop) {
+            $shop_id = Auth::user()->shop_id;
+            if ($role) {
+                $users = $users->where('role', $role)->where('shop_id', $shop_id)->latest()->get();
             } else {
-                $shop_id = $request->input('shop_id');
-                if ($shop_id) {
-                    $users = User::with(['shop'])->where('shop_id', $shop_id)->latest()->get();
-                } else {
-                    $users = User::with(['shop'])->latest()->get();
-                }
+                $users = $users->where('shop_id', $shop_id)->orWhereRelation('investments', 'shop_id', $shop_id)->latest()->get();
             }
-
-            return DataTables::of($users)
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    $button = '<a href="' . route('users.edit', $row->id) . '" class="btn btn-sm btn-info" title="Edit"><i class="fa fa-edit"></i></a>';
-                    $button .= ' <button class="btn btn-sm btn-danger btn-delete" title="hapus" data-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
-
-                    return $button;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
+        } else {
+            $shop_id = $request->input('shop_id');
+            if ($role && $shop_id) {
+                $users = $users->where('role', $role)->where('shop_id', $shop_id)->orWhereRelation('investments', 'id', $shop_id)->latest()->get();
+            } elseif ($role) {
+                $users = $users->where('role', $role)->latest()->get();
+            } elseif ($shop_id) {
+                $users = $users->where('shop_id', $shop_id)->orWhereRelation('investments', 'shop_id', $shop_id)->latest()->get();
+            } else {
+                $users = $users->latest()->get();
+            }
         }
 
         $shops = Shop::all();
 
-        return view('users.index', compact('shops'));
+        return view('users.index', compact('shops', 'users'));
     }
 
     /**
@@ -62,18 +61,22 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         $validated = $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'role' => 'required|in:admin,operator,investor',
-            'shop_id' => 'required_if:role,!=,investor',
+            'shop_id' =>   [
+                Rule::requiredIf(function () use ($request) {
+                    return $request->input('role') == 'admin' || $request->input('role') == 'operator';
+                }),
+            ],
             'alamat' => 'nullable',
             'no_hp' => 'nullable',
             'no_rekening' => 'nullable',
             'nama_bank' => 'nullable',
             'pemilik_rekening' => 'nullable',
         ]);
+
 
         if ($request->role == 'investor') {
             $validated['shop_id'] = null;
@@ -111,7 +114,11 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'role' => 'required|in:admin,operator,investor',
-            'shop_id' => 'required_if:role,!=,investor',
+            'shop_id' =>   [
+                Rule::requiredIf(function () use ($request) {
+                    return $request->input('role') == 'admin' || $request->input('role') == 'operator';
+                }),
+            ],
             'alamat' => 'nullable',
             'no_hp' => 'nullable',
             'no_rekening' => 'nullable',

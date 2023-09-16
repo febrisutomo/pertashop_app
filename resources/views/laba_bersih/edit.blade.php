@@ -6,7 +6,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Laba Bersih {{ $date->monthName . ' ' . $date->year }}</h1>
+                    <h1>Laba Bersih {{ $report->created_at->monthName . ' ' . $report->created_at->year }}</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -36,8 +36,8 @@
                         <div class="pb-2 mb-2 d-flex justify-content-center" style="border-bottom: 4px solid #000">
                             <h3 class="card-title font-weight-bold text-uppercase text-center">
                                 Perhitungan Laba Bersih
-                                {{ $date->startOfMonth()->format('d') }} s/d
-                                {{ $date->endOfMonth()->format('d') . ' ' . $date->monthName . ' ' . $date->year }}
+                                {{ $report->created_at->startOfMonth()->format('d') }} s/d
+                                {{ $report->created_at->endOfMonth()->format('d') . ' ' . $report->created_at->monthName . ' ' . $report->created_at->year }}
                                 <br>PERTASHOP {{ $shop->kode }} {{ $shop->alamat }} <br> {{ $shop->corporation->nama }}
                             </h3>
                         </div>
@@ -61,7 +61,7 @@
                                     <td>=</td>
                                     <td class="line-bottom d-flex justify-content-between">
                                         <span>Rp</span>
-                                        <span class="number">{{ $report['laba_kotor'] }}</span>
+                                        <span class="number">{{ $report->laba_kotor }}</span>
                                     </td>
                                     <td></td>
                                     <td></td>
@@ -73,7 +73,7 @@
                                     <td></td>
                                     <td class="d-flex justify-content-between font-weight-bold">
                                         <span>Rp</span>
-                                        <span class="number">{{ $report['laba_kotor'] }}</span>
+                                        <span class="number">{{ $report->laba_kotor }}</span>
                                     </td>
                                     <td></td>
                                 </tr>
@@ -85,9 +85,34 @@
                                     <td></td>
                                     <td></td>
                                 </tr>
+                                <tr>
+                                    <td><span style="width: 20px; display: inline-block">1.</span>
+                                        <span class="text-uppercase">Gaji Operator</span>
+                                    </td>
+                                    <td>=</td>
+                                    <td class="d-flex justify-content-between">
+                                        <span>Rp</span>
+                                        <span class="number">{{ $report->gaji_operator }}</span>
+                                    </td>
+                                    <td class="px-2"></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td><span style="width: 20px; display: inline-block">2.</span>
+                                        <span class="text-uppercase">Gaji Admin</span>
+                                    </td>
+                                    <td>=</td>
+                                    <td class="d-flex justify-content-between">
+                                        <span>Rp</span>
+                                        <span class="number">{{ $report->gaji_admin }}</span>
+                                    </td>
+                                    <td class="px-2"></td>
+                                    <td></td>
+                                </tr>
                                 @foreach ($spendings as $spending)
                                     <tr>
-                                        <td><span style="width: 20px; display: inline-block">{{ $loop->iteration }}.</span>
+                                        <td><span
+                                                style="width: 20px; display: inline-block">{{ $loop->iteration + 2 }}.</span>
                                             <span class="text-uppercase">{{ $spending['pengeluaran'] }}</span>
                                         </td>
                                         <td>=</td>
@@ -156,8 +181,7 @@
                                     <td width="20"></td>
                                 </tr>
                                 <tr class="font-weight-bold">
-                                    <td class="text-right"><button class="btn btn-sm btn-link btn-alokasi"><i
-                                                class="fas fa-edit"></i></button>Alokasi Modal Dasar dari
+                                    <td class="text-right">Alokasi Modal Dasar dari
                                         <span class="number">{{ $report['persentase_alokasi_modal'] }}</span>% Profit
                                     </td>
                                     <td width="20" class="px-2">=</td>
@@ -262,37 +286,49 @@
                             </table>
 
                         </div>
-                        <br>
-                        <br>
-                        <p class="text-right px-3">Banyumas,
-                            {{ $date->endOfMonth()->format('d') . ' ' . $date->monthName . ' ' . $date->year }}
-                        <p>
-                        <div class="row">
-                            <div class="col-sm-9">
-                                <div class="text-center">Disetujui Oleh,</div>
-                                <div class="row">
-                                    @foreach ($shop->investors as $investor)
-                                        <div class="col-sm mb-2 px-1">
-                                            <div class="text-center">
-                                                <p style="margin-top: 3cm">{{ $investor->name }}</p>
+                        <div class="ttd pt-4" style="display: none">
+                            <p class="text-right px-3">Banyumas,
+                                {{ $report->created_at->endOfMonth()->format('d') . ' ' . $report->created_at->monthName . ' ' . $report->created_at->year }}
+                            <p>
+                            <div class="row">
+                                <div class="col-sm-9">
+                                    <div class="text-center">Disetujui Oleh,</div>
+                                    <div class="row">
+                                        @foreach ($shop->investors as $investor)
+                                            <div class="col-sm mb-2 px-1">
+                                                <div class="text-center">
+                                                    <p style="margin-top: 3cm">{{ $investor->name }}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    @endforeach
+                                        @endforeach
 
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-3 mb-2 px-1">
-                                <div class="text-center ">
-                                    <div>Dibuat Oleh,</div>
-                                    <p style="margin-top: 3cm">{{ Auth::user()->name }}</p>
+                                <div class="col-sm-3 mb-2 px-1">
+                                    <div class="text-center ">
+                                        <div>Dibuat Oleh,</div>
+                                        <p style="margin-top: 3cm">{{ Auth::user()->name }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
                 <div class="card-footer">
                     <div class="text-right">
+                        @if (Auth::user()->role != 'investor')
+                            <button class="btn btn-danger mr-2 btn-delete">
+                                <i class="fas fa-trash mr-2 "></i>
+                                <span>Hapus</span>
+                            </button>
+                            <button class="btn btn-primary mr-2" data-toggle="modal" data-target="#modalEdit">
+                                <i class="fas fa-edit mr-2"></i>
+                                <span>Edit</span>
+                            </button>
+                        @endif
+
                         <button class="btn btn-warning" onclick="window.print()">
                             <i class="fas fa-print mr-2 "></i>
                             <span>Cetak</span>
@@ -304,43 +340,86 @@
 
 
     </section>
-    <div class="modal fade" id="modal_laba_kotor">
-        <div class="modal-dialog modal-sm">
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+        aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Alokasi Modal Dasar</h4>
+                    <h5 class="modal-title">Edit Laporan Laba Bersih</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="form_laba_kotor"
-                    action="{{ route('laba-bersih.alokasi-modal', ['shop_id' => $shop->id, 'year_month' => $date->format('Y-m')]) }}"
-                    method="POST">
+                <form action="{{ route('laba-bersih.update', $report->id) }}" method="POST">
                     @csrf
+                    @method('PUT')
                     <div class="modal-body">
-                        <div class="form-group">
-                            <div class="input-group">
+                        <div class="form-group row">
+                            <label for="gaji_operator" class="col-4 col-form-label">Gaji Operator</label>
+                            <div class="col-8">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="number"
+                                        class="form-control @error('gaji_operator') is-invalid @enderror"
+                                        id="gaji_operator" name="gaji_operator"
+                                        value="{{ old('gaji_operator', $report->gaji_operator) }}" required>
 
-                                <input type="number" class="form-control" id="persentase"
-                                    name="persentase_alokasi_modal"
-                                    value="{{ old('persentase_alokasi_modal', $report['persentase_alokasi_modal']) }}"
-                                    required>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">%</span>
                                 </div>
+                                @error('gaji_operator')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="gaji_admin" class="col-4 col-form-label">Gaji Admin</label>
+                            <div class="col-8">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="number" class="form-control @error('gaji_admin') is-invalid @enderror"
+                                        id="gaji_admin" name="gaji_admin"
+                                        value="{{ old('gaji_admin', $report->gaji_admin) }}" required>
+
+                                </div>
+                                @error('gaji_admin')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="persentase_alokasi_modal" class="col-4 col-form-label">Persen Alokasi
+                                Modal</label>
+                            <div class="col-8">
+                                <div class="input-group">
+                                    <input type="number"
+                                        class="form-control @error('persentase_alokasi_modal') is-invalid @enderror"
+                                        id="persentase_alokasi_modal" name="persentase_alokasi_modal"
+                                        value="{{ old('persentase_alokasi_modal', $report->persentase_alokasi_modal) }}"
+                                        required>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                                @error('persentase_alokasi_modal')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 
                     </div>
-                    <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
                     </div>
                 </form>
+
             </div>
-
         </div>
-
     </div>
 @endsection
 
@@ -370,6 +449,10 @@
                 visibility: hidden;
             }
 
+            .ttd {
+                display: block !important;
+            }
+
             #section-to-print {
                 visibility: visible;
                 position: absolute;
@@ -385,6 +468,39 @@
         $(document).ready(function() {
             $('.btn-alokasi').on('click', function() {
                 $('#modal_laba_kotor').modal('show');
+            });
+
+            $('.btn-delete').on('click', function() {
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Laporan Laba Bersih akan dihapus secara permanen!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "DELETE",
+                            url: "{{ route('laba-bersih.destroy', $report->id) }}",
+                            success: function(response) {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then((result) => {
+                                    window.location.replace(
+                                        "{{ route('laba-bersih.index', ['shop_id' => $report->shop_id]) }}"
+                                    );
+                                });
+                            }
+                        });
+                    }
+                });
             });
         })
     </script>

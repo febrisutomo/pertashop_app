@@ -49,7 +49,7 @@ class User extends Authenticatable
 
     public function investments()
     {
-        return $this->belongsToMany(Shop::class, 'investor_shop')->withPivot(['persentase', 'no_rekening', 'pemilik_rekening', 'nama_bank']);
+        return $this->belongsToMany(Shop::class, 'investor_shop')->withPivot(['id', 'persentase', 'no_rekening', 'pemilik_rekening', 'nama_bank']);
     }
 
 

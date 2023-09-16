@@ -102,7 +102,8 @@
                         </span>
                         <div class="info-box-content">
                             <span class="info-box-text">Tabungan</span>
-                            <span class="info-box-number currency">{{ $tabungan }}</span>
+                            <span
+                                class="info-box-number currency {{ $tabungan < 0 ? 'text-danger' : '' }}">{{ $tabungan }}</span>
                         </div>
 
                     </div>

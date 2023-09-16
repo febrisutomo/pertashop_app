@@ -21,7 +21,7 @@
                 <div>
                     <p class="mb-0 text-primary font-weight-bold text-uppercase">
                         @if (Auth::user()->shop)
-                            {{ Auth::user()->shop->corporation->nama }}
+                            {{ Auth::user()->shop->kode . ' ' . Auth::user()->shop->nama }}
                         @else
                             Pertashop App
                         @endif
@@ -121,72 +121,6 @@
                                 </p>
                             </a>
                         </li>
-
-
-
-
-                        {{-- <li class="nav-item">
-                            <a href="{{ route('incomings.index') }}"
-                                class="nav-link {{ Request::routeIs('incomings.*') ? 'active' : '' }}">
-                                <i class="nav-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="icon icon-tabler icon-tabler-download" width="24" height="24"
-                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
-                                        <path d="M7 11l5 5l5 -5"></path>
-                                        <path d="M12 4l0 12"></path>
-                                    </svg>
-                                </i>
-                                <p>
-                                    Penerimaan
-                                </p>
-                            </a>
-                        </li> --}}
-
-                        {{-- <li class="nav-item">
-                            <a href="{{ route('test-pumps.index') }}"
-                                class="nav-link {{ Request::routeIs('test-pumps.*') ? 'active' : '' }}">
-                                <i class="nav-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="icon icon-tabler icon-tabler-test-pipe-2" width="24"
-                                        height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                        fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M15 3v15a3 3 0 0 1 -6 0v-15"></path>
-                                        <path d="M9 12h6"></path>
-                                        <path d="M8 3h8"></path>
-                                    </svg>
-                                </i>
-                                <p>
-                                    Test Pump
-                                </p>
-                            </a>
-                        </li> --}}
-
-                        {{-- <li class="nav-item">
-                            <a href="{{ route('spendings.index') }}"
-                                class="nav-link {{ Request::routeIs('spendings.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="icon icon-tabler icon-tabler-receipt-2" width="24" height="24"
-                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path
-                                            d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2">
-                                        </path>
-                                        <path
-                                            d="M14 8h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5m2 0v1.5m0 -9v1.5">
-                                        </path>
-                                    </svg>
-                                </i>
-                                <p>
-                                    Pengeluaran
-                                </p>
-                            </a>
-                        </li> --}}
                     @endif
 
 

@@ -9,15 +9,13 @@
                     <h1>Dashboard</h1>
                 </div>
                 <div class="col-6 col-lg-3">
-                    @if (Auth::user()->role == 'super-admin')
-                        <select id="shop_id" name="shop_id" class="form-control">
-                            <option value="" disabled>-- Pilih Pertashop --</option>
-                            @foreach ($shops as $s)
-                                <option value="{{ $s->id }}" @selected(Request::query('shop_id') == $s->id)>
-                                    {{ $s->kode . ' ' . $s->nama }}</option>
-                            @endforeach
-                        </select>
-                    @endif
+                    <select id="shop_id" name="shop_id" class="form-control">
+                        <option value="" disabled>-- Pilih Pertashop --</option>
+                        @foreach ($shops as $s)
+                            <option value="{{ $s->id }}" @selected(Request::query('shop_id') == $s->id)>
+                                {{ $s->kode . ' ' . $s->nama }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
         </div>
@@ -25,31 +23,28 @@
 
     <section class="content">
         <div class="container-fluid">
-            <div class="alert alert-info" role="alert">
+            <div class="alert alert-success" role="alert">
                 {{ $sapaan }} <strong>{{ Auth::user()->name }}</strong> !
             </div>
-
             <div class="row">
+
 
                 <div class="col-12 col-sm-6 col-md-3">
                     <div class="info-box mb-3">
-                        <span class="info-box-icon bg-fuchsia elevation-1">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                class="icon icon-tabler icon-tabler-arrow-big-down-lines" width="42" height="42"
-                                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                stroke-linecap="round" stroke-linejoin="round">
+                        <span class="info-box-icon bg-info elevation-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-stack-2"
+                                width="42" height="42" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <path
-                                    d="M15 12h3.586a1 1 0 0 1 .707 1.707l-6.586 6.586a1 1 0 0 1 -1.414 0l-6.586 -6.586a1 1 0 0 1 .707 -1.707h3.586v-3h6v3z">
-                                </path>
-                                <path d="M15 3h-6"></path>
-                                <path d="M15 6h-6"></path>
+                                <path d="M12 4l-8 4l8 4l8 -4l-8 -4"></path>
+                                <path d="M4 12l8 4l8 -4"></path>
+                                <path d="M4 16l8 4l8 -4"></path>
                             </svg>
                         </span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Pembelian</span>
+                            <span class="info-box-text">Posisi Modal</span>
                             <span class="info-box-number currency">
-                                {{ $summary['jumlah_pembelian_rp'] }}
+                                {{ $posisi_modal }}
                             </span>
                         </div>
                     </div>
@@ -58,22 +53,24 @@
                 <div class="col-12 col-sm-6 col-md-3">
                     <div class="info-box">
                         <span class="info-box-icon bg-danger elevation-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-big-up-lines"
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-coins"
                                 width="42" height="42" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                                 fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M9 14c0 1.657 2.686 3 6 3s6 -1.343 6 -3s-2.686 -3 -6 -3s-6 1.343 -6 3z"></path>
+                                <path d="M9 14v4c0 1.656 2.686 3 6 3s6 -1.344 6 -3v-4"></path>
                                 <path
-                                    d="M9 12h-3.586a1 1 0 0 1 -.707 -1.707l6.586 -6.586a1 1 0 0 1 1.414 0l6.586 6.586a1 1 0 0 1 -.707 1.707h-3.586v3h-6v-3z">
+                                    d="M3 6c0 1.072 1.144 2.062 3 2.598s4.144 .536 6 0c1.856 -.536 3 -1.526 3 -2.598c0 -1.072 -1.144 -2.062 -3 -2.598s-4.144 -.536 -6 0c-1.856 .536 -3 1.526 -3 2.598z">
                                 </path>
-                                <path d="M9 21h6"></path>
-                                <path d="M9 18h6"></path>
+                                <path d="M3 6v10c0 .888 .772 1.45 2 2"></path>
+                                <path d="M3 11c0 .888 .772 1.45 2 2"></path>
                             </svg>
                         </span>
 
                         <div class="info-box-content">
-                            <span class="info-box-text">Penjualan</span>
+                            <span class="info-box-text">Total Profit PS</span>
                             <span class="info-box-number currency">
-                                {{ $summary['jumlah_penjualan_bersih_rp'] }}
+                                {{ $total_profit_pertashop }}
                             </span>
                         </div>
                     </div>
@@ -83,7 +80,7 @@
                 <div class="clearfix hidden-md-up"></div>
                 <div class="col-12 col-sm-6 col-md-3">
                     <div class="info-box mb-3">
-                        <span class="info-box-icon bg-warning elevation-1">
+                        <span class="info-box-icon bg-purple elevation-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-wallet"
                                 width="42" height="42" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                                 fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -95,9 +92,9 @@
                             </svg>
                         </span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Laba Kotor</span>
+                            <span class="info-box-text">Total Profit Anda</span>
                             <span class="info-box-number currency">
-                                {{ $summary['laba_kotor'] }}
+                                {{ $total_profit_anda }}
                             </span>
                         </div>
 
@@ -107,7 +104,7 @@
 
                 <div class="col-12 col-sm-6 col-md-3">
                     <div class="info-box mb-3">
-                        <span class="info-box-icon bg-purple elevation-1">
+                        <span class="info-box-icon bg-warning elevation-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-dollar"
                                 width="42" height="42" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                                 fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -122,8 +119,8 @@
                         </span>
                         <div class="info-box-content">
                             <span class="info-box-text">Omset Harian</span>
-                            <span class="info-box-number liter">
-                                {{ $summary['rata_rata_omset_harian'] }}
+                            <span class="info-box-number currency">
+                                {{ $summary['rata_rata_omset_harian_rp'] }}
                         </div>
 
                     </div>
@@ -132,7 +129,7 @@
 
             </div>
             <div class="row">
-                <div class="col-12 col-md-9">
+                <div class="col-12">
                     <div class="card">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
@@ -169,24 +166,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-3">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class=" d-flex justify-content-between align-items-center">
-                                <h3 class="card-title"><i class="fas fa-gas-pump mr-1"></i>Stok BBM (&ell;)</h3>
-                            </div>
 
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex flex-column justify-content-center">
-                                <canvas id="stockChart"
-                                    style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
-
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
             </div>
 
         </div>
@@ -236,33 +216,6 @@
 
             });
 
-            const stocks = @json($stocks);
-            const ctxStockChart = document.getElementById('stockChart').getContext('2d');
-            let stockChart = new Chart(ctxStockChart, {
-                type: 'bar',
-                data: {
-                    labels: stocks.labels,
-                    datasets: stocks.datasets
-                },
-                options: {
-                    scales: {
-                        x: {
-                            // display: false, // Sembunyikan sumbu X
-                            stacked: true,
-                        },
-                        y: {
-                            min: 0,
-                            max: 3500, // totalStock harus diisi dengan total stok produk
-                            stacked: true,
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false, // Sembunyikan legenda
-                        }
-                    }
-                }
-            });
         });
     </script>
 @endpush

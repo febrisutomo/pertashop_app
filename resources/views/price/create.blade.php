@@ -44,6 +44,16 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <label for="jam" class="col-sm-4 col-form-label">Tanggal</label>
+                            <div class="col-sm-8">
+                                <input type="time" class="form-control @error('jam') is-invalid @enderror" id="jam"
+                                    name="jam" value="{{ old('jam', '00:00') }}">
+                                @error('jam')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label for="harga_beli" class="col-sm-4 col-form-label">Harga Beli</label>
                             <div class="col-sm-8">
                                 <div class="input-group">

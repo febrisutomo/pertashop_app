@@ -46,6 +46,16 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <label for="jam" class="col-sm-4 col-form-label">Tanggal</label>
+                            <div class="col-sm-8">
+                                <input type="time" class="form-control @error('jam') is-invalid @enderror" id="jam"
+                                    name="jam" value="{{ old('jam', $price->created_at->format('H:i')) }}">
+                                @error('jam')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label for="harga_beli" class="col-sm-4 col-form-label">Harga Beli</label>
                             <div class="col-sm-8">
                                 <div class="input-group">
@@ -53,7 +63,8 @@
                                         <span class="input-group-text">Rp</span>
                                     </div>
                                     <input type="number" class="form-control @error('harga_beli') is-invalid @enderror"
-                                        id="harga_beli" name="harga_beli" value="{{ old('harga_beli', $price->harga_beli) }}">
+                                        id="harga_beli" name="harga_beli"
+                                        value="{{ old('harga_beli', $price->harga_beli) }}">
                                 </div>
                                 @error('harga_beli')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -69,14 +80,15 @@
                                         <span class="input-group-text">Rp</span>
                                     </div>
                                     <input type="number" class="form-control @error('harga_jual') is-invalid @enderror"
-                                        id="harga_jual" name="harga_jual" value="{{ old('harga_jual', $price->harga_jual) }}">
+                                        id="harga_jual" name="harga_jual"
+                                        value="{{ old('harga_jual', $price->harga_jual) }}">
                                 </div>
                                 @error('harga_jual')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
-                        
+
 
                     </div>
 

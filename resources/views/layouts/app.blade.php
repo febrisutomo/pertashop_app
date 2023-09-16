@@ -90,6 +90,16 @@
             return date.toLocaleDateString('id-ID', options);
         }
 
+        //format time 
+        function formatTime(inputDate) {
+            const date = new Date(inputDate);
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit',
+            };
+            return date.toLocaleTimeString('id-ID', options);
+        }
+
         function formatNumber(data, fractionDigit = 0) {
             return parseFloat(data).toLocaleString('id-ID', {
                 minimumFractionDigits: fractionDigit,

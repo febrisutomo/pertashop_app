@@ -40,10 +40,10 @@ class RekapModal extends Model
         return $this->created_at->monthName . " " . $this->created_at->format('Y');
     }
 
-    public function getUangDiBankAttribute()
-    {
-        return $this->modal_awal - $this->sisa_do - $this->kas_kecil - $this->belum_disetor - $this->piutang;
-    }
+    // public function getUangDiBankAttribute()
+    // {
+    //     return $this->modal_awal - $this->sisa_do - $this->kas_kecil - $this->belum_disetorkan - $this->piutang;
+    // }
 
     public function getPenambahanModalAttribute()
     {

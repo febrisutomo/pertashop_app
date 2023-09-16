@@ -23,11 +23,9 @@
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <div class="row justify-content-between align-items-center">
-                        @if (Auth::user()->shop)
-                            <h3 class="card-title mr-2">
-                                {{ Auth::user()->shop->kode . ' ' . Auth::user()->shop->nama }}</h3>
-                        @else
-                            <div class="col-md-6 d-flex justify-content-between">
+                        <div
+                            class="{{ Auth::user()->role == 'super-admin' ? 'col-6' : 'col-6 col-lg-3' }} d-flex justify-content-between align-items-center">
+                            @if (Auth::user()->role == 'super-admin')
                                 <select id="shop_id" name="shop_id" class="form-control mr-2">
                                     <option value="" disabled>--Pilih Pertashop--</option>
                                     @foreach ($shops as $s)
@@ -35,29 +33,29 @@
                                             {{ $s->kode . ' ' . $s->nama }}</option>
                                     @endforeach
                                 </select>
-                                <select id="year_month" name="year_month" class="form-control">
-                                    <option value="" disabled>--Pilih Bulan--</option>
+                            @endif
+                            <select id="year_month" name="year_month" class="form-control">
+                                <option value="" disabled>--Pilih Bulan--</option>
+                                @php
+                                    $currentYear = date('Y');
+                                    $currentMonth = date('n');
+                                @endphp
+                                @for ($tahun = $currentYear; $tahun >= 2021; $tahun--)
                                     @php
-                                        $currentYear = date('Y');
-                                        $currentMonth = date('n');
+                                        $lastMonth = $tahun == $currentYear ? $currentMonth : 12;
                                     @endphp
-                                    @for ($tahun = $currentYear; $tahun >= 2021; $tahun--)
+                                    @for ($bulan = $lastMonth; $bulan >= 1; $bulan--)
                                         @php
-                                            $lastMonth = $tahun == $currentYear ? $currentMonth : 12;
+                                            $date = Carbon\Carbon::create($tahun, $bulan, 1);
+                                            $value = $date->format('Y-m');
+                                            $label = $date->monthName . ' ' . $date->year;
                                         @endphp
-                                        @for ($bulan = $lastMonth; $bulan >= 1; $bulan--)
-                                            @php
-                                                $date = Carbon\Carbon::create($tahun, $bulan, 1);
-                                                $value = $date->format('Y-m');
-                                                $label = $date->monthName . ' ' . $date->year;
-                                            @endphp
-                                            <option value="{{ $value }}" @selected(Request::query('year_month') == $value)>
-                                                {{ $label }}</option>
-                                        @endfor
+                                        <option value="{{ $value }}" @selected(Request::query('year_month') == $value)>
+                                            {{ $label }}</option>
                                     @endfor
-                                </select>
-                            </div>
-                        @endif
+                                @endfor
+                            </select>
+                        </div>
 
                         @if (Auth::user()->role == 'admin' || Auth::user()->role == 'super-admin')
                             <div class="col-md-3 d-flex justify-content-end order-first order-md-last mb-2 mb-md-0">
@@ -197,14 +195,23 @@
 
             $('.data-table').dataTable()
 
+            @if (Auth::user()->role == 'super-admin')
+                $('#shop_id, #year_month').on('change', function() {
+                    const shop_id = $('#shop_id').val();
+                    const year_month = $('#year_month').val();
+                    window.location.replace(
+                        `{{ route('purchases.index') }}?shop_id=${shop_id}&year_month=${year_month}`
+                    );
+                });
+            @else
+                $('#year_month').on('change', function() {
+                    const year_month = $('#year_month').val();
+                    window.location.replace(
+                        `{{ route('purchases.index') }}?year_month=${year_month}`
+                    );
+                });
+            @endif
 
-            $('#shop_id, #year_month').on('change', function() {
-                const shop_id = $('#shop_id').val();
-                const year_month = $('#year_month').val();
-                window.location.replace(
-                    `{{ route('purchases.index') }}?shop_id=${shop_id}&year_month=${year_month}`
-                );
-            });
 
 
             $('.btn-delete').on('click', function() {

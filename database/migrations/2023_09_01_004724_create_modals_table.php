@@ -15,10 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('shop_id')->constrained();
 
-            $table->unsignedDecimal('sisa_do', 10, 2)->default(0);
-            $table->unsignedDecimal('volume_sisa_do', 10, 2)->default(0);
             $table->unsignedDecimal('kas_kecil', 10, 2)->default(0);
-            $table->unsignedDecimal('belum_disetorkan', 10, 2)->default(0);
             $table->unsignedDecimal('piutang', 10, 2)->default(0);
 
             $table->unsignedDecimal('rugi', 10, 2)->default(0);

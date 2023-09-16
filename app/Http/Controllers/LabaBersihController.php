@@ -5,125 +5,265 @@ namespace App\Http\Controllers;
 use App\Models\Shop;
 use App\Models\Spending;
 use App\Models\LabaBersih;
+use App\Models\RekapModal;
 use App\Models\DailyReport;
 use Illuminate\Http\Request;
+use App\Models\ProfitSharing;
 use Illuminate\Support\Carbon;
 use App\Models\SpendingCategory;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
 use App\Http\Controllers\LabaKotorController;
 
 class LabaBersihController extends Controller
 {
-    public static function getLabaBersih(string $shop_id, string $year_month)
-    {
-        $summary = LabaKotorController::getLabaKotorFinal($shop_id, $year_month);
-
-        $laba_kotor = $summary['laba_kotor'];
-
-        list($year, $month) = explode("-", $year_month);
-
-
-        $reports = DailyReport::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
-
-
-        $laba_bersih = LabaBersih::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
-
-        $persentase_alokasi_modal = $laba_bersih ? $laba_bersih->persentase_alokasi_modal : 10;
-
-        $total_biaya = $reports->sum('pengeluaran');;
-        $laba_bersih = $laba_kotor - $total_biaya;
-        $alokasi_modal = $persentase_alokasi_modal / 100 * $laba_bersih;
-        $laba_bersih_dibagi = $laba_bersih - $alokasi_modal;
-
-        return [
-            'laba_kotor' => $laba_kotor,
-            'total_biaya' => $total_biaya,
-            'laba_bersih' => $laba_bersih,
-            'persentase_alokasi_modal' => $persentase_alokasi_modal,
-            'alokasi_modal' => $alokasi_modal,
-            'laba_bersih_dibagi' => $laba_bersih_dibagi,
-        ];
-    }
-
 
     public function index(Request $request)
     {
 
-        if ($request->ajax()) {
+        if (Auth::user()->role == 'admin') {
+            $shop_id = Auth::user()->shop_id;
+        } else {
             $shop_id = $request->input('shop_id', 1);
-
-            $sales = DailyReport::where('shop_id', $shop_id)->get()->groupBy(function ($item) {
-                return $item->created_at->format('Y-m');
-            });
-
-            $data = $sales->map(function ($value, $key) use ($shop_id) {
-
-                $report = self::getLabaBersih($shop_id, $key);
-                $report['shop_id'] = $shop_id;
-                $report['bulan'] = $key;
-
-                return $report;
-            });
-
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    $button = '<a href="' . route('laba-bersih.edit', ['shop_id' => $row['shop_id'], 'year_month' => $row['bulan']]) . '" class="btn btn-sm btn-link" title="Detail"><i class="fa fa-list"></i></a>';
-                    return $button;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
         }
 
         $shops = Shop::all();
         if (Auth::user()->role == 'investor') {
-            $shops = Auth::user()->investor->shops;
+            $shops = Auth::user()->investments;
         }
 
-        return view('laba_bersih.index', compact('shops'));
+        $shop = Shop::find($shop_id);
+
+        $labaBersih = LabaBersih::where('shop_id', $shop_id)->latest()->get();
+
+        return view('laba_bersih.index', compact('shops', 'labaBersih', 'shop'));
+    }
+
+    public function store(Request $request)
+    {
+        $shop_id = $request->input('shop_id', 1);
+
+        $year_month = $request->input('year_month', Carbon::now()->format('Y-m'));
+
+        list($year, $month) = explode('-', $year_month);
+
+        //check if laba_bersih already exists
+        $laba_bersih_exist = LabaBersih::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
+
+        if ($laba_bersih_exist) {
+            return redirect()->back()->with('error', 'Laporan Laba Bersih sudah ada');
+        }
+
+        $reports = DailyReport::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
+
+        if ($reports->isEmpty()) {
+            return redirect()->back()->with('error', 'Belum ada penjualan di bulan ini');
+        }
+
+        $summary = LabaKotorController::getLabaKotorFinal($shop_id, $year_month);
+
+        $laba_kotor = $summary['laba_kotor'];
+
+        $total_biaya = $reports->sum('pengeluaran');
+
+        try {
+            DB::beginTransaction();
+
+
+            $labaBersih = LabaBersih::create([
+                'shop_id' => $shop_id,
+                'created_at' => Carbon::createFromFormat('Y-m', $year_month)->endOfMonth(),
+                'laba_kotor' => $laba_kotor,
+                'total_biaya' => $total_biaya,
+            ]);
+
+            //create profit sharing
+            $profitSharing = ProfitSharing::create([
+                'shop_id' => $shop_id,
+                'created_at' => $labaBersih->created_at,
+                'nilai_profit_sharing' => $labaBersih->laba_bersih,
+                'alokasi_modal' => $labaBersih->alokasi_modal,
+            ]);
+
+            $shop = Shop::find($shop_id);
+
+            $investor_profits = $shop->investors->map(function ($investor) use ($profitSharing) {
+                return [
+                    'investor_shop_id' => $investor->pivot->id,
+                    'nilai_profit' => $investor->pivot->persentase / 100 * ($profitSharing->nilai_profit_sharing - $profitSharing->alokasi_modal),
+                ];
+            });
+
+            $profitSharing->investorProfits()->createMany($investor_profits);
+
+            DB::commit();
+
+            return redirect()->route('laba-bersih.edit', [$shop_id, $year_month])->with('success', 'Laporan Laba Bersih berhasil dibuat');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'Transaction failed: ' . $e->getMessage());
+        }
     }
 
     public function edit(string $shop_id, string $year_month)
     {
+        list($year, $month) = explode('-', $year_month);
 
-        $report = self::getLabaBersih($shop_id, $year_month);
-        $shop =  Shop::with(['investors'])->find($shop_id);
-        $date =  Carbon::createFromFormat('Y-m', $year_month);
+        $summary = LabaKotorController::getLabaKotorFinal($shop_id, $year_month);
+        $reports = DailyReport::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
 
-        list($year, $month) = explode("-", $year_month);
+        //update laba bersih if reports updated
+        $report = LabaBersih::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
 
-        $spendings = Spending::whereRelation('dailyReport', 'shop_id', $shop_id)
-            ->whereMonth('created_at', $month)
-            ->whereYear('created_at', $year)->orderBy('category_id')
-            ->get()->groupBy('category_id');
+        try {
+            DB::beginTransaction();
 
-        //spendings to array
-        $spendings = $spendings->map(function ($value, $key) {
-            $category = SpendingCategory::find($key)->nama;
-            return ['pengeluaran' => $category, 'jumlah' => $value->sum('jumlah')];
-        });
+            $report->update([
+                'laba_kotor' => $summary['laba_kotor'],
+                'total_biaya' => $reports->sum('pengeluaran'),
+            ]);
 
-        return view('laba_bersih.edit', compact('report', 'shop', 'date', 'spendings'));
+            $report = LabaBersih::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
+
+            $modal = RekapModal::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
+
+            if ($modal) {
+                $modal->update([
+                    'rugi' => $report->laba_bersih < 0 ? $report->laba_bersih : 0,
+                    'alokasi_keuntungan' => $report->alokasi_modal,
+                ]);
+            }
+
+            //update profit sharing if laba bersih updated
+            $profitSharing = ProfitSharing::where('shop_id', $report->shop_id)->whereYear('created_at', $report->created_at->format('Y'))->whereMonth('created_at', $report->created_at->format('m'))->first();
+
+            if ($profitSharing) {
+                $profitSharing->update([
+                    'alokasi_modal' => $report->alokasi_modal,
+                    'nilai_profit_sharing' => $report->laba_bersih,
+                ]);
+
+                $shop =  Shop::with(['investors'])->find($report->shop_id);
+                $investor_profits = $shop->investors->map(function ($investor) use ($profitSharing) {
+                    return [
+                        'investor_shop_id' => $investor->pivot->id,
+                        'nilai_profit' => $investor->pivot->persentase / 100 * ($profitSharing->nilai_profit_sharing - $profitSharing->alokasi_modal),
+                    ];
+                });
+
+                $profitSharing->investorProfits()->delete();
+
+                $profitSharing->investorProfits()->createMany($investor_profits);
+            }
+
+            $shop =  Shop::with(['investors'])->find($shop_id);
+
+            $spendings = Spending::whereRelation('dailyReport', 'shop_id', $shop_id)
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)->orderBy('category_id')
+                ->get()->groupBy('category_id');
+
+            //spendings to array
+            $spendings = $spendings->map(function ($value, $key) {
+                $category = SpendingCategory::find($key)->nama;
+                return ['pengeluaran' => $category, 'jumlah' => $value->sum('jumlah')];
+            });
+
+            DB::commit();
+
+            return view('laba_bersih.edit', compact('report', 'shop', 'spendings'));
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'Transaction failed: ' . $e->getMessage());
+        }
     }
 
-    public function alokasi_modal(Request $request, string $shop_id, string $year_month)
+    public function update(Request $request, LabaBersih $labaBersih)
     {
-        list($year, $month) = explode("-", $year_month);
 
-        $laba_bersih = LabaBersih::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
+        $customMessages = [
+            'required' => ':attribute wajib diisi.',
+        ];
 
-        if ($laba_bersih) {
-            $laba_bersih->update(['persentase_alokasi_modal' => $request->input('persentase_alokasi_modal')]);
-        } else {
-            LabaBersih::create([
-                'shop_id' => $shop_id,
-                'persentase_alokasi_modal' => $request->input('persentase_alokasi_modal'),
-                'created_at' => Carbon::createFromFormat('Y-m', $year_month),
-            ]);
+        $validatedData = $request->validate([
+            'gaji_operator' => 'required|numeric',
+            'gaji_admin' => 'required|numeric',
+            'persentase_alokasi_modal' => 'required|numeric',
+        ], $customMessages);
+
+
+        try {
+            DB::beginTransaction();
+
+            $labaBersih->update($validatedData);
+
+            $labaBersih = LabaBersih::where('shop_id', $labaBersih->shop_id)->whereYear('created_at', $labaBersih->created_at->format('Y'))->whereMonth('created_at', $labaBersih->created_at->format('m'))->first();
+
+            $modal = RekapModal::where('shop_id', $labaBersih->shop_id)->whereYear('created_at', $labaBersih->shop_id)->whereMonth('created_at', $labaBersih->created_at->format('Y'))->first();
+
+            if ($modal) {
+                $modal->update([
+                    'rugi' => $labaBersih->laba_bersih < 0 ? $labaBersih->laba_bersih : 0,
+                    'alokasi_keuntungan' => $labaBersih->alokasi_modal,
+                ]);
+            }
+
+            $profitSharing = ProfitSharing::where('shop_id', $labaBersih->shop_id)->whereYear('created_at', $labaBersih->created_at->format('Y'))->whereMonth('created_at', $labaBersih->created_at->format('m'))->first();
+
+            if ($profitSharing) {
+                $profitSharing->update([
+                    'alokasi_modal' => $labaBersih->alokasi_modal,
+                    'nilai_profit_sharing' => $labaBersih->laba_bersih,
+                ]);
+
+                $shop =  Shop::with(['investors'])->find($labaBersih->shop_id);
+                $investor_profits = $shop->investors->map(function ($investor) use ($profitSharing) {
+                    return [
+                        'investor_shop_id' => $investor->pivot->id,
+                        'nilai_profit' => $investor->pivot->persentase / 100 * ($profitSharing->nilai_profit_sharing - $profitSharing->alokasi_modal),
+                    ];
+                });
+
+                $profitSharing->investorProfits()->delete();
+
+                $profitSharing->investorProfits()->createMany($investor_profits);
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Laporan Laba Bersih berhasil diubah');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'Transaction failed: ' . $e->getMessage());
+        }
+    }
+
+    public function destroy(LabaBersih $labaBersih)
+    {
+        $labaBersih->delete();
+
+        //delete profit sharing
+
+        $profitSharing = ProfitSharing::where('shop_id', $labaBersih->shop_id)->whereYear('created_at', $labaBersih->created_at->format('Y'))->whereMonth('created_at', $labaBersih->created_at->format('m'))->first();
+
+        if ($profitSharing) {
+            $profitSharing->delete();
         }
 
-        return redirect()->route('laba-bersih.edit', ['shop_id' => $shop_id, 'year_month' => $year_month]);
+        $rekapModal = RekapModal::where('shop_id', $labaBersih->shop_id)->whereYear('created_at', $labaBersih->created_at->format('Y'))->whereMonth('created_at', $labaBersih->created_at->format('m'))->first();
+
+        if ($rekapModal) {
+            $rekapModal->delete();
+        }
+
+        //return json
+        return response()->json([
+            'success' => true,
+            'message' => 'Laporan Laba Bersih berhasil dihapus',
+        ]);
     }
 }

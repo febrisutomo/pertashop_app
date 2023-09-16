@@ -75,7 +75,8 @@
                                                 class="ml-2">&ell;</span></td>
                                         <td class="px-3">x</td>
                                         <td class="d-flex justify-content-between">
-                                            <span>Rp</span><span class="number-float">{{ $r['stok_awal_harga_beli'] }}</span>
+                                            <span>Rp</span><span
+                                                class="number-float">{{ $r['stok_awal_harga_beli'] }}</span>
                                         </td>
                                         <td class="px-5">&#10132;</td>
                                         <td class="d-flex justify-content-between">
@@ -97,7 +98,8 @@
                                         </td>
                                         <td class="px-2">=</td>
                                         <td class="text-right line-bottom"><span
-                                                class="number-float">{{ $r['datang'] }}</span><span class="ml-2">&ell;</span>
+                                                class="number-float">{{ $r['datang'] }}</span><span
+                                                class="ml-2">&ell;</span>
                                         </td>
                                         <td class="px-3">x</td>
                                         <td class="d-flex justify-content-between">
@@ -184,8 +186,7 @@
                                         </td>
                                         <td class="px-5">&#10132;</td>
                                         <td class="d-flex justify-content-between">
-                                            <span>Rp</span><span
-                                                class="number">{{ $r['jumlah_penjualan_rp'] }}</span>
+                                            <span>Rp</span><span class="number">{{ $r['jumlah_penjualan_rp'] }}</span>
                                         </td>
                                         <td></td>
                                     </tr>
@@ -194,7 +195,8 @@
                                         <td class="font-weight-bold font-italic pl-3">Sisa Stock {{ $i + 1 }} (A-B)
                                         </td>
                                         <td class="px-2">=</td>
-                                        <td class="text-right"><span class="number-float">{{ $r['sisa_stok'] }}</span><span
+                                        <td class="text-right"><span
+                                                class="number-float">{{ $r['sisa_stok'] }}</span><span
                                                 class="ml-2">&ell;</span></td>
                                         <td class="px-3">x</td>
                                         <td class="d-flex justify-content-between"><span>Rp</span><span
@@ -422,30 +424,33 @@
                             </div>
 
                         </div>
-                        <p class="text-right px-3">Banyumas,
-                            {{ $date->endOfMonth()->format('d') . ' ' . $date->monthName . ' ' . $date->year }}
-                        <p>
-                        <div class="row">
-                            <div class="col-sm-9">
-                                <div class="text-center">Disetujui Oleh,</div>
-                                <div class="row">
-                                    @foreach ($shop->investors as $investor)
-                                        <div class="col-sm mb-2 px-1">
-                                            <div class="text-center">
-                                                <p style="margin-top: 3cm">{{ $investor->name }}</p>
+                        <div class="ttd pt-4" style="display: none">
+                            <p class="text-right px-3">Banyumas,
+                                {{ $date->endOfMonth()->format('d') . ' ' . $date->monthName . ' ' . $date->year }}
+                            <p>
+                            <div class="row">
+                                <div class="col-sm-9">
+                                    <div class="text-center">Disetujui Oleh,</div>
+                                    <div class="row">
+                                        @foreach ($shop->investors as $investor)
+                                            <div class="col-sm mb-2 px-1">
+                                                <div class="text-center">
+                                                    <p style="margin-top: 3cm">{{ $investor->name }}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    @endforeach
+                                        @endforeach
 
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-3 mb-2 px-1">
-                                <div class="text-center ">
-                                    <div>Dibuat Oleh,</div>
-                                    <p style="margin-top: 3cm">{{ Auth::user()->name }}</p>
+                                <div class="col-sm-3 mb-2 px-1">
+                                    <div class="text-center ">
+                                        <div>Dibuat Oleh,</div>
+                                        <p style="margin-top: 3cm">{{ Auth::user()->name }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
 
                     </div>
                 </div>
@@ -476,6 +481,10 @@
         @media print {
             body {
                 visibility: hidden;
+            }
+
+            .ttd {
+                display: block !important;
             }
 
             #section-to-print {

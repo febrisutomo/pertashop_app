@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shop;
-use App\Models\Corporation;
+use App\Models\User;
 use App\Models\Investor;
+use App\Models\Corporation;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -22,7 +23,7 @@ class ShopController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $button = '<a href="' . route('shops.edit', $row->id) . '" class="btn btn-sm btn-info mr-1" title="Edit"><i class="fa fa-edit"></i></a>';
-                    $button .= '<a href="' . route('shops.investors', $row->id) . '" class="btn btn-sm btn-success mr-1" title="Investors"><i class="fa fa-user"></i></a>';
+                    $button .= '<a href="' . route('shops.investors', $row->id) . '" class="btn btn-sm btn-success mr-1" title="Investors"><i class="fa fa-users"></i></a>';
                     $button .= '<button class="btn btn-sm btn-danger btn-delete" title="hapus" data-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
                     return $button;
                 })
@@ -115,23 +116,10 @@ class ShopController extends Controller
 
     public function investor(Request $request, Shop $shop)
     {
-        if ($request->ajax()) {
-
-            $data = $shop->investors->load('user');
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    $button = '<button class="btn btn-sm btn-info btn-edit mr-1" title="edit" data-id="' . $row->id . '" data-persentase="' . $row->pivot->persentase . '" data-nama="' . $row->user->name . '"><i class="fa fa-edit"></i></button>';
-                    $button .= '<button class="btn btn-sm btn-danger btn-delete" title="hapus" data-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
-                    return $button;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
-        }
-
-        $investors = Investor::whereDoesntHave('shops', function ($query) use ($shop) {
-            $query->where('shop_id', $shop->id);
-        })->get();
+        // $investors = User::where('role', 'investor')->whereDoesntHave('investments', function ($query) use ($shop) {
+        //     $query->where('shop_id', $shop->id);
+        // })->get();
+        $investors = User::where('role', 'investor')->get();
 
         return view('shop.investors', compact('shop', 'investors'));
     }
@@ -140,15 +128,26 @@ class ShopController extends Controller
     {
         $request->validate([
             'investor_id' => 'required',
-            'persentase' => 'required'
+            'persentase' => 'required',
+            'nama_bank' => 'required',
+            'no_rekening' => 'required',
+            'pemilik_rekening' => 'required',
         ]);
 
         //attach investors to shop
 
 
-        $shop->investors()->attach([$request->investor_id => ['persentase' => $request->persentase]]);
+        $shop->investors()->attach([
+            $request->investor_id =>
+            [
+                'persentase' => $request->persentase,
+                'nama_bank' => $request->nama_bank,
+                'no_rekening' => $request->no_rekening,
+                'pemilik_rekening' => $request->pemilik_rekening
+            ]
+        ]);
 
-        return response()->json(['message' => 'Investor berhasil ditambahkan ke Pertashop.']);
+        return redirect()->back()->with('success', 'Investor berhasil ditambahkan ke Pertashop.');
     }
 
     public function investorUpdate(Request $request, Shop $shop)

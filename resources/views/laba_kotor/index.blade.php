@@ -22,30 +22,57 @@
         <div class="container-fluid">
             <div class="card card-primary card-outline">
                 <div class="card-header">
-                    <div class=" d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            @if (Auth::user()->role == 'operator')
-                                <h3 class="card-title mr-2">
-                                    {{ Auth::user()->shop->kode . ' ' . Auth::user()->shop->nama }}</h3>
-                            @elseif(Auth::user()->role == 'admin')
-                                <h3 class="card-title mr-2">
-                                    {{ Auth::user()->admin->shop->kode . ' ' . Auth::user()->admin->shop->nama }}</h3>
-                            @else
-                                <select name="shop_id" class="form-control mr-2" style="width: 200px">
-                                    @foreach ($shops as $shop)
-                                        <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
+                    <div class="row justify-content-between align-items-center">
+                        <div
+                            class="{{ Auth::user()->role == 'super-admin' ? 'col-6' : 'col-6 col-lg-3' }} d-flex justify-content-between align-items-center">
+                            @if (Auth::user()->role != 'admin' )
+                                <select id="shop_id" name="shop_id" class="form-control mr-2">
+                                    <option value="" disabled>--Pilih Pertashop--</option>
+                                    @foreach ($shops as $s)
+                                        <option value="{{ $s->id }}" @selected(Request::query('shop_id') == $s->id)>
+                                            {{ $s->kode . ' ' . $s->nama }}</option>
                                     @endforeach
                                 </select>
                             @endif
 
                         </div>
+
                     </div>
 
                 </div>
                 <div class="card-body">
 
-                    <div class="table-responsive-lg">
+                    <div class="table-responsive">
                         <table id="table" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center align-middle">Bulan</th>
+                                    <th class="text-center align-middle">Jumlah Pembelian</th>
+                                    <th class="text-center align-middle">Jumlah Penjualan Bersih</th>
+                                    <th class="text-center align-middle">Rata2 Omset Harian (&ell;)</th>
+                                    <th class="text-center align-middle">Sisa Stok Akhir (&ell;)</th>
+                                    <th class="text-center align-middle">Laba Kotor</th>
+                                    <th class="text-center align-middle">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($labaKotors as $laba)
+                                    <tr>
+                                        <td class="text-left text-nowrap">{{ $laba['bulan'] }}</td>
+                                        <td class="text-right currency">{{ $laba['jumlah_pembelian_rp'] }}</td>
+                                        <td class="text-right currency">{{ $laba['jumlah_penjualan_bersih_rp'] }}</td>
+                                        <td class="text-right number-float">{{ $laba['rata_rata_omset_harian'] }}</td>
+                                        <td class="text-right number-float">{{ $laba['sisa_stok_akhir'] }}</td>
+                                        <td class="text-right currency">{{ $laba['laba_kotor'] }}</td>
+                                        <td class="align-middle text-center">
+                                            <a class="btn btn-sm btn-link"
+                                                href="{{ route('laba-kotor.edit', ['shop_id' => $laba['shop_id'], 'year_month' => $laba['bulan']]) }}">
+                                                <i class="fas fa-list"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -58,127 +85,13 @@
 @push('script')
     <script>
         $(document).ready(function() {
-            var dataTable = $('#table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('laba-kotor.index') }}",
-                columns: [{
-                        title: '#',
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        width: 16,
-                        className: 'text-right'
-                    },
 
-                    {
-                        title: 'Bulan',
-                        data: 'bulan',
-                        name: 'bulan',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatYearMonth(data)
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        title: 'Jumlah Pembelian',
-                        data: 'jumlah_pembelian_rp',
-                        name: 'jumlah_pembelian_rp',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatCurrency(data, 0);
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        title: 'Jumlah Penjualan Bersih',
-                        data: 'jumlah_penjualan_bersih_rp',
-                        name: 'jumlah_penjualan_bersih_rp',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatCurrency(data, 0);
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        title: 'Rata-rata Omset Harian (&ell;)',
-                        data: 'rata_rata_omset_harian',
-                        name: 'rata_rata_omset_harian',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatNumber(data);
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        title: 'Sisa Stok Akhir (&ell;)',
-                        data: 'sisa_stok_akhir',
-                        name: 'sisa_stok_akhir',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatNumber(data);
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        title: 'Laba Kotor',
-                        data: 'laba_kotor',
-                        name: 'laba_kotor',
-                        className: 'text-right',
-                        render: function(data, type) {
-                            if (type === 'display') {
-                                return formatCurrency(data, 0);
-                            }
-                            return data;
-                        }
-                    },
-
-                    {
-                        title: 'Aksi',
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },
-                ],
-                order: [
-                    [0, 'desc']
-                ],
-                columnDefs: [{
-                        responsivePriority: 1,
-                        targets: 0
-                    },
-                    {
-                        responsivePriority: 2,
-                        targets: -1
-                    }
-                ],
-                responsive: {
-                    details: {
-                        display: DataTable.Responsive.display.modal({
-                            header: function(row) {
-                                var data = row.data();
-                                return 'Detail Laporan Laba';
-                            }
-                        }),
-                        renderer: DataTable.Responsive.renderer.tableAll({
-                            tableClass: 'table'
-                        })
-                    }
-                }
-            });
-
-            $('select[name=shop_id]').on('change', function() {
-                dataTable.ajax.url(`?shop_id=${this.value}`).load();
+            $('#table').dataTable();
+            $('#shop_id').on('change', function() {
+                const shop_id = $('#shop_id').val();
+                window.location.replace(
+                    `{{ route('laba-kotor.index') }}?shop_id=${shop_id}`
+                );
             });
 
 

@@ -28,16 +28,160 @@
                             <h3 class="card-title mr-2">{{ $shop->kode }} {{ $shop->nama }}</h3>
 
                         </div>
-                        <button class="btn btn-primary btn-add"><i class="fa fa-plus mr-2"></i>Tambah
-                            Investor</button>
+                        <button class="btn btn-primary btn-add" data-toggle="modal" data-target="#modalAdd"><i
+                                class="fa fa-plus mr-2"></i>Tambah</button>
 
                     </div>
 
                 </div>
 
                 <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="table" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">No</th>
+                                    <th class="text-center">Nama</th>
+                                    <th class="text-center">Persentase</th>
+                                    <th class="text-center">Rekening Bank</th>
+                                    <th class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($shop->investors as $investor)
+                                    <tr>
+                                        <td class="text-center">{{ $loop->iteration }}</td>
+                                        <td>{{ $investor->name }}</td>
+                                        <td class="text-right"><span
+                                                class="number">{{ $investor->pivot->persentase }}</span> %</td>
+                                        <td>{{ $investor->pivot->nama_bank . ' ' . $investor->pivot->no_rekening . ' a/n' . $investor->pivot->pemilik_rekening }}
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info btn-edit" data-toggle="modal"
+                                                data-target="#modalEdit{{ $investor->id }}"><i
+                                                    class="fa fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-danger btn-delete"
+                                                data-id="{{ $investor->id }}"><i class="fa fa-trash"></i></button>
 
-                    <table id="table" class="table table-bordered"></table>
+                                            <div class="modal fade" id="modalEdit{{ $investor->pivot->id }}">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title">Tambah Investor</h4>
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+
+                                                        <form id="form_investor"
+                                                            action="{{ route('shops.investors.update', $shop->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            <div class="modal-body">
+                                                                <div class="form-group row">
+                                                                    <label for="investor_id"
+                                                                        class="col-sm-4 col-form-label">Investor</label>
+                                                                    <div class="col-sm-8">
+                                                                        <select name="investor_id" id="investor_id"
+                                                                            class="form-control" required>
+                                                                            <option value="">--Pilih Investor--
+                                                                            </option>
+                                                                            @foreach ($investors as $inv)
+                                                                                <option value="{{ $inv->id }}"
+                                                                                    @selected($inv->id == old('investor_id', $investor->id))>
+                                                                                    {{ $inv->name }}</option>
+                                                                            @endforeach
+                                                                        </select>
+
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row">
+                                                                    <label for="persentase"
+                                                                        class="col-sm-4 col-form-label">Persentase</label>
+                                                                    <div class="col-sm-8">
+                                                                        <div class="input-group">
+                                                                            <input type="number" class="form-control"
+                                                                                id="persentase" name="persentase"
+                                                                                value="{{ old('persentase', $investor->pivot->persentase) }}"
+                                                                                required>
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text">%</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-group row">
+                                                                    <label for="nama_bank"
+                                                                        class="col-sm-4 col-form-label">Nama Bank</label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text"
+                                                                            class="form-control @error('nama_bank') is-invalid @enderror"
+                                                                            id="nama_bank" name="nama_bank"
+                                                                            value="{{ old('nama_bank', $investor->pivot->nama_bank) }}"
+                                                                            required>
+                                                                        @error('nama_bank')
+                                                                            <div class="invalid-feedback d-block">
+                                                                                {{ $message }}</div>
+                                                                        @enderror
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-group row">
+                                                                    <label for="no_rekening"
+                                                                        class="col-sm-4 col-form-label">No. Rekening</label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text"
+                                                                            class="form-control @error('no_rekening') is-invalid @enderror"
+                                                                            id="no_rekening" name="no_rekening"
+                                                                            value="{{ old('no_rekening', $investor->pivot->no_rekening) }}"
+                                                                            required>
+                                                                        @error('no_rekening')
+                                                                            <div class="invalid-feedback d-block">
+                                                                                {{ $message }}</div>
+                                                                        @enderror
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-group row">
+                                                                    <label for="pemilik_rekening"
+                                                                        class="col-sm-4 col-form-label">a/n
+                                                                        Rekening</label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text"
+                                                                            class="form-control @error('pemilik_rekening') is-invalid @enderror"
+                                                                            id="pemilik_rekening" name="pemilik_rekening"
+                                                                            value="{{ old('pemilik_rekening', $investor->pivot->pemilik_rekening) }}"
+                                                                            required>
+                                                                        @error('pemilik_rekening')
+                                                                            <div class="invalid-feedback d-block">
+                                                                                {{ $message }}</div>
+                                                                        @enderror
+                                                                    </div>
+                                                                </div>
+
+
+                                                            </div>
+                                                            <div class="modal-footer justify-content-right">
+                                                                <button type="button" class="btn btn-default"
+                                                                    data-dismiss="modal">Close</button>
+                                                                <button type="submit"
+                                                                    class="btn btn-primary">Simpan</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+                    </div>
 
                 </div>
 
@@ -45,7 +189,7 @@
         </div>
     </section>
 
-    <div class="modal fade" id="modal_investor">
+    <div class="modal fade" id="modalAdd">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -54,7 +198,9 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+
                 <form id="form_investor" action="{{ route('shops.investors.store', $shop->id) }}" method="POST">
+                    @csrf
                     <div class="modal-body">
                         <div class="form-group row">
                             <label for="investor_id" class="col-sm-4 col-form-label">Investor</label>
@@ -63,9 +209,10 @@
                                     <option value="">--Pilih Investor--</option>
                                     @foreach ($investors as $investor)
                                         <option value="{{ $investor->id }}">
-                                            {{ $investor->user->name }}</option>
+                                            {{ $investor->name }}</option>
                                     @endforeach
                                 </select>
+
                                 <input type="hidden" id="investor_name" class="form-control" readonly>
                                 <input type="hidden" id="id" name="id">
                             </div>
@@ -83,8 +230,43 @@
                             </div>
                         </div>
 
+                        <div class="form-group row">
+                            <label for="nama_bank" class="col-sm-4 col-form-label">Nama Bank</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control @error('nama_bank') is-invalid @enderror"
+                                    id="nama_bank" name="nama_bank" value="{{ old('nama_bank') }}" required>
+                                @error('nama_bank')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="no_rekening" class="col-sm-4 col-form-label">No. Rekening</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control @error('no_rekening') is-invalid @enderror"
+                                    id="no_rekening" name="no_rekening" value="{{ old('no_rekening') }}" required>
+                                @error('no_rekening')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="pemilik_rekening" class="col-sm-4 col-form-label">a/n Rekening</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control @error('pemilik_rekening') is-invalid @enderror"
+                                    id="pemilik_rekening" name="pemilik_rekening" value="{{ old('pemilik_rekening') }}"
+                                    required>
+                                @error('pemilik_rekening')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+
                     </div>
-                    <div class="modal-footer justify-content-between">
+                    <div class="modal-footer justify-content-right">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Simpan</button>
                     </div>
@@ -100,115 +282,7 @@
 @push('script')
     <script>
         $(document).ready(function() {
-            var dataTable = $('#table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('shops.investors', $shop->id) }}",
-                columns: [{
-                        title: '#',
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        width: '20',
-                    },
-                    {
-                        title: 'Nama',
-                        data: 'user.name',
-                        name: 'user.name',
-                    },
-                    {
-                        title: 'Persentase',
-                        data: 'pivot.persentase',
-                        name: 'pivot.persentase',
-                        class: 'text-right',
-                        width: 100,
-                        render: function(data) {
-                            return formatNumber(data, 0) + '%';
-                        }
-                    },
-                    {
-                        title: 'Aksi',
-                        data: 'action',
-                        name: 'action',
-                        width: 80,
-                        orderable: false,
-                        searchable: false
-                    },
-                ],
-                order: [
-                    [0, 'desc']
-                ],
-                columnDefs: [{
-                        responsivePriority: 1,
-                        targets: 0
-                    },
-                    {
-                        responsivePriority: 2,
-                        targets: -1
-                    }
-                ],
-                responsive: {
-                    details: {
-                        display: DataTable.Responsive.display.modal({
-                            header: function(row) {
-                                var data = row.data();
-                                return 'Detail Investor Pertashop';
-                            }
-                        }),
-                        renderer: DataTable.Responsive.renderer.tableAll({
-                            tableClass: 'table'
-                        })
-                    }
-                }
-            });
 
-
-            //show modal add
-            $('.btn-add').on('click', function() {
-                $('#modal_investor').modal('show');
-                $('#modal_investor .modal-title').text('Tambah Investor');
-                $('#form_investor').attr('action', "{{ route('shops.investors.store', $shop->id) }}");
-                $('#form_investor').attr('method', "POST");
-                $('#form_investor').trigger('reset');
-                $('#investor_id').removeClass('d-none').attr('required', true);
-                $('#investor_name').attr('type', 'hidden')
-            });
-
-            //show modal edit
-            $('.table').on('click', '.btn-edit', function() {
-                let id = $(this).data('id');
-                let persentase = $(this).data('persentase');
-                let nama = $(this).data('nama');
-                $('#modal_investor').modal('show');
-                $('#modal_investor .modal-title').text('Edit Investor');
-                $('#form_investor').attr('action', "{{ route('shops.investors.update', $shop->id) }}");
-                $('#form_investor').attr('method', "PUT");
-                $('#investor_id').addClass('d-none').attr('required', false);
-                $('#id').val(id);
-                $('#investor_name').attr('type', 'text').val(nama)
-                $('#persentase').val(persentase);
-            });
-
-            //submit form investor
-            $('#form_investor').on('submit', function(e) {
-                e.preventDefault();
-                var formData = $(this).serialize();
-                $.ajax({
-                    type: $(this).attr('method'),
-                    url: $(this).attr('action'),
-                    data: formData,
-                    success: function(response) {
-                        dataTable.ajax.reload();
-                        $('#modal_investor').modal('hide');
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 1500 // milliseconds
-                        });
-                    }
-                });
-            })
 
             //delete investor
             $('.table').on('click', '.btn-delete', function() {

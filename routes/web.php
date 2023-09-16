@@ -5,9 +5,7 @@ use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PriceController;
-use App\Http\Controllers\IncomingController;
 use App\Http\Controllers\PurchaseController;
-use App\Http\Controllers\SpendingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LabaKotorController;
 use App\Http\Controllers\Auth\LoginController;
@@ -33,7 +31,7 @@ Route::get('login', [LoginController::class, 'index'])->name('login');
 Route::post('login', [LoginController::class, 'authenticate'])->name('authenticate');
 Route::delete('logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/migrate-fresh-seed', function() {
+Route::get('/migrate-fresh-seed', function () {
     Artisan::call('migrate:fresh --seed');
     return 'Success migrate fresh and seed!';
 });
@@ -41,52 +39,66 @@ Route::get('/migrate-fresh-seed', function() {
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::resources([
-        'purchases' => PurchaseController::class,
-        'daily-reports' => DailyReportController::class,
-        'spendings' => SpendingController::class,
+    Route::resource('purchases', PurchaseController::class)->middleware(['role:super-admin,admin']);
+    //route daily reports
+    Route::prefix('daily-reports')->middleware(['role:super-admin,admin,operator'])->group(function () {
+        Route::get('/', [DailyReportController::class, 'index'])->name('daily-reports.index');
+        Route::get('/{dailyReport}/edit', [DailyReportController::class, 'edit'])->name('daily-reports.edit');
+        Route::put('/{dailyReport}', [DailyReportController::class, 'update'])->name('daily-reports.update');
+        Route::delete('/{dailyReport}', [DailyReportController::class, 'destroy'])->name('daily-reports.destroy');
+        Route::get('/create/shop-data', [DailyReportController::class, 'getShopData'])->name('daily-reports.shop-data');
+        Route::get('/{shop_id}/{date}/detail', [DailyReportController::class, 'detail'])->name('daily-reports.detail');
+    });
 
-        'corporations' => CorporationController::class,
-        'prices' => PriceController::class,
-        'shops' => ShopController::class,
-        'users' => UserController::class,
-    ]);
-
-    Route::get('/daily-reports/{shop_id}/{date}/detail', [DailyReportController::class, 'detail'])->name('daily-reports.detail');
-
-    Route::get('/daily-reports/create/shop-data', [DailyReportController::class, 'getShopData'])->name('daily-reports.shop-data');
-
-    Route::get('/shops/{shop}/investors', [ShopController::class, 'investor'])->name('shops.investors');
-    Route::post('/shops/{shop}/investors', [ShopController::class, 'investorStore'])->name('shops.investors.store');
-    Route::put('/shops/{shop}/investors', [ShopController::class, 'investorUpdate'])->name('shops.investors.update');
-    Route::delete('/shops/{shop}/investors', [ShopController::class, 'investorDestroy'])->name('shops.investors.destroy');
-
-    // Route::prefix('spendings')->group(function () {
-    //     Route::get('/', [SpendingController::class, 'index'])->name('spendings.index');
-    //     Route::get('/create', [SpendingController::class, 'create'])->name('spendings.create');
-    //     Route::get('/{shop_id}/{year_month}', [SpendingController::class, 'edit'])->name('spendings.edit');
-    // });
+    Route::prefix('daily-reports')->middleware(['role:super-admin,admin,operator'])->group(function () {
+        Route::get('/create', [DailyReportController::class, 'create'])->name('daily-reports.create');
+        Route::post('/', [DailyReportController::class, 'store'])->name('daily-reports.store');
+    });
+    Route::middleware(['role:super-admin'])->group(function () {
+        Route::resources([
+            'corporations' => CorporationController::class,
+            'prices' => PriceController::class,
+            'shops' => ShopController::class,
+            'users' => UserController::class,
+        ]);
+        Route::prefix('shops')->group(function () {
+            Route::get('/{shop}/investors', [ShopController::class, 'investor'])->name('shops.investors');
+            Route::post('/{shop}/investors', [ShopController::class, 'investorStore'])->name('shops.investors.store');
+            Route::put('/{shop}/investors', [ShopController::class, 'investorUpdate'])->name('shops.investors.update');
+            Route::delete('/{shop}/investors', [ShopController::class, 'investorDestroy'])->name('shops.investors.destroy');
+        });
+    });
 
     Route::prefix('laba-kotor')->group(function () {
-        Route::get('/', [LabaKotorController::class, 'index'])->name('laba-kotor.index');
-        Route::get('/{shop_id}/{year_month}', [LabaKotorController::class, 'edit'])->name('laba-kotor.edit');
+        Route::get('/', [LabaKotorController::class, 'index'])->middleware(['role:super-admin,admin,investor'])->name('laba-kotor.index');
+        Route::get('/{shop_id}/{year_month}', [LabaKotorController::class, 'edit'])->middleware(['role:super-admin,admin'])->name('laba-kotor.edit');
     });
 
     Route::prefix('laba-bersih')->group(function () {
-        Route::get('/', [LabaBersihController::class, 'index'])->name('laba-bersih.index');
-        Route::get('/{shop_id}/{year_month}', [LabaBersihController::class, 'edit'])->name('laba-bersih.edit');
-        Route::post('/{shop_id}/{year_month}/alokasi_modal', [LabaBersihController::class, 'alokasi_modal'])->name('laba-bersih.alokasi-modal');
+        Route::middleware(['role:super-admin,admin,investor'])->group(function () {
+            Route::get('/', [LabaBersihController::class, 'index'])->name('laba-bersih.index');
+            Route::get('/{shop_id}/{year_month}', [LabaBersihController::class, 'edit'])->name('laba-bersih.edit');
+        });
+        Route::middleware(['role:super-admin,admin'])->group(function () {
+            Route::post('/store', [LabaBersihController::class, 'store'])->name('laba-bersih.store');
+            Route::put('/{labaBersih}', [LabaBersihController::class, 'update'])->name('laba-bersih.update');
+            Route::delete('/{labaBersih}', [LabaBersihController::class, 'destroy'])->name('laba-bersih.destroy');
+        });
     });
 
     Route::prefix('rekap-modal')->group(function () {
-        Route::get('/', [RekapModalController::class, 'index'])->name('rekap-modal.index');
-        Route::post('/store', [RekapModalController::class, 'store'])->name('rekap-modal.store');
-        Route::delete('/{id}', [RekapModalController::class, 'destroy'])->name('rekap-modal.destroy');
-        Route::get('/{shop_id}/{year_month}', [RekapModalController::class, 'edit'])->name('rekap-modal.edit');
+        Route::middleware(['role:super-admin,admin,investor'])->group(function () {
+            Route::get('/', [RekapModalController::class, 'index'])->name('rekap-modal.index');
+            Route::get('/{shop_id}/{year_month}', [RekapModalController::class, 'edit'])->name('rekap-modal.edit');
+        });
+        Route::middleware(['role:super-admin,admin'])->group(function () {
+            Route::post('/store', [RekapModalController::class, 'store'])->name('rekap-modal.store');
+            Route::delete('/{rekapModal}', [RekapModalController::class, 'destroy'])->name('rekap-modal.destroy');
+            Route::put('/{rekapModal}', [RekapModalController::class, 'update'])->name('rekap-modal.update');
+        });
     });
 
-    Route::prefix('profit-sharing')->group(function () {
+    Route::prefix('profit-sharing')->middleware(['role:super-admin,admin,investor'])->group(function () {
         Route::get('/', [ProfitSharingController::class, 'index'])->name('profit-sharing.index');
-        Route::get('/{shop_id}/{year_month}', [ProfitSharingController::class, 'edit'])->name('profit-sharing.edit');
     });
 });
