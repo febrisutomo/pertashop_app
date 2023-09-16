@@ -80,9 +80,9 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    Route::prefix('laba-kotor')->group(function () {
-        Route::get('/', [LabaKotorController::class, 'index'])->middleware(['role:super-admin,admin,investor'])->name('laba-kotor.index');
-        Route::get('/{shop_id}/{year_month}', [LabaKotorController::class, 'edit'])->middleware(['role:super-admin,admin'])->name('laba-kotor.edit');
+    Route::prefix('laba-kotor')->middleware(['role:super-admin,admin,investor'])->group(function () {
+        Route::get('/', [LabaKotorController::class, 'index'])->name('laba-kotor.index');
+        Route::get('/{shop_id}/{year_month}', [LabaKotorController::class, 'edit'])->name('laba-kotor.edit');
     });
 
     Route::prefix('laba-bersih')->group(function () {
