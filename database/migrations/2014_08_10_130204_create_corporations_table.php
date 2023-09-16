@@ -14,6 +14,12 @@ return new class extends Migration
         Schema::create('corporations', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
+            $table->string('no_hp')->nullable();
+            $table->string('nama_bank')->nullable();
+            $table->string('no_rekening')->nullable();
+            $table->string('pemilik_rekening')->nullable();
+            $table->date('izin_dikeluarkan')->nullable();
+            $table->date('izin_berakhir')->nullable();
             $table->string('alamat');
             $table->timestamps();
         });

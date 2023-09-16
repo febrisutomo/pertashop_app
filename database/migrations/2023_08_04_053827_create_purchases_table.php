@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
+            $table->string('no_so')->unique();
             $table->foreignId('shop_id')->constrained();
-            $table->foreignId('supplier_id')->constrained();
-            $table->decimal('jumlah', 10, 2);
-            $table->foreignId('price_id');
+            $table->foreignId('vendor_id')->constrained();
+            $table->unsignedDecimal('volume', 10, 2);
+            $table->unsignedDecimal('total_bayar', 10, 2);
             $table->timestamps();
         });
     }

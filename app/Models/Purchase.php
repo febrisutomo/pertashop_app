@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Price;
-use Illuminate\Support\Carbon;
+use App\Models\Incoming;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -13,40 +12,34 @@ class Purchase extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['tanggal', 'total_harga', 'datang', 'sisa'];
+    protected $append = ['harga_per_liter', 'tanggal', 'status'];
 
-    public function price()
+    public function incoming()
     {
-        return $this->belongsTo(Price::class);
+        return $this->hasOne(Incoming::class);
     }
 
-    public function incomings()
+    public function getHargaPerLiterAttribute()
     {
-        return $this->hasMany(Incoming::class);
+        return $this->total_bayar / $this->volume;
     }
 
-    public function getSisaAttribute()
+    public function vendor()
     {
-        return $this->jumlah - $this->incomings->sum('jumlah');
-    }
-
-    public function getDatangAttribute()
-    {
-        return $this->jumlah - $this->sisa;
-    }
-
-    public function supplier()
-    {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsTo(Vendor::class);
     }
 
     public function getTanggalAttribute()
     {
-        return Carbon::createFromFormat('Y-m-d H:i:s', $this->created_at)->format('d/m/Y');
+        return $this->created_at->format('d') . " " . $this->created_at->monthName . " " . $this->created_at->format('Y');
     }
 
-    public function getTotalHargaAttribute()
+    public function getStatusAttribute()
     {
-        return $this->jumlah * $this->price->harga_beli;
+        if ($this->incoming) {
+            return "Diterima";
+        } else {
+            return "Dipesan";
+        }
     }
 }

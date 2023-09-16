@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('incomings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shop_id')->constrained();
-            $table->foreignId('operator_id')->constrained();
+            $table->foreignId('daily_report_id')->constrained()->cascadeOnDelete();
             $table->foreignId('purchase_id')->constrained();
-            $table->decimal('jumlah', 10, 2);
-            $table->decimal('stik_awal', 10, 2);
-            $table->decimal('stik_akhir', 10, 2);
+            $table->foreignId('vendor_id')->constrained();
+            $table->string('sopir');
+            $table->string('no_polisi');
+            $table->decimal('stik_sebelum_curah', 10, 2);
+            $table->decimal('stik_setelah_curah', 10, 2);
             $table->timestamps();
         });
     }

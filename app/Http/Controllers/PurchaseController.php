@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Price;
-use App\Models\Purchase;
+use Carbon\Carbon;
 use App\Models\Shop;
-use App\Models\Supplier;
+use App\Models\Purchase;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseController extends Controller
 {
@@ -16,36 +17,32 @@ class PurchaseController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $shop_id = $request->input('shop_id', 1);
 
-            $data = Purchase::where('shop_id', $shop_id)->with(['supplier', 'price'])->latest()->get();
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    $button = '<a href="' . route('purchases.edit', $row->id) . '" class="btn btn-sm btn-info" title="Edit"><i class="fa fa-edit"></i></a>';
-                    $button .= ' <button class="btn btn-sm btn-danger btn-delete" title="hapus" data-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
-                    return $button;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
+        if (Auth::user()->role == 'super-admin') {
+            $shop_id = $request->input('shop_id', 1);
+        } else {
+            $shop_id = Auth::user()->shop_id;
         }
 
+        $year_month = $request->input('year_month', Carbon::now()->format('Y-m'));
+        list($year, $month) = explode('-', $year_month);
+
+        $purchases = Purchase::with('vendor', 'incoming')->where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
 
         $shops = Shop::all();
-        return view('purchase.index', compact('shops'));
+
+        return view('purchase.index', compact('shops', 'purchases'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $harga = Price::latest()->first()->harga_beli;
-        $suppliers = Supplier::all();
         $shops = Shop::all();
+        $vendors = Vendor::all();
 
-        return view('purchase.create', compact('harga', 'suppliers', 'shops'));
+        return view('purchase.create', compact('vendors', 'shops'));
     }
 
     /**
@@ -59,19 +56,25 @@ class PurchaseController extends Controller
 
         $validatedData = $request->validate([
             'created_at' => 'required|date',
-            'shop_id' => 'required|numeric',
-            'supplier_id' => 'required|numeric',
-            'jumlah' => 'required|numeric',
+            'shop_id' =>   [
+                Rule::requiredIf(function () {
+                    return Auth::user()->role == 'super-admin';
+                }),
+            ],
+            'vendor_id' => 'required|numeric',
+            'no_so' => 'required|string|unique:purchases',
+            'volume' => 'required|numeric',
+            'total_bayar' => 'required|numeric',
 
         ], $customMessages);
 
+        if (Auth::user()->role == 'admin') {
+            $validatedData['shop_id'] = Auth::user()->shop_id;
+        }
 
-        $validatedData['price_id'] =  Price::latest()->first()->id;
+        $purchase = Purchase::create($validatedData);
 
-
-        Purchase::create($validatedData);
-
-        return to_route('purchases.index')->with('success', 'Data pembelian telah berhasil disimpan.');
+        return to_route('purchases.index', ['shop_id' => $purchase->shop_id])->with('success', 'Data pembelian berhasil disimpan.');
     }
 
     /**
@@ -87,10 +90,9 @@ class PurchaseController extends Controller
      */
     public function edit(Purchase $purchase)
     {
-        $harga = $purchase->price->harga_beli;
-        $suppliers = Supplier::all();
+        $vendors = Vendor::all();
         $shops = Shop::all();
-        return view('purchase.edit', compact('harga', 'suppliers', 'shops', 'purchase'));
+        return view('purchase.edit', compact('vendors', 'shops', 'purchase'));
     }
 
     /**
@@ -104,15 +106,16 @@ class PurchaseController extends Controller
 
         $validatedData = $request->validate([
             'created_at' => 'required|date',
-            'shop_id' => 'required|numeric',
-            'supplier_id' => 'required|numeric',
-            'jumlah' => 'required|numeric',
+            'vendor_id' => 'required|numeric',
+            'no_so' => 'required|string|unique:purchases,no_so,' . $purchase->id . ',id',
+            'volume' => 'required|numeric',
+            'total_bayar' => 'required|numeric',
 
         ], $customMessages);
 
         $purchase->update($validatedData);
 
-        return to_route('purchases.index')->with('success', 'Data pembelian telah berhasil diupdate.');
+        return to_route('purchases.index')->with('success', 'Data pembelian berhasil diubah.');
     }
 
     /**

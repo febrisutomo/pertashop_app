@@ -5,26 +5,19 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2 align-items-center">
-                <div class="col-9">
+                <div class="col-6 col-lg-9">
                     <h1>Dashboard</h1>
                 </div>
-                <div class="col-3">
-                    @if (Auth::user()->role == 'operator')
-                        <h3 class="text-right text-md font-weight-bold">
-                            {{ Auth::user()->operator->shop->kode . ' ' . Auth::user()->operator->shop->nama }}</h3>
-                    @else
-                        <select name="shop_id" class="form-control">
-                            <option value="">Semua Pertashop</option>
-                            @foreach ($shops as $shop)
-                                <option value="{{ $shop->id }}">{{ $shop->kode . ' ' . $shop->nama }}</option>
+                <div class="col-6 col-lg-3">
+                    @if (Auth::user()->role == 'super-admin')
+                        <select id="shop_id" name="shop_id" class="form-control">
+                            <option value="" disabled>-- Pilih Pertashop --</option>
+                            @foreach ($shops as $s)
+                                <option value="{{ $s->id }}" @selected(Request::query('shop_id') == $s->id)>
+                                    {{ $s->kode . ' ' . $s->nama }}</option>
                             @endforeach
                         </select>
                     @endif
-
-                    {{-- <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item active">Home</li>
-                    </ol> --}}
-
                 </div>
             </div>
         </div>
@@ -32,25 +25,55 @@
 
     <section class="content">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 col-sm-6 col-md-3">
-                    <div class="info-box">
-                        <span class="info-box-icon bg-info elevation-1"><i class="fas fa-upload"></i></span>
+            <div class="alert alert-info" role="alert">
+                {{ $sapaan }} <strong>{{ Auth::user()->name }}</strong> !
+            </div>
 
+            <div class="row">
+
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box mb-3">
+                        <span class="info-box-icon bg-fuchsia elevation-1">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="icon icon-tabler icon-tabler-arrow-big-down-lines" width="42" height="42"
+                                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path
+                                    d="M15 12h3.586a1 1 0 0 1 .707 1.707l-6.586 6.586a1 1 0 0 1 -1.414 0l-6.586 -6.586a1 1 0 0 1 .707 -1.707h3.586v-3h6v3z">
+                                </path>
+                                <path d="M15 3h-6"></path>
+                                <path d="M15 6h-6"></path>
+                            </svg>
+                        </span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Penjualan Bersih</span>
-                            <span class="info-box-number" id="jumlahPenjualanBersih"></span>
+                            <span class="info-box-text">Pembelian</span>
+                            <span class="info-box-number currency">
+                                {{ $summary['jumlah_pembelian_rp'] }}
+                            </span>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-12 col-sm-6 col-md-3">
-                    <div class="info-box mb-3">
-                        <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-download"></i></span>
+                    <div class="info-box">
+                        <span class="info-box-icon bg-danger elevation-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-big-up-lines"
+                                width="42" height="42" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path
+                                    d="M9 12h-3.586a1 1 0 0 1 -.707 -1.707l6.586 -6.586a1 1 0 0 1 1.414 0l6.586 6.586a1 1 0 0 1 -.707 1.707h-3.586v3h-6v-3z">
+                                </path>
+                                <path d="M9 21h6"></path>
+                                <path d="M9 18h6"></path>
+                            </svg>
+                        </span>
+
                         <div class="info-box-content">
-                            <span class="info-box-text">Pembelian</span>
-                            <span class="info-box-number" id="jumlahPembelian">
-                                {{-- <small>&ell;</small> --}}
+                            <span class="info-box-text">Penjualan</span>
+                            <span class="info-box-number currency">
+                                {{ $summary['jumlah_penjualan_bersih_rp'] }}
                             </span>
                         </div>
                     </div>
@@ -60,10 +83,21 @@
                 <div class="clearfix hidden-md-up"></div>
                 <div class="col-12 col-sm-6 col-md-3">
                     <div class="info-box mb-3">
-                        <span class="info-box-icon bg-success elevation-1"><i class="fas fa-wallet"></i></span>
+                        <span class="info-box-icon bg-warning elevation-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-wallet"
+                                width="42" height="42" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path
+                                    d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12">
+                                </path>
+                                <path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"></path>
+                            </svg>
+                        </span>
                         <div class="info-box-content">
                             <span class="info-box-text">Laba Kotor</span>
-                            <span class="info-box-number" id="labaKotor">
+                            <span class="info-box-number currency">
+                                {{ $summary['laba_kotor'] }}
                             </span>
                         </div>
 
@@ -73,13 +107,23 @@
 
                 <div class="col-12 col-sm-6 col-md-3">
                     <div class="info-box mb-3">
-                        <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-chart-bar"></i></span>
+                        <span class="info-box-icon bg-purple elevation-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-dollar"
+                                width="42" height="42" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M13 21h-7a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v3"></path>
+                                <path d="M16 3v4"></path>
+                                <path d="M8 3v4"></path>
+                                <path d="M4 11h12.5"></path>
+                                <path d="M21 15h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5"></path>
+                                <path d="M19 21v1m0 -8v1"></path>
+                            </svg>
+                        </span>
                         <div class="info-box-content">
                             <span class="info-box-text">Omset Harian</span>
-                            <span class="info-box-number">
-                                <span id="omsetHarian">
-                                </span>
-                                &ell;</span>
+                            <span class="info-box-number liter">
+                                {{ $summary['rata_rata_omset_harian'] }}
                         </div>
 
                     </div>
@@ -91,13 +135,30 @@
                 <div class="col-12 col-md-9">
                     <div class="card">
                         <div class="card-header">
-                            <div class=" d-flex justify-content-between align-items-center">
-                                <h3 class="card-title"><i class="fas fa-chart-line mr-1"></i>Penjualan (&ell;)</h3>
-                                <input name="filter" type="text" value="day" hidden>
-                                <div class="">
-                                    <button class="btn btn-sm btn-primary btn-filter filter-day">Harian</button>
-                                    <button class="btn btn-sm btn-link btn-filter filter-week">Mingguan</button>
-                                    <button class="btn btn-sm btn-link btn-filter filter-month">Bulanan</button>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="card-title mr-2"><i class="fas fa-chart-line mr-1"></i>Grafik Penjualan</h3>
+                                <div style="width: 200px">
+                                    <select id="year_month" name="year_month" class="form-control">
+                                        <option value="" disabled>--Pilih Bulan--</option>
+                                        @php
+                                            $currentYear = date('Y');
+                                            $currentMonth = date('n');
+                                        @endphp
+                                        @for ($tahun = $currentYear; $tahun >= 2021; $tahun--)
+                                            @php
+                                                $lastMonth = $tahun == $currentYear ? $currentMonth : 12;
+                                            @endphp
+                                            @for ($bulan = $lastMonth; $bulan >= 1; $bulan--)
+                                                @php
+                                                    $date = Carbon\Carbon::create($tahun, $bulan, 1);
+                                                    $value = $date->format('Y-m');
+                                                    $label = $date->monthName . ' ' . $date->year;
+                                                @endphp
+                                                <option value="{{ $value }}" @selected(Request::query('year_month') == $value)>
+                                                    {{ $label }}</option>
+                                            @endfor
+                                        @endfor
+                                    </select>
                                 </div>
                             </div>
 
@@ -112,7 +173,7 @@
                     <div class="card">
                         <div class="card-header">
                             <div class=" d-flex justify-content-between align-items-center">
-                                <h3 class="card-title"><i class="fas fa-gas-pump mr-1"></i>Stok (&ell;)</h3>
+                                <h3 class="card-title"><i class="fas fa-gas-pump mr-1"></i>Stok BBM (&ell;)</h3>
                             </div>
 
                         </div>
@@ -134,23 +195,31 @@
 
 @push('script')
     <script>
-        var ctxSalesChart = document.getElementById('salesChart').getContext('2d');
-        var salesChart;
+        $(document).ready(function() {
 
-        function showSalesChart(data) {
+            $('#shop_id, #year_month').on('change', function() {
+                const shop_id = $('#shop_id').val();
+                const year_month = $('#year_month').val();
+                window.location.replace(
+                    `{{ route('dashboard') }}?shop_id=${shop_id}&year_month=${year_month}`
+                );
+            });
 
-            var filter = $('input[name=filter]').val()
-            // Hapus chart sebelumnya jika ada
-            if (salesChart) {
-                salesChart.destroy();
-            }
-
-            // Buat chart baru
-            salesChart = new Chart(ctxSalesChart, {
-                type: 'bar',
+            const sales = @json($sales);
+            const ctxSalesChart = document.getElementById('salesChart').getContext('2d');
+            let salesChart = new Chart(ctxSalesChart, {
+                type: 'line',
                 data: {
-                    labels: data.labels,
-                    datasets: data.datasets
+                    labels: sales.labels,
+                    datasets: [{
+                        label: 'Penjualan',
+                        data: sales.data,
+                        backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                        borderColor: 'rgba(0, 123, 255, 1)',
+                        borderWidth: 1,
+                        // tension: 0.3,
+                        // fill: true,
+                    }]
                 },
                 options: {
                     scales: {
@@ -158,46 +227,32 @@
                             min: 0,
                         }
                     },
-                }
+                    plugins: {
+                        legend: {
+                            display: false,
+                        }
+                    }
+                },
+
             });
 
-
-            $('.btn-filter').removeClass('btn-primary')
-            $('.btn-filter').addClass('btn-link')
-            $(`.filter-${filter}`).removeClass('btn-link')
-            $(`.filter-${filter}`).addClass('btn-primary')
-        }
-
-
-        var ctxStockChart = document.getElementById('stockChart').getContext('2d');
-        var stockChart;
-
-        function showStocks(data) {
-            // var bg_color = stok_akhir_aktual <= 1500 ? '#dc3545' :
-            //     '#20c997';
-
-
-            console.log(data)
-
-            if (stockChart) {
-                stockChart.destroy(); // Hapus chart yang ada jika sudah ada
-            }
-
-            stockChart = new Chart(ctxStockChart, {
+            const stocks = @json($stocks);
+            const ctxStockChart = document.getElementById('stockChart').getContext('2d');
+            let stockChart = new Chart(ctxStockChart, {
                 type: 'bar',
                 data: {
-                    labels: data.labels,
-                    datasets: data.datasets
+                    labels: stocks.labels,
+                    datasets: stocks.datasets
                 },
                 options: {
                     scales: {
                         x: {
-                            display: false, // Sembunyikan sumbu X
+                            // display: false, // Sembunyikan sumbu X
                             stacked: true,
                         },
                         y: {
                             min: 0,
-                            max: 3000, // totalStock harus diisi dengan total stok produk
+                            max: 3500, // totalStock harus diisi dengan total stok produk
                             stacked: true,
                         }
                     },
@@ -208,64 +263,6 @@
                     }
                 }
             });
-        }
-
-        function getData() {
-
-            var shop_id = $('select[name=shop_id]').val()
-            var filter = $('input[name=filter]').val()
-
-            $.ajax({
-                url: "{{ route('dashboard') }}",
-                method: 'GET',
-                data: {
-                    filter,
-                    shop_id
-                },
-                success: function(data) {
-                    var sales = data.sales;
-                    var stocks = data.stocks;
-                    showSalesChart(sales);
-                    showStocks(stocks);
-
-                    var summary = data.summary;
-                    $('#jumlahPenjualanBersih').text(formatCurrency(summary.jumlah_penjualan_bersih, 0));
-                    $('#jumlahPembelian').text(formatCurrency(summary.jumlah_pembelian, 0));
-                    $('#labaKotor').text(formatCurrency(summary.laba_kotor, 0));
-                    $('#omsetHarian').text(formatNumber(summary.omset_harian));
-
-                },
-                error: function(xhr, status, error) {
-                    console.error(error);
-                }
-            });
-        }
-
-
-
-
-        $(document).ready(function() {
-            // $('#time-filter').on('change', function() {
-            //     var timeFilter = $(this).val();
-            //     getData(timeFilter);
-            // });
-
-            $(".filter-week").on('click', function() {
-                $('input[name=filter]').val('week').trigger('change');
-            })
-            $(".filter-day").on('click', function() {
-                $('input[name=filter]').val('day').trigger('change');
-            })
-            $(".filter-month").on('click', function() {
-                $('input[name=filter]').val('month').trigger('change');
-            })
-
-            $('select[name=shop_id], input[name=filter]').on('change', function() {
-                getData()
-            })
-
-            getData();
-            // showLossesGain()
         });
     </script>
 @endpush
