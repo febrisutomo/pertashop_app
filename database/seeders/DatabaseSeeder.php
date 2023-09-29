@@ -241,61 +241,61 @@ class DatabaseSeeder extends Seeder
         #attach investor to shop
         #attach to shop kalitapen
         $ptsam->investments()->attach($kalitapen, [
-            'persentase' => 70,
+            'investasi' => 70/100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '13900 2109 0000',
             'pemilik_rekening' => 'ADLAI BUDIARTO TJIPTO',
         ]);
 
         $victor->investments()->attach($kalitapen, [
-            'persentase' => 15,
+            'investasi' => 15/100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '13900 1724 2391',
             'pemilik_rekening' => 'MARLINA NATALIA SETIAWAN',
         ]);
 
         $koko->investments()->attach($kalitapen, [
-            'persentase' => 5,
+            'investasi' => 5/100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '90000 0679 3138',
             'pemilik_rekening' => 'KOKO ARIBOWO',
         ]);
 
         $kosim->investments()->attach($kalitapen, [
-            'persentase' => 5,
+            'investasi' => 5/100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '13900 9204 6840',
             'pemilik_rekening' => 'SUGIYANTO KOSIM SINDU',
         ]);
 
         $kaswari->investments()->attach($kalitapen, [
-            'persentase' => 5,
+            'investasi' => 5/100 * 460000000,
             'nama_bank' => 'BNI',
             'no_rekening' => '0436 8454 88',
             'pemilik_rekening' => 'KASWARI',
         ]);
 
         #attach to shop gumelar
-        $koko->investments()->attach($gumelar, [
-            'persentase' => 75,
-            'nama_bank' => 'BCA',
-            'no_rekening' => '7510 6699 96',
-            'pemilik_rekening' => 'PT. TRIMITRA CIPTA KREASI',
-        ]);
+        // $koko->investments()->attach($gumelar, [
+        //     'investasi' => 75,
+        //     'nama_bank' => 'BCA',
+        //     'no_rekening' => '7510 6699 96',
+        //     'pemilik_rekening' => 'PT. TRIMITRA CIPTA KREASI',
+        // ]);
 
-        $adlai->investments()->attach($gumelar, [
-            'persentase' => 15,
-            'nama_bank' => 'Mandiri',
-            'no_rekening' => '13900 2109 0000',
-            'pemilik_rekening' => 'R. ADLAI BT KALAPAAKING',
-        ]);
+        // $adlai->investments()->attach($gumelar, [
+        //     'investasi' => 15,
+        //     'nama_bank' => 'Mandiri',
+        //     'no_rekening' => '13900 2109 0000',
+        //     'pemilik_rekening' => 'R. ADLAI BT KALAPAAKING',
+        // ]);
 
-        $eko->investments()->attach($gumelar, [
-            'persentase' => 10,
-            'nama_bank' => 'BCA',
-            'no_rekening' => '4240 2645 82',
-            'pemilik_rekening' => 'EKO CAHYONO',
-        ]);
+        // $eko->investments()->attach($gumelar, [
+        //     'investasi' => 10,
+        //     'nama_bank' => 'BCA',
+        //     'no_rekening' => '4240 2645 82',
+        //     'pemilik_rekening' => 'EKO CAHYONO',
+        // ]);
 
         Price::insert([
             [
@@ -347,7 +347,7 @@ class DatabaseSeeder extends Seeder
 
 
         Vendor::factory(1)->create();
-
+ 
 
         // $purchase = Purchase::create([
         //     'no_so' => 123456,
@@ -651,7 +651,7 @@ class DatabaseSeeder extends Seeder
         $investors = [
             [
                 'investor_shop_id' => $ptsam->investments()->where('shop_id', $kalitapen->id)->first()->pivot->id,
-                'persentase' => 100,
+                'investasi' => 100/100 * 460000000,
             ]
         ];
 
@@ -664,7 +664,7 @@ class DatabaseSeeder extends Seeder
                 $investor_profit = [
                     'profit_sharing_id' => $profit_sharing['id'],
                     'investor_shop_id' => $investor['investor_shop_id'],
-                    'nilai_profit' => $profit_sharing['nilai_profit_sharing'] * ($investor['persentase'] / 100),
+                    'nilai_profit' => $profit_sharing['nilai_profit_sharing'] * ($investor['investasi'] / 460000000),
                 ];
 
                 $investor_profits[] = $investor_profit;
@@ -849,7 +849,7 @@ class DatabaseSeeder extends Seeder
                 $investor_profit = [
                     'profit_sharing_id' => $profit_sharing['id'],
                     'investor_shop_id' => $investor->pivot->id,
-                    'nilai_profit' => ($profit_sharing['nilai_profit_sharing'] - $profit_sharing['alokasi_modal']) * ($investor->pivot->persentase / 100),
+                    'nilai_profit' => ($profit_sharing['nilai_profit_sharing'] - $profit_sharing['alokasi_modal']) * ($investor->pivot->investasi / 460000000),
                 ];
 
                 $investor_profits[] = $investor_profit;

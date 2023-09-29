@@ -58,7 +58,7 @@
                         @endforeach
                         <hr>
 
-                        <div class="table-responsive-lg">
+                        <div class="table-responsive">
 
                             @foreach ($reports as $i => $r)
                                 <table style="width: 100%">

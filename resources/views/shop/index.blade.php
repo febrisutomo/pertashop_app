@@ -32,7 +32,7 @@
                 </div>
                 <div class="card-body">
 
-                    <div class="table-responsive-lg">
+                    <div class="table-responsive">
                         <table id="table" class="table table-bordered">
                         </table>
                     </div>

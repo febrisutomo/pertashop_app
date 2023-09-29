@@ -13,7 +13,7 @@ class InvestorProfit extends Model
 
     protected $guarded = ['id'];
 
-    public function investorShop()
+public function investorShop()
     {
         return $this->belongsTo(InvestorShop::class);
     }

@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('corporation_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('shop_id')->constrained()->cascadeOnDelete();
             $table->string('nama_file');
+            $table->string('nama_dokumen')->nullable();
+            $table->date('izin_dikeluarkan')->nullable();
+            $table->date('izin_berakhir')->nullable();
+
             $table->timestamps();
         });
     }

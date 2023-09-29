@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Models\Document;
 use App\Models\Corporation;
 use App\Models\ProfitSharing;
 use Illuminate\Database\Eloquent\Model;
@@ -28,7 +29,12 @@ class Shop extends Model
 
     public function investors()
     {
-        return $this->belongsToMany(User::class, 'investor_shop')->using(InvestorShop::class)->withPivot(['id', 'persentase', 'no_rekening', 'pemilik_rekening', 'nama_bank']);
+        return $this->belongsToMany(User::class, 'investor_shop')->using(InvestorShop::class)->withPivot(['id', 'investasi', 'no_rekening', 'pemilik_rekening', 'nama_bank']);
+    }
+
+    public function getNilaiInvestasiAttribute()
+    {
+        return $this->investors->sum('pivot.investasi');
     }
 
     public function getStokAwalAttribute()
@@ -40,5 +46,10 @@ class Shop extends Model
     public function profitSharings()
     {
         return $this->hasMany(ProfitSharing::class);
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
     }
 }

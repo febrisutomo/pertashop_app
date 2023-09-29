@@ -39,10 +39,10 @@
                     <div class="table-responsive">
                         <table id="table" class="table table-bordered">
                             <thead>
-                                <tr>
+                                {{-- <tr>
                                     <th colspan="6">Nilai Investasi Pertashop: <span
                                             class="currency">{{ $shop->nilai_investasi }}</span></th>
-                                </tr>
+                                </tr> --}}
                                 <tr>
                                     <th class="text-center">No</th>
                                     <th class="text-center">Nama</th>
@@ -58,7 +58,7 @@
                                         <td class="text-center">{{ $loop->iteration }}</td>
                                         <td>{{ $investor->name }}</td>
                                         <td class="text-right"><span
-                                                class="currency">{{ ($investor->pivot->persentase / 100) * $shop->nilai_investasi }}</span>
+                                                class="currency">{{ $investor->pivot->investasi }}</span>
                                         </td>
                                         <td class="text-right"><span
                                                 class="number-float">{{ $investor->pivot->persentase }}</span> %</td>
@@ -106,7 +106,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="form-group row">
-                                                                    <label for="nilai_investasi"
+                                                                    <label for="investasi"
                                                                         class="col-sm-4 col-form-label">Nilai
                                                                         Investasi</label>
                                                                     <div class="col-sm-8">
@@ -115,15 +115,15 @@
                                                                                 <span class="input-group-text">Rp</span>
                                                                             </div>
                                                                             <input type="number" step="any"
-                                                                                class="form-control" id="nilai_investasi"
-                                                                                name="nilai_investasi"
-                                                                                value="{{ old('nilai_investasi', ($investor->pivot->persentase / 100) * $shop->nilai_investasi) }}"
+                                                                                class="form-control" id="investasi"
+                                                                                name="investasi"
+                                                                                value="{{ old('investasi', $investor->pivot->investasi) }}"
                                                                                 required>
 
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="form-group row">
+                                                                {{-- <div class="form-group row">
                                                                     <label for="persentase"
                                                                         class="col-sm-4 col-form-label">Persentase</label>
                                                                     <div class="col-sm-8">
@@ -138,7 +138,7 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
+                                                                </div> --}}
 
                                                                 <div class="form-group row">
                                                                     <label for="nama_bank"
@@ -210,9 +210,9 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="2" class="text-right">Total</th>
+                                    <th colspan="2" class="text-right">Total Investasi</th>
                                     <th class="text-right currency">
-                                        {{ $shop->investors->sum('pivot.persentase') * $shop->nilai_investasi }}</th>
+                                        {{ $shop->nilai_investasi }}</th>
                                     <th class="text-right"><span>{{ $shop->investors->sum('pivot.persentase') }}</span>%
                                     </th>
                                     <th></th>
@@ -255,20 +255,20 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="nilai_investasi" class="col-sm-4 col-form-label">Nilai Investasi</label>
+                            <label for="investasi" class="col-sm-4 col-form-label">Nilai Investasi</label>
                             <div class="col-sm-8">
 
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Rp</span>
                                     </div>
-                                    <input type="number" step="any" class="form-control" id="nilai_investasi"
-                                        name="nilai_investasi" value="" required>
+                                    <input type="number" step="any" class="form-control" id="investasi"
+                                        name="investasi" value="" required>
 
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group row">
+                        {{-- <div class="form-group row">
                             <label for="persentase" class="col-sm-4 col-form-label">Persentase</label>
                             <div class="col-sm-8">
                                 <div class="input-group">
@@ -279,7 +279,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="form-group row">
                             <label for="nama_bank" class="col-sm-4 col-form-label">Nama Bank</label>

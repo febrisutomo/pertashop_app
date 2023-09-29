@@ -29,7 +29,7 @@
 
                 </div>
                 <form id="insertForm" action="{{ route('shops.store') }}" method="POST" class="needs-validation"
-                    novalidate>
+                    novalidate enctype="multipart/form-data">
                     @csrf
                     <div class="card-body">
 
@@ -156,24 +156,6 @@
                             </div>
                         </div>
 
-                        <div class="form-group row">
-                            <label for="nilai_investasi" class="col-sm-4 col-form-label">Nilai Investasi</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">Rp</span>
-                                    </div>
-                                    <input type="number"
-                                        class="form-control @error('nilai_investasi') is-invalid @enderror"
-                                        id="nilai_investasi" name="nilai_investasi"
-                                        value="{{ old('nilai_investasi') }}">
-                                </div>
-                                @error('nilai_investasi')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
 
                     </div>
 
@@ -186,4 +168,7 @@
             </div>
         </div>
     </section>
+
+    
 @endsection
+

@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Shop;
 use App\Models\User;
-use App\Models\Investor;
 use App\Models\Corporation;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Yajra\DataTables\Facades\DataTables;
 
 class ShopController extends Controller
@@ -24,6 +25,7 @@ class ShopController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $button = '<a href="' . route('shops.edit', $row->id) . '" class="btn btn-sm btn-info mr-1" title="Edit"><i class="fa fa-edit"></i></a>';
+                    $button .= '<a href="' . route('shops.documents', $row->id) . '" class="btn btn-sm btn-warning mr-1" title="Dokumen"><i class="fa fa-file-alt"></i></a>';
                     $button .= '<a href="' . route('shops.investors', $row->id) . '" class="btn btn-sm btn-success mr-1" title="Investors"><i class="fa fa-users"></i></a>';
                     $button .= '<button class="btn btn-sm btn-danger btn-delete" title="hapus" data-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
                     return $button;
@@ -58,7 +60,6 @@ class ShopController extends Controller
             'totalisator_awal' => 'required',
             'corporation_id' => 'required',
             'modal_awal' => 'required',
-            'nilai_investasi' => 'required',
             'kapasitas' => 'required',
             'skala' => 'required',
         ]);
@@ -98,14 +99,12 @@ class ShopController extends Controller
             'totalisator_awal' => 'required',
             'corporation_id' => 'required',
             'modal_awal' => 'required',
-            'nilai_investasi' => 'required',
             'kapasitas' => 'required',
             'skala' => 'required',
         ]);
 
         $shop->update($validated);
-
-        return redirect()->route('shops.index')->with('success', 'Data berhasil diubah');
+        return redirect()->route('shops.index')->with('success', 'Data berhasil diupdate');
     }
 
     /**
@@ -115,6 +114,11 @@ class ShopController extends Controller
     {
         $shop->delete();
         return response()->json(['message' => 'Data berhasil dihapus.']);
+    }
+
+    public function documents(Shop $shop)
+    {
+        return view('shop.document', compact('shop'));
     }
 
     public function investor(Request $request, Shop $shop)
@@ -131,7 +135,7 @@ class ShopController extends Controller
     {
         $request->validate([
             'investor_id' => 'required',
-            'persentase' => 'required',
+            'investasi' => 'required',
             'nama_bank' => 'required',
             'no_rekening' => 'required',
             'pemilik_rekening' => 'required',
@@ -150,19 +154,13 @@ class ShopController extends Controller
             $shop->investors()->attach([
                 $request->investor_id =>
                 [
-                    'persentase' => $request->persentase,
+                    'investasi' => $request->investasi,
                     'nama_bank' => $request->nama_bank,
                     'no_rekening' => $request->no_rekening,
                     'pemilik_rekening' => $request->pemilik_rekening
                 ]
             ]);
 
-            $total_persentase = $shop->investors()->sum('persentase');
-
-            if ($total_persentase  > 100) {
-                DB::rollback();
-                return redirect()->back()->with('error', 'Total persentase investor melebihi 100%.');
-            }
 
             DB::commit();
 
@@ -178,7 +176,7 @@ class ShopController extends Controller
     {
         $request->validate([
             'investor_id' => 'required',
-            'persentase' => 'required',
+            'investasi' => 'required',
             'nama_bank' => 'required',
             'no_rekening' => 'required',
             'pemilik_rekening' => 'required',
@@ -188,18 +186,11 @@ class ShopController extends Controller
             DB::beginTransaction();
 
             $shop->investors()->updateExistingPivot($request->investor_id, [
-                'persentase' => $request->persentase,
+                'investasi' => $request->investasi,
                 'nama_bank' => $request->nama_bank,
                 'no_rekening' => $request->no_rekening,
                 'pemilik_rekening' => $request->pemilik_rekening
             ]);
-
-            $total_persentase = $shop->investors()->sum('persentase');
-
-            if ($total_persentase  > 100) {
-                DB::rollback();
-                return redirect()->back()->with('error', 'Total persentase investor melebihi 100%.');
-            }
 
             DB::commit();
 
@@ -215,6 +206,13 @@ class ShopController extends Controller
     {
 
         $shop->investors()->detach($request->id);
+
+        foreach ($shop->documents as $document) {
+            if (File::exists('documents/' . $document->nama_file)) {
+                File::delete('documents/' . $document->nama_file);
+            }
+        }
+
 
         return response()->json(['message' => 'Investor berhasil dihapus dari Pertashop.']);
     }

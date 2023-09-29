@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('shop_id')->constrained();
-            $table->unsignedDecimal('persentase', 13, 10);
+            $table->unsignedDecimal('investasi', 12, 0);
             $table->string('no_rekening')->nullable();
             $table->string('pemilik_rekening')->nullable();
             $table->string('nama_bank')->nullable();
