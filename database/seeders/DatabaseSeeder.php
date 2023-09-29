@@ -34,12 +34,12 @@ class DatabaseSeeder extends Seeder
 
         $SPA = Corporation::factory()->create([
             'nama' => 'PT Sinergy Petrajaya Abadi',
-            'alamat' => 'Desa Kalibenda RT2/1 kec. Ajibarang kab banyumas'
+            'alamat' => 'Komplek BBPTUHPT Baturraden, Jl. Raya Desa Kemutug Lor, Desa/Kelurahan Kemutug Lor, Kec. Baturraden, Kab. Banyumas, Provinsi Jawa Tengah 53151'
         ]);
 
         $KKB = Corporation::factory()->create([
             'nama' => 'KPRI Kokarnaba Baturraden',
-            'alamat' => 'JL Raya Kemutug Lor Baturraden'
+            'alamat' => 'Komplek BBPTUHPT Baturraden, Jl. Raya Desa Kemutug Lor, Desa/Kelurahan Kemutug Lor, Kec. Baturraden, Kab. Banyumas, Provinsi Jawa Tengah 53151'
         ]);
 
         //create shop
@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Kalitapen',
             'kode' => '4P.53119',
             'short_name' => 'KLT',
-            'alamat' => 'Kel. Kalitapen Kec. Purwojati Kab. Banyumas',
+            'alamat' => 'Jl. Raya Purwojati, Kalitapen, Kec. Purwojati, Kabupaten Banyumas, Jawa Tengah 53175',
             'totalisator_awal' => 311404.970,
             'stik_awal' => 113,
             'modal_awal' => 60000000,
@@ -57,7 +57,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Kalibenda',
             'short_name' => 'KLB',
             'kode' => '4P.53134',
-            'alamat' => 'Kel. Kalibenda Kec. Ajibarang Kab. Banyumas',
+            'alamat' => 'Jl. Banjar Sari, RT.002/001, Kertasari, Kalibenda, Kec. Ajibarang, Kabupaten Banyumas, Jawa Tengah 53163',
             'totalisator_awal' => 303328.590,
             'stik_awal' => 120,
         ]);
@@ -66,7 +66,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Pageralang',
             'short_name' => 'PGL',
             'kode' => '4P.53164',
-            'alamat' => 'Kel. Pageralang Kec. Kemranjen Kab. Banyumas',
+            'alamat' => 'Jl. Banjar Sari, RT.002/001, Kertasari, Kalibenda, Kec. Ajibarang, Kabupaten Banyumas, Jawa Tengah 53163',
             'totalisator_awal' => 58543.424,
             'stik_awal' => 64,
             'skala' => 21.46
@@ -77,7 +77,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Gumelar',
             'short_name' => 'GML',
             'kode' => '4P.53158',
-            'alamat' => 'Kel. Gumelar Kec. Gumelar Kab. Banyumas',
+            'alamat' => 'Jl. Raya Gumelar No.KM.20, Tuwah Kulon, Gumelar, Kec. Gumelar, Kabupaten Banyumas, Jawa Tengah 53165',
             'totalisator_awal' => 113644.88,
             'stik_awal' => 98.20,
             'modal_awal' => 120000000
@@ -88,7 +88,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Kemutug Lor',
             'short_name' => 'KML',
             'kode' => '4P.53143',
-            'alamat' => 'Kel. Kemutug Lor Kec. Baturraden Kab. Banyumas',
+            'alamat' => 'Jl. Raya Desa Kemutug Lor, RT.005/RW.004, Dusun III Berubahan, Kemutug Lor, Kec. Baturaden, Kabupaten Banyumas, Jawa Tengah 53151',
             'totalisator_awal' => 166491.170,
             'stik_awal' => 39.10,
             'skala' => 21.49

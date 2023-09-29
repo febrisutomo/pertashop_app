@@ -63,12 +63,6 @@
                         className: 'text-nowrap',
                     },
                     {
-                        title: 'No Telepon',
-                        data: 'no_hp',
-                        name: 'no_hp',
-                        className: 'text-nowrap',
-                    },
-                    {
                         title: 'Alamat',
                         data: 'alamat',
                         name: 'alamat',
