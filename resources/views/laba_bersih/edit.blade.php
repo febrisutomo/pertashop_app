@@ -43,7 +43,7 @@
                         </div>
 
 
-                        <div class="table-responsive-lg">
+                        <div class="table-responsive">
 
                             <table style="width: 100%">
                                 <tr>

@@ -7,8 +7,6 @@ namespace Database\Seeders;
 use App\Models\Shop;
 use App\Models\User;
 use App\Models\Price;
-use App\Models\Purchase;
-use App\Models\Spending;
 use App\Models\Vendor;
 use App\Models\TestPump;
 use App\Models\RekapModal;
@@ -34,12 +32,12 @@ class DatabaseSeeder extends Seeder
 
         $SPA = Corporation::factory()->create([
             'nama' => 'PT Sinergy Petrajaya Abadi',
-            'alamat' => 'Desa Kalibenda RT2/1 kec. Ajibarang kab banyumas'
+            'alamat' => 'Komplek BBPTUHPT Baturraden, Jl. Raya Desa Kemutug Lor, Desa/Kelurahan Kemutug Lor, Kec. Baturraden, Kab. Banyumas, Provinsi Jawa Tengah 53151'
         ]);
 
         $KKB = Corporation::factory()->create([
             'nama' => 'KPRI Kokarnaba Baturraden',
-            'alamat' => 'JL Raya Kemutug Lor Baturraden'
+            'alamat' => 'Komplek BBPTUHPT Baturraden, Jl. Raya Desa Kemutug Lor, Desa/Kelurahan Kemutug Lor, Kec. Baturraden, Kab. Banyumas, Provinsi Jawa Tengah 53151'
         ]);
 
         //create shop
@@ -47,7 +45,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Kalitapen',
             'kode' => '4P.53119',
             'short_name' => 'KLT',
-            'alamat' => 'Kel. Kalitapen Kec. Purwojati Kab. Banyumas',
+            'alamat' => 'Jl. Raya Purwojati, Kalitapen, Kec. Purwojati, Kabupaten Banyumas, Jawa Tengah 53175',
             'totalisator_awal' => 311404.970,
             'stik_awal' => 113,
             'modal_awal' => 60000000,
@@ -57,7 +55,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Kalibenda',
             'short_name' => 'KLB',
             'kode' => '4P.53134',
-            'alamat' => 'Kel. Kalibenda Kec. Ajibarang Kab. Banyumas',
+            'alamat' => 'Jl. Banjar Sari, RT.002/001, Kertasari, Kalibenda, Kec. Ajibarang, Kabupaten Banyumas, Jawa Tengah 53163',
             'totalisator_awal' => 303328.590,
             'stik_awal' => 120,
         ]);
@@ -66,7 +64,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Pageralang',
             'short_name' => 'PGL',
             'kode' => '4P.53164',
-            'alamat' => 'Kel. Pageralang Kec. Kemranjen Kab. Banyumas',
+            'alamat' => 'Jl. Banjar Sari, RT.002/001, Kertasari, Kalibenda, Kec. Ajibarang, Kabupaten Banyumas, Jawa Tengah 53163',
             'totalisator_awal' => 58543.424,
             'stik_awal' => 64,
             'skala' => 21.46
@@ -77,7 +75,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Gumelar',
             'short_name' => 'GML',
             'kode' => '4P.53158',
-            'alamat' => 'Kel. Gumelar Kec. Gumelar Kab. Banyumas',
+            'alamat' => 'Jl. Raya Gumelar No.KM.20, Tuwah Kulon, Gumelar, Kec. Gumelar, Kabupaten Banyumas, Jawa Tengah 53165',
             'totalisator_awal' => 113644.88,
             'stik_awal' => 98.20,
             'modal_awal' => 120000000
@@ -88,7 +86,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Kemutug Lor',
             'short_name' => 'KML',
             'kode' => '4P.53143',
-            'alamat' => 'Kel. Kemutug Lor Kec. Baturraden Kab. Banyumas',
+            'alamat' => 'Jl. Raya Desa Kemutug Lor, RT.005/RW.004, Dusun III Berubahan, Kemutug Lor, Kec. Baturaden, Kabupaten Banyumas, Jawa Tengah 53151',
             'totalisator_awal' => 166491.170,
             'stik_awal' => 39.10,
             'skala' => 21.49
@@ -241,61 +239,61 @@ class DatabaseSeeder extends Seeder
         #attach investor to shop
         #attach to shop kalitapen
         $ptsam->investments()->attach($kalitapen, [
-            'persentase' => 70,
+            'investasi' => 70 / 100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '13900 2109 0000',
             'pemilik_rekening' => 'ADLAI BUDIARTO TJIPTO',
         ]);
 
         $victor->investments()->attach($kalitapen, [
-            'persentase' => 15,
+            'investasi' => 15 / 100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '13900 1724 2391',
             'pemilik_rekening' => 'MARLINA NATALIA SETIAWAN',
         ]);
 
         $koko->investments()->attach($kalitapen, [
-            'persentase' => 5,
+            'investasi' => 5 / 100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '90000 0679 3138',
             'pemilik_rekening' => 'KOKO ARIBOWO',
         ]);
 
         $kosim->investments()->attach($kalitapen, [
-            'persentase' => 5,
+            'investasi' => 5 / 100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '13900 9204 6840',
             'pemilik_rekening' => 'SUGIYANTO KOSIM SINDU',
         ]);
 
         $kaswari->investments()->attach($kalitapen, [
-            'persentase' => 5,
+            'investasi' => 5 / 100 * 460000000,
             'nama_bank' => 'BNI',
             'no_rekening' => '0436 8454 88',
             'pemilik_rekening' => 'KASWARI',
         ]);
 
         #attach to shop gumelar
-        $koko->investments()->attach($gumelar, [
-            'persentase' => 75,
-            'nama_bank' => 'BCA',
-            'no_rekening' => '7510 6699 96',
-            'pemilik_rekening' => 'PT. TRIMITRA CIPTA KREASI',
-        ]);
+        // $koko->investments()->attach($gumelar, [
+        //     'investasi' => 75,
+        //     'nama_bank' => 'BCA',
+        //     'no_rekening' => '7510 6699 96',
+        //     'pemilik_rekening' => 'PT. TRIMITRA CIPTA KREASI',
+        // ]);
 
-        $adlai->investments()->attach($gumelar, [
-            'persentase' => 15,
-            'nama_bank' => 'Mandiri',
-            'no_rekening' => '13900 2109 0000',
-            'pemilik_rekening' => 'R. ADLAI BT KALAPAAKING',
-        ]);
+        // $adlai->investments()->attach($gumelar, [
+        //     'investasi' => 15,
+        //     'nama_bank' => 'Mandiri',
+        //     'no_rekening' => '13900 2109 0000',
+        //     'pemilik_rekening' => 'R. ADLAI BT KALAPAAKING',
+        // ]);
 
-        $eko->investments()->attach($gumelar, [
-            'persentase' => 10,
-            'nama_bank' => 'BCA',
-            'no_rekening' => '4240 2645 82',
-            'pemilik_rekening' => 'EKO CAHYONO',
-        ]);
+        // $eko->investments()->attach($gumelar, [
+        //     'investasi' => 10,
+        //     'nama_bank' => 'BCA',
+        //     'no_rekening' => '4240 2645 82',
+        //     'pemilik_rekening' => 'EKO CAHYONO',
+        // ]);
 
         Price::insert([
             [
@@ -346,7 +344,11 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        Vendor::factory(1)->create();
+        Vendor::factory()->create([
+            'nama' => 'PT Pertamina Patra Niaga Depot Maos',
+            'no_hp' => '(0282) 95235',
+            'alamat' => 'Jl. Raya No.1, Kampungbaru, Karangreja, Kec. Maos, Kabupaten Cilacap, Jawa Tengah 53272',
+        ]);
 
 
         // $purchase = Purchase::create([
@@ -651,7 +653,7 @@ class DatabaseSeeder extends Seeder
         $investors = [
             [
                 'investor_shop_id' => $ptsam->investments()->where('shop_id', $kalitapen->id)->first()->pivot->id,
-                'persentase' => 100,
+                'investasi' => 100 / 100 * 460000000,
             ]
         ];
 
@@ -664,7 +666,7 @@ class DatabaseSeeder extends Seeder
                 $investor_profit = [
                     'profit_sharing_id' => $profit_sharing['id'],
                     'investor_shop_id' => $investor['investor_shop_id'],
-                    'nilai_profit' => $profit_sharing['nilai_profit_sharing'] * ($investor['persentase'] / 100),
+                    'nilai_profit' => $profit_sharing['nilai_profit_sharing'] * ($investor['investasi'] / 460000000),
                 ];
 
                 $investor_profits[] = $investor_profit;
@@ -849,7 +851,7 @@ class DatabaseSeeder extends Seeder
                 $investor_profit = [
                     'profit_sharing_id' => $profit_sharing['id'],
                     'investor_shop_id' => $investor->pivot->id,
-                    'nilai_profit' => ($profit_sharing['nilai_profit_sharing'] - $profit_sharing['alokasi_modal']) * ($investor->pivot->persentase / 100),
+                    'nilai_profit' => ($profit_sharing['nilai_profit_sharing'] - $profit_sharing['alokasi_modal']) * ($investor->pivot->investasi / 460000000),
                 ];
 
                 $investor_profits[] = $investor_profit;

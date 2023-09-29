@@ -63,29 +63,10 @@
                         className: 'text-nowrap',
                     },
                     {
-                        title: 'No Telepon',
-                        data: 'no_hp',
-                        name: 'no_hp',
-                        className: 'text-nowrap',
-                    },
-                    {
                         title: 'Alamat',
                         data: 'alamat',
                         name: 'alamat',
                     },
-                    {
-                        title: 'Izin Berakhir',
-                        data: 'izin_berakhir',
-                        name: 'izin_berakhir',
-                        className: 'text-nowrap',
-                        render: function(data, type, row) {
-                            if (data) {
-                                return formatDate(data);
-                            }
-                            return null
-                        }
-                    },
-
                     {
                         title: 'Aksi',
                         data: 'action',

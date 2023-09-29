@@ -44,7 +44,7 @@
 
 
                         <br>
-                        <div class="table-responsive-lg">
+                        <div class="table-responsive">
 
                             <h6 class="text-center font-weight-bold">POSISI MODAL KERJA</h6>
                             <table id="table" style="border: 1.5px solid black">

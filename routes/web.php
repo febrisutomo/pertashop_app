@@ -73,6 +73,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 
         Route::prefix('master/shops')->group(function () {
+            Route::get('/{shop}/documents', [ShopController::class, 'documents'])->name('shops.documents');
             Route::get('/{shop}/investors', [ShopController::class, 'investor'])->name('shops.investors');
             Route::post('/{shop}/investors', [ShopController::class, 'investorStore'])->name('shops.investors.store');
             Route::put('/{shop}/investors', [ShopController::class, 'investorUpdate'])->name('shops.investors.update');
