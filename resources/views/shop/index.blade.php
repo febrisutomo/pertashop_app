@@ -65,6 +65,7 @@
                         title: 'Nama',
                         data: 'nama',
                         name: 'nama',
+                        width: '150',
                     },
                     {
                         title: 'Alamat',
@@ -77,7 +78,8 @@
                         name: 'action',
                         className: 'text-center',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        width: '200',
                     },
                 ],
                 order: [
