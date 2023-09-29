@@ -23,6 +23,6 @@ class InvestorShop extends Pivot
 
   public function getPersentaseAttribute()
   {
-    return $this->investasi / $this->shop->nilai_investasi * 100;
+    return $this->shop->nilai_investasi != 0 ? $this->investasi / $this->shop->nilai_investasi * 100 : 0;
   }
 }
