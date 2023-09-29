@@ -7,8 +7,6 @@ namespace Database\Seeders;
 use App\Models\Shop;
 use App\Models\User;
 use App\Models\Price;
-use App\Models\Purchase;
-use App\Models\Spending;
 use App\Models\Vendor;
 use App\Models\TestPump;
 use App\Models\RekapModal;
@@ -241,35 +239,35 @@ class DatabaseSeeder extends Seeder
         #attach investor to shop
         #attach to shop kalitapen
         $ptsam->investments()->attach($kalitapen, [
-            'investasi' => 70/100 * 460000000,
+            'investasi' => 70 / 100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '13900 2109 0000',
             'pemilik_rekening' => 'ADLAI BUDIARTO TJIPTO',
         ]);
 
         $victor->investments()->attach($kalitapen, [
-            'investasi' => 15/100 * 460000000,
+            'investasi' => 15 / 100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '13900 1724 2391',
             'pemilik_rekening' => 'MARLINA NATALIA SETIAWAN',
         ]);
 
         $koko->investments()->attach($kalitapen, [
-            'investasi' => 5/100 * 460000000,
+            'investasi' => 5 / 100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '90000 0679 3138',
             'pemilik_rekening' => 'KOKO ARIBOWO',
         ]);
 
         $kosim->investments()->attach($kalitapen, [
-            'investasi' => 5/100 * 460000000,
+            'investasi' => 5 / 100 * 460000000,
             'nama_bank' => 'Mandiri',
             'no_rekening' => '13900 9204 6840',
             'pemilik_rekening' => 'SUGIYANTO KOSIM SINDU',
         ]);
 
         $kaswari->investments()->attach($kalitapen, [
-            'investasi' => 5/100 * 460000000,
+            'investasi' => 5 / 100 * 460000000,
             'nama_bank' => 'BNI',
             'no_rekening' => '0436 8454 88',
             'pemilik_rekening' => 'KASWARI',
@@ -346,8 +344,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        Vendor::factory(1)->create();
- 
+        Vendor::factory()->create([
+            'nama' => 'PT Pertamina Patra Niaga Depot Maos',
+            'no_hp' => '(0282) 95235',
+            'alamat' => 'Jl. Raya No.1, Kampungbaru, Karangreja, Kec. Maos, Kabupaten Cilacap, Jawa Tengah 53272',
+        ]);
+
 
         // $purchase = Purchase::create([
         //     'no_so' => 123456,
@@ -651,7 +653,7 @@ class DatabaseSeeder extends Seeder
         $investors = [
             [
                 'investor_shop_id' => $ptsam->investments()->where('shop_id', $kalitapen->id)->first()->pivot->id,
-                'investasi' => 100/100 * 460000000,
+                'investasi' => 100 / 100 * 460000000,
             ]
         ];
 
