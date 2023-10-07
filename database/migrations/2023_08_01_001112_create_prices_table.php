@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('prices', function (Blueprint $table) {
             $table->id();
-            $table->decimal('harga_beli', 10, 2);
-            $table->decimal('harga_jual', 10, 2);
+            $table->decimal('harga_beli', 10, 3);
+            $table->decimal('harga_jual', 10, 3);
             $table->timestamps();
         });
     }

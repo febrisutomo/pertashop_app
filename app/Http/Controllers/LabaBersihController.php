@@ -160,9 +160,11 @@ class LabaBersihController extends Controller
 
             $shop =  Shop::with(['investors'])->find($shop_id);
 
-            $spendings = Spending::whereRelation('dailyReport', 'shop_id', $shop_id)
-                ->whereMonth('created_at', $month)
-                ->whereYear('created_at', $year)->orderBy('category_id')
+            $spendings =  Spending::whereHas('dailyReport', function ($query) use ($month, $year, $shop_id) {
+                $query->where('shop_id', $shop_id)
+                    ->whereMonth('created_at', $month)
+                    ->whereYear('created_at', $year);
+            })->orderBy('category_id')
                 ->get()->groupBy('category_id');
 
             //spendings to array
