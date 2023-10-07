@@ -122,7 +122,7 @@ class LabaBersihController extends Controller
 
             $report->update([
                 'laba_kotor' => $summary['laba_kotor'],
-                'total_biaya' => $reports->sum('pengeluaran'),
+                'total_biaya' => $reports->sum('pengeluaran') + $report->gaji_operator + $report->gaji_admin,
             ]);
 
             $report = LabaBersih::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
