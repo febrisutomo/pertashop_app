@@ -188,7 +188,7 @@
                                     <td width="150">
                                         <div class="line-bottom d-flex justify-content-between">
                                             <span>Rp</span>
-                                            <span class="number-float">{{ $report['alokasi_modal'] }}</span>
+                                            <span class="number">{{ $report['alokasi_modal'] }}</span>
                                         </div>
 
                                     </td>
