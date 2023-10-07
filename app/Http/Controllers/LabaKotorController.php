@@ -67,8 +67,7 @@ class LabaKotorController extends Controller
             // $jumlah_penjualan_rp = $jumlah_penjualan * $harga_jual;
             $jumlah_penjualan_rp = $reports->sum('rupiah_penjualan');
 
-            // $sisa_stok = $jumlah_pembelian - $jumlah_penjualan; //(A-B)
-            $sisa_stok = $reports->last()->stok_akhir_teoritis;
+            $sisa_stok = $jumlah_pembelian - $jumlah_penjualan; //(A-B)
             $sisa_stok_rp = $sisa_stok * $harga_beli;
 
             $losses_gain =  $reports->sum('losses_gain');
