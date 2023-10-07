@@ -134,7 +134,7 @@
                                     <td></td>
                                     <td class="d-flex justify-content-between">
                                         <span>Rp</span>
-                                        <span class="number">{{ $spendings->sum('jumlah') }}</span>
+                                        <span class="number">{{ $report->total_biaya }}</span>
                                     </td>
                                     <td></td>
                                     <td></td>
