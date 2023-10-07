@@ -162,7 +162,8 @@
                                     <td width="150">
                                         <div class="line-bottom d-flex justify-content-between">
                                             <span>Rp</span>
-                                            <span class="number">{{ $report['total_biaya'] }}</span>
+                                            <span
+                                                class="number">{{ $report->total_biaya + $report->gaji_operator + $report->gaji_admin }}</span>
                                         </div>
 
                                     </td>
