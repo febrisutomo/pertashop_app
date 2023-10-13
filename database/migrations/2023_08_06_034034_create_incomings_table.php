@@ -18,8 +18,9 @@ return new class extends Migration
             $table->foreignId('vendor_id')->constrained();
             $table->string('sopir');
             $table->string('no_polisi');
-            $table->decimal('stik_sebelum_curah', 10, 2);
-            $table->decimal('stik_setelah_curah', 10, 2);
+            $table->decimal('volume', 6, 2);
+            $table->decimal('stik_sebelum_curah', 5, 2);
+            $table->decimal('stik_setelah_curah', 5, 2);
             $table->timestamps();
         });
     }

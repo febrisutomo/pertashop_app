@@ -331,6 +331,20 @@
                                                 </select>
                                             </div>
                                         </div>
+
+                                        <div class="form-group row">
+                                            <label for="volume_order" class="col-4 col-form-label">Sisa Order</label>
+                                            <div class="col-8">
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" id="sisa_order"
+                                                        name="sisa_order" value="{{ old('sisa_order') }}" readonly>
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">&ell;</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div class="form-group row">
                                             <label for="vendor_id" class="col-4 col-form-label">Vendor Pengirim</label>
                                             <div class="col-8">
@@ -342,18 +356,6 @@
                                                             {{ $vendor->nama }}</option>
                                                     @endforeach
                                                 </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="volume_order" class="col-4 col-form-label">Volume Order</label>
-                                            <div class="col-8">
-                                                <div class="input-group">
-                                                    <input type="number" class="form-control" id="volume_order"
-                                                        name="volume" value="{{ old('volume_order') }}" readonly>
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text">&ell;</span>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </div>
 
@@ -371,6 +373,20 @@
                                                 <input type="text"
                                                     class="form-control @error('no_polisi') is-invalid @enderror"
                                                     id="no_polisi" name="no_polisi" value="{{ old('no_polisi') }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="volume_diterima" class="col-4 col-form-label">Volume
+                                                Diterima</label>
+                                            <div class="col-8">
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" id="volume_diterima"
+                                                        name="volume_diterima" value="{{ old('volume_diterima') }}">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">&ell;</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -435,8 +451,8 @@
 
 
                                         <div class="form-group row">
-                                            <label for="penerimaan_real" class="col-4 col-form-label">Volume
-                                                Diterima</label>
+                                            <label for="penerimaan_real" class="col-4 col-form-label">Penerimaan
+                                                Real</label>
                                             <div class="col-8">
                                                 <div class="input-group">
                                                     <input type="number" class="form-control" id="penerimaan_real"
@@ -609,16 +625,47 @@
                         </div>
 
                         <div class="form-group row">
-                            <label for="disetorkan" class="col-4 col-form-label">Disetorkan</label>
+                            <label for="setor_tunai" class="col-4 col-form-label">Setor Tunai</label>
                             <div class="col-8">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Rp</span>
                                     </div>
-                                    <input type="number" class="form-control @error('disetorkan') is-invalid @enderror"
-                                        id="disetorkan" name="disetorkan" value="{{ old('disetorkan') }}">
+                                    <input type="number" class="form-control @error('setor_tunai') is-invalid @enderror"
+                                        id="setor_tunai" name="setor_tunai" value="{{ old('setor_tunai') }}">
                                 </div>
-                                @error('disetorkan')
+                                @error('setor_tunai')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="setor_qris" class="col-4 col-form-label">Setor QRIS</label>
+                            <div class="col-8">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="number" class="form-control @error('setor_qris') is-invalid @enderror"
+                                        id="setor_qris" name="setor_qris" value="{{ old('setor_qris') }}">
+                                </div>
+                                @error('setor_qris')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="setor_transfer" class="col-4 col-form-label">Setor Transfer</label>
+                            <div class="col-8">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="number"
+                                        class="form-control @error('setor_transfer') is-invalid @enderror"
+                                        id="setor_transfer" name="setor_transfer" value="{{ old('setor_transfer') }}">
+                                </div>
+                                @error('setor_transfer')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -717,49 +764,51 @@
             $('#operator_id').trigger('change');
 
 
-            $('#totalisator_akhir, #test_pump, #penerimaan, #pengeluaran, #price_id, #stik_akhir, #disetorkan').on(
-                'input',
-                function() {
-                    const totalisator_awal = $('#totalisator_awal').val() * 1;
-                    const totalisator_akhir = $('#totalisator_akhir').val() * 1;
-                    const test_pump = $('#test_pump').val() * 1;
-                    const volume_penjualan = totalisator_akhir - totalisator_awal - test_pump;
-                    const harga = $('#price_id option:selected').text() * 1;
-                    const rupiah_penjualan = volume_penjualan * harga;
-                    $('#volume_penjualan').val(volume_penjualan.toFixed(2));
-                    $('#rupiah_penjualan').val(rupiah_penjualan.toFixed());
+            $('#totalisator_akhir, #test_pump, #penerimaan, #pengeluaran, #price_id, #stik_akhir, #setor_tunai, #setor_qris, #setor_transfer')
+                .on(
+                    'input',
+                    function() {
+                        const totalisator_awal = $('#totalisator_awal').val() * 1;
+                        const totalisator_akhir = $('#totalisator_akhir').val() * 1;
+                        const test_pump = $('#test_pump').val() * 1;
+                        const volume_penjualan = totalisator_akhir - totalisator_awal - test_pump;
+                        const harga = $('#price_id option:selected').text() * 1;
+                        const rupiah_penjualan = volume_penjualan * harga;
+                        $('#volume_penjualan').val(volume_penjualan.toFixed(2));
+                        $('#rupiah_penjualan').val(rupiah_penjualan.toFixed());
 
-                    //hitung stok akhir teoritis
-                    const stok_awal = $('#stok_awal').val() * 1;
-                    const penerimaan = $('#penerimaan').val() * 1;
-                    const stok_akhir_teoritis = stok_awal + penerimaan + today_penerimaan - volume_penjualan -
-                        today_penjualan;
-                    $('#stok_akhir_teoritis').val(stok_akhir_teoritis.toFixed(2));
+                        //hitung stok akhir teoritis
+                        const stok_awal = $('#stok_awal').val() * 1;
+                        const penerimaan = $('#penerimaan').val() * 1;
+                        const stok_akhir_teoritis = stok_awal + penerimaan + today_penerimaan - volume_penjualan -
+                            today_penjualan;
+                        $('#stok_akhir_teoritis').val(stok_akhir_teoritis.toFixed(2));
 
-                    const stik_akhir = $('#stik_akhir').val() * 1;
-                    const skala = $('#skala').val() * 1;
-                    if (stik_akhir != '') {
-                        const stok_akhir_aktual = stik_akhir * skala;
-                        $('#stok_akhir_aktual').val(stok_akhir_aktual.toFixed(2));
-                        // losses gain = stok akhir - stok akhir teoritis
-                        const losses_gain = stok_akhir_aktual - stok_akhir_teoritis;
-                        $('#losses_gain').val(losses_gain.toFixed(2));
-                    } else {
-                        $('#stok_akhir_aktual').val('');
-                        $('#losses_gain').val('');
-                    }
+                        const stik_akhir = $('#stik_akhir').val() * 1;
+                        const skala = $('#skala').val() * 1;
+                        if (stik_akhir != '') {
+                            const stok_akhir_aktual = stik_akhir * skala;
+                            $('#stok_akhir_aktual').val(stok_akhir_aktual.toFixed(2));
+                            // losses gain = stok akhir - stok akhir teoritis
+                            const losses_gain = stok_akhir_aktual - stok_akhir_teoritis;
+                            $('#losses_gain').val(losses_gain.toFixed(2));
+                        } else {
+                            $('#stok_akhir_aktual').val('');
+                            $('#losses_gain').val('');
+                        }
 
-                    const pengeluaran = $('#pengeluaran').val() * 1;
-                    const pendapatan = rupiah_penjualan - pengeluaran;
-                    $('#pendapatan').val(pendapatan.toFixed());
+                        const pengeluaran = $('#pengeluaran').val() * 1;
+                        const pendapatan = rupiah_penjualan - pengeluaran;
+                        $('#pendapatan').val(pendapatan.toFixed());
 
-                    //selisih setoran
-                    const disetorkan = $('#disetorkan').val() * 1;
-                    const selisih = disetorkan - pendapatan;
+                        //selisih setoran
+                        const disetorkan = $('#setor_tunai').val() * 1 + $('#setor_qris').val() * 1 + $(
+                            '#setor_transfer').val() * 1;
+                        const selisih = disetorkan - pendapatan;
 
-                    $('#selisih_setoran').val(selisih.toFixed());
+                        $('#selisih_setoran').val(selisih.toFixed());
 
-                });
+                    });
 
 
             //PENERIMAAN
@@ -772,8 +821,8 @@
             //auto fill volume on change purchase_id
             $('#purchase_id').on('change', function() {
                 const purchase = $(this).find(':selected').data('purchase');
-                $('#volume_order').val(purchase?.volume);
-
+                console.log(purchase);
+                $('#sisa_order').val(purchase?.sisa);
             })
 
             let last_purchase_id = @json(old('purchase_id'));
@@ -785,6 +834,7 @@
             let last_stik_setelah_curah = @json(old('stik_setelah_curah'));
             let last_stok_setelah_curah = @json(old('stok_setelah_curah'));
             let last_penerimaan_real = @json(old('penerimaan_real'));
+            let last_volume_diterima = @json(old('volume_diterima'));
 
             //save penerimaan
             $('.btn-save-penerimaan').on('click', function() {
@@ -796,9 +846,10 @@
                 const stik_sebelum_curah = $('#stik_sebelum_curah').val();
                 const stik_setelah_curah = $('#stik_setelah_curah').val();
                 const penerimaan_real = $('#penerimaan_real').val();
-                if (purchase_id == '' || vendor_id == '' || sopir == '' || no_polisi == '' || stik_sebelum_curah == '' ||
-                    stik_setelah_curah == '' ||
-                    penerimaan_real == '') {
+                const volume_diterima = $('#volume_diterima').val();
+                if (purchase_id == '' || vendor_id == '' || sopir == '' || no_polisi == '' ||
+                    stik_sebelum_curah == '' || stik_setelah_curah == '' || penerimaan_real == '' ||
+                    volume_diterima == '') {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
@@ -808,8 +859,7 @@
                 }
 
                 //set volume order to penerimaan
-                const purchase = $('#purchase_id').find(':selected').data('purchase');
-                $('#penerimaan').val(purchase?.volume);
+                $('#penerimaan').val(volume_diterima);
                 $('#penerimaan').trigger('input');
 
                 last_purchase_id = purchase_id;
@@ -821,6 +871,7 @@
                 last_stik_setelah_curah = stik_setelah_curah;
                 last_stok_setelah_curah = stik_setelah_curah * $('#skala').val();
                 last_penerimaan_real = penerimaan_real;
+                last_volume_diterima = volume_diterima;
 
                 $('#modalPenerimaan').modal('hide');
             })
@@ -838,6 +889,7 @@
                 $('#stik_setelah_curah').val(last_stik_setelah_curah);
                 $('#stok_setelah_curah').val(last_stok_setelah_curah);
                 $('#penerimaan_real').val(last_penerimaan_real);
+                $('#volume_diterima').val(last_volume_diterima);
             })
 
             //show btn-delete-penerimaan if peneriman not empty

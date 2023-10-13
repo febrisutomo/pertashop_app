@@ -23,8 +23,7 @@
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <div class="row justify-content-between align-items-center">
-                        <div
-                            class="col-6 col-lg-3 d-flex justify-content-between align-items-center">
+                        <div class="col-6 col-lg-3 d-flex justify-content-between align-items-center">
                             @if (Auth::user()->role != 'admin')
                                 <select id="shop_id" name="shop_id" class="form-control mr-2">
                                     <option value="" disabled>--Pilih Pertashop--</option>
@@ -65,10 +64,26 @@
                                 @foreach ($labaBersih as $laba)
                                     <tr>
                                         <td class="align-middle">{{ $laba->bulan }}</td>
-                                        <td class="align-middle text-right currency">{{ $laba->laba_kotor }}</td>
-                                        <td class="align-middle text-right currency">{{ $laba->total_biaya }}</td>
-                                        <td class="align-middle text-right currency">{{ $laba->alokasi_modal }}</td>
-                                        <td class="align-middle text-right currency">{{ $laba->laba_bersih_dibagi }}</td>
+                                        <td class="align-middle">
+                                            <div class="d-flex justify-content-between currency">
+                                                {{ $laba->laba_kotor }}
+                                            </div>
+                                        </td>
+                                        <td class="align-middle">
+                                            <div class="d-flex justify-content-between currency">
+                                                {{ $laba->total_biaya }}
+                                            </div>
+                                        </td>
+                                        <td class="align-middle">
+                                            <div class="d-flex justify-content-between currency">
+                                                {{ $laba->alokasi_modal }}
+                                            </div>
+                                        </td>
+                                        <td class="align-middle">
+                                            <div class="d-flex justify-content-between currency">
+                                                {{ $laba->laba_bersih_dibagi }}
+                                            </div>
+                                        </td>
                                         <td class="align-middle text-center">
                                             <a class="btn btn-sm btn-link"
                                                 href="{{ route('laba-bersih.edit', ['shop_id' => $laba->shop_id, 'year_month' => $laba->created_at->format('Y-m')]) }}">

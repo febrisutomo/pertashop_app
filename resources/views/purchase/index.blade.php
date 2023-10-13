@@ -73,12 +73,12 @@
                             <thead>
                                 <tr>
                                     <th class="text-center">Tanggal Order</th>
-                                    <th class="text-center">No. SO</th>
+                                    <th class="text-center text-nowrap">No. SO</th>
                                     <th class="text-center">Vendor</th>
-                                    <th class="text-center">Volume Order (&ell;)</th>
+                                    <th class="text-center">Vol. Order (&ell;)</th>
                                     <th class="text-center">Harga / (&ell;) </th>
                                     <th class="text-center">Total Bayar</th>
-                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Vol. Diterima (&ell;)</th>
                                     <th class="text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -91,10 +91,10 @@
                                         <td class="text-right number-float">{{ $purchase->volume }}</td>
                                         <td class="text-right currency-decimal">{{ $purchase->harga_per_liter }}</td>
                                         <td class="text-right currency">{{ $purchase->total_bayar }}</td>
-                                        <td>
-                                            @if ($purchase->status == 'Diterima')
+                                        <td class="text-right">
+                                            @if ($purchase->incomings->sum('volume') > 0)
                                                 <button class="btn text-success btn-link" data-toggle="modal"
-                                                    data-target="#modalPenerimaan{{ $purchase->id }}">Diterima</button>
+                                                    data-target="#modalPenerimaan{{ $purchase->id }}">{{ $purchase->incomings->sum('volume') }}</button>
                                                 <div class="modal fade" id="modalPenerimaan{{ $purchase->id }}"
                                                     tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
                                                     aria-hidden="true">
@@ -108,62 +108,71 @@
                                                                 </button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                <table class="table">
-                                                                    <tr>
-                                                                        <td>No. SO</td>
-                                                                        <td>{{ $purchase->incoming->purchase->no_so }}</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Vendor Order</td>
-                                                                        <td>{{ $purchase->incoming->purchase->vendor->nama }}
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Vendor Pengirim</td>
-                                                                        <td>{{ $purchase->incoming->vendor->nama }}
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Sopir</td>
-                                                                        <td>{{ $purchase->incoming->sopir }}</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>No. Polisi</td>
-                                                                        <td>{{ $purchase->incoming->no_polisi }}</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Volume Order</td>
-                                                                        <td><span
-                                                                                class="number-float">{{ $purchase->incoming->purchase->volume }}</span>
-                                                                            &ell;
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Stik Sebelum Curah</td>
-                                                                        <td><span
-                                                                                class="number-float">{{ $purchase->incoming->stik_sebelum_curah }}</span>
-                                                                            cm (<span
-                                                                                class="number-float">{{ $purchase->incoming->stok_sebelum_curah }}</span>
-                                                                            &ell;
-                                                                            )</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Stik Setelah Curah</td>
-                                                                        <td><span
-                                                                                class="number-float">{{ $purchase->incoming->stik_setelah_curah }}</span>
-                                                                            cm (<span
-                                                                                class="number-float">{{ $purchase->incoming->stok_setelah_curah }}</span>
-                                                                            &ell;
-                                                                            )</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>Penerimaan Real</td>
-                                                                        <td><span
-                                                                                class="number-float">{{ $purchase->incoming->penerimaan_real }}</span>
-                                                                            &ell;
-                                                                        </td>
-                                                                    </tr>
-                                                                </table>
+                                                                @foreach ($purchase->incomings as $incoming)
+                                                                    <table class="table">
+                                                                        {{-- <tr>
+                                                                            <td class="text-left">No. SO</td>
+                                                                            <td>{{ $incoming->purchase->no_so }}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left">Vendor Order</td>
+                                                                            <td>{{ $incoming->purchase->vendor->nama }}
+                                                                            </td>
+                                                                        </tr> --}}
+                                                                        <tr>
+                                                                            <td class="text-left">Tanggal</td>
+                                                                            <td>{{ $incoming->report->created_at->format('d-m-Y') }}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left">Vendor Pengirim</td>
+                                                                            <td>{{ $incoming->vendor->nama }}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left">Sopir</td>
+                                                                            <td>{{ $incoming->sopir }}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left">No. Polisi</td>
+                                                                            <td>{{ $incoming->no_polisi }}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left">Volume Diterima</td>
+                                                                            <td><span
+                                                                                    class="number-float">{{ $incoming->volume }}</span>
+                                                                                &ell;
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left">Stik Sebelum Curah</td>
+                                                                            <td><span
+                                                                                    class="number-float">{{ $incoming->stik_sebelum_curah }}</span>
+                                                                                cm (<span
+                                                                                    class="number-float">{{ $incoming->stok_sebelum_curah }}</span>
+                                                                                &ell;
+                                                                                )</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left">Stik Setelah Curah</td>
+                                                                            <td><span
+                                                                                    class="number-float">{{ $incoming->stik_setelah_curah }}</span>
+                                                                                cm (<span
+                                                                                    class="number-float">{{ $incoming->stok_setelah_curah }}</span>
+                                                                                &ell;
+                                                                                )</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td class="text-left">Penerimaan Real</td>
+                                                                            <td><span
+                                                                                    class="number-float">{{ $incoming->penerimaan_real }}</span>
+                                                                                &ell;
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                @endforeach
+
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary"
@@ -173,7 +182,7 @@
                                                     </div>
                                                 </div>
                                             @else
-                                                <button class="btn text-warning btn-link">Dipesan</button>
+                                                <button class="btn text-warning btn-link">0</button>
                                             @endif
                                         </td>
                                         <td class="text-center">

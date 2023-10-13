@@ -64,7 +64,7 @@
                                     </div>
                                     <input type="number" class="form-control @error('harga_beli') is-invalid @enderror"
                                         id="harga_beli" name="harga_beli"
-                                        value="{{ old('harga_beli', $price->harga_beli) }}">
+                                        value="{{ old('harga_beli', $price->harga_beli + 0) }}">
                                 </div>
                                 @error('harga_beli')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -81,7 +81,7 @@
                                     </div>
                                     <input type="number" class="form-control @error('harga_jual') is-invalid @enderror"
                                         id="harga_jual" name="harga_jual"
-                                        value="{{ old('harga_jual', $price->harga_jual) }}">
+                                        value="{{ old('harga_jual', $price->harga_jual + 0) }}">
                                 </div>
                                 @error('harga_jual')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>

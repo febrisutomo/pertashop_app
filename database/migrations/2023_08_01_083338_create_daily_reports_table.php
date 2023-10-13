@@ -17,8 +17,10 @@ return new class extends Migration
             $table->foreignId('operator_id')->constrained('users');
             $table->foreignId('price_id')->constrained();
             $table->unsignedDecimal('totalisator_akhir', 10, 3);
-            $table->unsignedDecimal('stik_akhir', 10, 2)->nullable();
-            $table->unsignedDecimal('disetorkan', 10, 2);
+            $table->unsignedDecimal('stik_akhir', 5, 2)->nullable();
+            $table->unsignedDecimal('setor_tunai', 12, 0);
+            $table->unsignedDecimal('setor_qris', 12, 0);
+            $table->unsignedDecimal('setor_transfer', 12, 0);
             $table->boolean('diverifikasi')->default(false);
             $table->timestamps();
         });

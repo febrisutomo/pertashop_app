@@ -374,6 +374,8 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         SpendingCategory::insert([
+            ['nama' => 'Gaji Operator'],
+            ['nama' => 'Gaji Admin'],
             ['nama' => 'Ongkos Bongkar'],
             ['nama' => 'Biaya Transfer'],
             ['nama' => 'Fotocopy & ATK'],

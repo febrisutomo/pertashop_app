@@ -125,6 +125,7 @@ class UserController extends Controller
             'no_rekening' => 'nullable',
             'nama_bank' => 'nullable',
             'pemilik_rekening' => 'nullable',
+            'tabungan_awal' => 'nullable|numeric',
         ]);
 
         if ($request->role == 'investor') {
@@ -169,6 +170,7 @@ class UserController extends Controller
             'no_rekening' => 'nullable',
             'nama_bank' => 'nullable',
             'pemilik_rekening' => 'nullable',
+            'tabungan_awal' => 'nullable|numeric',
         ]);
 
         if ($request->password) {

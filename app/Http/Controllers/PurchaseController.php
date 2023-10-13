@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Price;
 use Carbon\Carbon;
 use App\Models\Shop;
 use App\Models\Purchase;
@@ -27,7 +28,7 @@ class PurchaseController extends Controller
         $year_month = $request->input('year_month', Carbon::now()->format('Y-m'));
         list($year, $month) = explode('-', $year_month);
 
-        $purchases = Purchase::with('vendor', 'incoming')->where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
+        $purchases = Purchase::with('vendor', 'incomings')->where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
 
         $shops = Shop::all();
 
@@ -74,7 +75,7 @@ class PurchaseController extends Controller
 
         $purchase = Purchase::create($validatedData);
 
-        return to_route('purchases.index', ['shop_id' => $purchase->shop_id])->with('success', 'Data pembelian berhasil disimpan.');
+        return to_route('purchases.index', ['shop_id' => $purchase->shop_id, 'year_month' => $purchase->created_at->format('Y-m')])->with('success', 'Data pembelian berhasil disimpan.');
     }
 
     /**
@@ -92,6 +93,7 @@ class PurchaseController extends Controller
     {
         $vendors = Vendor::all();
         $shops = Shop::all();
+
         return view('purchase.edit', compact('vendors', 'shops', 'purchase'));
     }
 
@@ -115,7 +117,7 @@ class PurchaseController extends Controller
 
         $purchase->update($validatedData);
 
-        return to_route('purchases.index')->with('success', 'Data pembelian berhasil diubah.');
+        return to_route('purchases.index', ['shop_id' => $purchase->shop_id, 'year_month' => $purchase->created_at->format('Y-m')])->with('success', 'Data pembelian berhasil diubah.');
     }
 
     /**

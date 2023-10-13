@@ -12,11 +12,11 @@ class Purchase extends Model
 
     protected $guarded = ['id'];
 
-    protected $append = ['harga_per_liter', 'tanggal', 'status'];
+    protected $appends = ['harga_per_liter', 'tanggal', 'diterima', 'sisa'];
 
-    public function incoming()
+    public function incomings()
     {
-        return $this->hasOne(Incoming::class);
+        return $this->hasMany(Incoming::class);
     }
 
     public function getHargaPerLiterAttribute()
@@ -34,12 +34,13 @@ class Purchase extends Model
         return $this->created_at->format('d') . " " . $this->created_at->monthName . " " . $this->created_at->format('Y');
     }
 
-    public function getStatusAttribute()
+    public function getDiterimaAttribute()
     {
-        if ($this->incoming) {
-            return "Diterima";
-        } else {
-            return "Dipesan";
-        }
+        return $this->incomings()->sum('volume');
+    }
+
+    public function getSisaAttribute()
+    {
+        return $this->volume - $this->diterima;
     }
 }

@@ -67,7 +67,7 @@
                                 {{ $shop->kode . ' ' . $shop->nama }} TAHUN {{ Request::query('year', date('Y')) }}</h5>
 
                             <table id="table" class="table table-bordered">
-                                <thead class="table-warning">
+                                <thead style="background-color: yellow">
                                     <tr>
                                         <th colspan="100%">Nilai Investasi: <span
                                                 class="currency">{{ $shop->nilai_investasi }}</span>
@@ -127,7 +127,7 @@
                                     @endforeach
 
                                 </tbody>
-                                <tfoot class="table-warning">
+                                <tfoot style="background-color: yellow">
                                     <tr>
                                         <th class="text-nowrap">Total Profit</th>
                                         <th class="text-right text-nowrap currency">
@@ -185,6 +185,7 @@
         @media print {
             body {
                 visibility: hidden;
+                -webkit-print-color-adjust: exact;
             }
 
             .ttd,

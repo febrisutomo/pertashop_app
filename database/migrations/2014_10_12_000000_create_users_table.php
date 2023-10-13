@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('no_rekening')->nullable();
             $table->string('pemilik_rekening')->nullable();
             $table->string('nama_bank')->nullable();
+            $table->decimal('tabungan_awal', 12, 0)->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

@@ -2,13 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Shop;
-use App\Models\User;
 use App\Models\Vendor;
-use App\Models\Operator;
 use App\Models\Purchase;
 use App\Models\DailyReport;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 

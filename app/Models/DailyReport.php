@@ -112,12 +112,12 @@ class DailyReport extends Model
 
     public function getPenerimaanAttribute()
     {
-        return $this->incoming?->purchase?->volume;
+        return $this->incoming?->volume;
     }
 
     public function getVolumePenjualanAttribute()
     {
-        return round($this->totalisator_akhir - $this->totalisator_awal - $this->percobaan, 2);
+        return $this->totalisator_akhir - $this->totalisator_awal - $this->percobaan;
     }
 
     public function getStokAkhirTeoritisAttribute()
@@ -137,7 +137,7 @@ class DailyReport extends Model
 
     public function getPendapatanAttribute()
     {
-        return round($this->rupiah_penjualan - $this->pengeluaran);
+        return $this->rupiah_penjualan - $this->pengeluaran;
     }
 
     public function getRupiahPenjualanAttribute()
@@ -147,7 +147,7 @@ class DailyReport extends Model
 
     public function getDisetorkanAttribute()
     {
-        return round($this->attributes['disetorkan']);
+        return round($this->setor_tunai + $this->setor_qris + $this->setor_transfer);
     }
 
     public function getSelisihSetoranAttribute()
@@ -157,7 +157,7 @@ class DailyReport extends Model
 
     public function getTabunganAttribute()
     {
-        return round($this->latestByOperator() ? $this->latestByOperator()->tabungan + $this->selisih_setoran : $this->selisih_setoran);
+        return ($this->latestByOperator() ? $this->latestByOperator()->tabungan + $this->selisih_setoran : $this->selisih_setoran + $this->operator->tabungan_awal);
     }
 
     public function getTanggalPanjangAttribute()
@@ -169,6 +169,4 @@ class DailyReport extends Model
     {
         return $this->created_at->format('d/m/Y');
     }
-
-    
 }
