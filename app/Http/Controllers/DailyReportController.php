@@ -17,7 +17,6 @@ use Illuminate\Validation\Rule;
 use App\Models\SpendingCategory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class DailyReportController extends Controller
@@ -86,7 +85,7 @@ class DailyReportController extends Controller
 
         $shops = Shop::all();
         $operators = User::where('role', 'operator')->where('shop_id', $shop_id)->get();
-        $purchases = Purchase::where('shop_id', $shop_id)->doesntHave('incoming')->get();
+        $purchases = Purchase::where('shop_id', $shop_id)->doesntHave('incomings')->get();
 
         $categories = SpendingCategory::all();
 
@@ -122,7 +121,9 @@ class DailyReportController extends Controller
             'totalisator_akhir' => 'required|numeric',
             'stik_awal' => 'required|numeric',
             'stik_akhir' => 'nullable',
-            'disetorkan' => 'required|numeric'
+            'setor_tunai' => 'nullable',
+            'setor_qris' => 'nullable',
+            'setor_transfer' => 'nullable'
         ], $customMessages);
 
 
@@ -171,10 +172,12 @@ class DailyReportController extends Controller
 
                 foreach ($categories as $index => $category) {
                     Spending::create([
+                        'shop_id' => $validated['shop_id'],
                         'daily_report_id' => $dailyReport->id,
                         'category_id' => $category,
                         'jumlah' => $jumlahs[$index],
                         'keterangan' => $keterangans[$index],
+                        'created_at' => $validated['created_at'],
                     ]);
                 }
             }
@@ -214,11 +217,10 @@ class DailyReportController extends Controller
         $shops = Shop::all();
         $operators = User::where('role', 'operator')->where('shop_id', $dailyReport->shop_id)->get();
 
-        //purcahses where doesnt have incoming or incoming id same with daily report incoming id
-        $purchases = Purchase::with(['vendor'])->where('shop_id', $dailyReport->shop_id)->where(function ($query) use ($dailyReport) {
-            $query->doesntHave('incoming')
-                ->orWhere('id', $dailyReport?->incoming?->purchase_id);
-        })->get();
+        // Retrieve purchases that belong to the same shop as the daily report and either do not have any incoming records or have an incoming record with the same purchase ID as the daily report's incoming record.
+        $purchases = Purchase::where('shop_id', $dailyReport->shop_id)->get()->filter(function ($purchase) use ($dailyReport) {
+            return $purchase->sisa > 0 || $purchase->id == $dailyReport->incoming?->purchase_id;
+        });
 
         $categories = SpendingCategory::all();
 
@@ -249,9 +251,10 @@ class DailyReportController extends Controller
             'totalisator_akhir' => 'required|numeric',
             'stik_awal' => 'required|numeric',
             'stik_akhir' => 'nullable',
-            'disetorkan' => 'required|numeric'
+            'setor_tunai' => 'nullable',
+            'setor_qris' => 'nullable',
+            'setor_transfer' => 'nullable'
         ], $customMessages);
-
 
         $validated['created_at'] = Carbon::parse($validated['tanggal'] . ' ' . $validated['jam']);
 
@@ -281,11 +284,11 @@ class DailyReportController extends Controller
 
             //check input penerimaan not null
             if ($request->input('penerimaan') != null && $request->input('penerimaan') != 0) {
-                Incoming::updateOrCreate([
-                    'daily_report_id' => $dailyReport->id,
+                Incoming::updateOrCreate(['daily_report_id' => $dailyReport->id], [
                     'purchase_id' => $request->input('purchase_id'),
                     'vendor_id' => $request->input('vendor_id'),
                     'sopir' => $request->input('sopir'),
+                    'volume' => $request->input('penerimaan'),
                     'no_polisi' => $request->input('no_polisi'),
                     'stik_sebelum_curah' => $request->input('stik_sebelum_curah'),
                     'stik_setelah_curah' => $request->input('stik_setelah_curah'),
@@ -304,10 +307,12 @@ class DailyReportController extends Controller
 
                 foreach ($categories as $index => $category) {
                     Spending::create([
+                        'shop_id' => $dailyReport->shop_id,
                         'daily_report_id' => $dailyReport->id,
                         'category_id' => $category,
                         'jumlah' => $jumlahs[$index],
                         'keterangan' => $keterangans[$index],
+                        'created_at' => $validated['created_at'],
                     ]);
                 }
             } else {
@@ -370,18 +375,14 @@ class DailyReportController extends Controller
 
             $shop = Shop::find($shop_id);
 
-            $yesterday_report = DailyReport::where('shop_id', $shop->id)
-                ->whereDate('created_at', '<', $date->format('Y-m-d'))
-                ->latest()
-                ->first();
-
             $latest_report = DailyReport::where('shop_id', $shop->id)
+                ->where('created_at', '<', $date->format('Y-m-d H:i:s'))
                 ->latest()
                 ->first();
 
             $skala = $shop->skala;
             $totalisator_awal =  $latest_report ? $latest_report->totalisator_akhir : $shop->totalisator_awal;
-            $stik_awal =  $yesterday_report ? $yesterday_report->stik_akhir : $shop->stik_awal;
+            $stik_awal =  $latest_report && $latest_report->stik_akhir ? $latest_report->stik_akhir  : $shop->stik_awal;
             $today_report = DailyReport::where('shop_id', $shop->id)->whereDate('created_at', $date->format('Y-m-d'))->get();
             $today_penjualan = $today_report->sum('volume_penjualan');
             $today_penerimaan = $today_report->sum('penerimaan');

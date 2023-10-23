@@ -23,8 +23,7 @@
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <div class="row justify-content-between align-items-center">
-                        <div
-                            class="col-6 col-lg-3 d-flex justify-content-between align-items-center">
+                        <div class="col-6 col-lg-3 d-flex justify-content-between align-items-center">
                             @if (Auth::user()->role != 'admin')
                                 <select id="shop_id" name="shop_id" class="form-control mr-2">
                                     <option value="" disabled>--Pilih Pertashop--</option>
@@ -60,7 +59,7 @@
                                 <thead>
                                     <tr>
                                         <th class="align-middle text-center table-warning">No</th>
-                                        <th class="align-middle text-center table-warning">Bulan</th>
+                                        <th class="align-middle text-center table-warning text-nowrap">Bulan</th>
                                         <th class="align-middle text-center table-warning">Nilai Modal Awal</th>
                                         <th class="align-middle text-center table-danger">Penyusutan Karena Rugi</th>
                                         <th class="align-middle text-center table-danger">Penyusutan Karena Pajak & Biaya
@@ -77,27 +76,46 @@
                                 <tbody>
                                     <tr class="table-info">
                                         <th colspan="7" class="align-middle text-right">Saldo Awal Modal</th>
-                                        <th class="align-middle text-right currency">
-                                            {{ $shop->modal_awal }}</th>
+                                        <th class="align-middle">
+                                            <div class="d-flex justify-content-between currency">
+                                                {{ $shop->modal_awal }}
+                                            </div>
+                                        </th>
                                         <th class="aksi"></th>
                                     </tr>
                                     @foreach ($modals as $modal)
                                         <tr>
                                             <td class="align-middle text-center">{{ $loop->iteration }}</td>
                                             <td class="align-middle text-nowrap">{{ $modal['bulan'] }}</td>
-                                            <td class="align-middle text-right currency">{{ $modal->modal_awal }}
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between currency">
+                                                    {{ $modal->modal_awal }}
+                                                </div>
                                             </td>
-                                            <td class="align-middle text-right text-danger currency">{{ $modal->rugi }}
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between currency">
+                                                    {{ $modal->rugi * -1 }}
+                                                </div>
                                             </td>
-                                            <td class="align-middle text-right text-danger currency">
-                                                {{ $modal->pajak_bank }}
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between currency">
+                                                    {{ $modal->pajak_bank * -1 }}
+                                                </div>
                                             </td>
-                                            <td class="align-middle text-right currency">
-                                                {{ $modal->alokasi_keuntungan }}
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between currency">
+                                                    {{ $modal->alokasi_keuntungan }}
+                                                </div>
                                             </td>
-                                            <td class="align-middle text-right currency">{{ $modal->bunga_bank }}
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between currency">
+                                                    {{ $modal->bunga_bank }}
+                                                </div>
                                             </td>
-                                            <td class="align-middle text-right currency">{{ $modal->modal_akhir }}
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-between currency">
+                                                    {{ $modal->modal_akhir }}
+                                                </div>
                                             </td>
                                             <td class="align-middle text-center aksi">
                                                 <a class="btn btn-sm btn-link"
@@ -109,8 +127,11 @@
                                     @endforeach
                                     <tr class="table-info">
                                         <th colspan="7" class="align-middle text-right">Saldo Akhir Modal</th>
-                                        <th class="align-middle text-right currency">
-                                            {{ $modals->last()?->modal_akhir }}
+                                        <th class="align-middle">
+                                            <div class="d-flex justify-content-between currency">
+                                                {{ $shop->modal_awal }}
+                                                {{ $modals->last()?->modal_akhir }}
+                                            </div>
                                         </th>
                                         <th class="aksi"></th>
                                     </tr>
@@ -190,6 +211,7 @@
         @media print {
             body {
                 visibility: hidden;
+                -webkit-print-color-adjust: exact;
             }
 
             .ttd {

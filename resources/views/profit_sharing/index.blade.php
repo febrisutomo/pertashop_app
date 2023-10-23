@@ -185,6 +185,7 @@
         @media print {
             body {
                 visibility: hidden;
+                -webkit-print-color-adjust: exact;
             }
 
             .ttd,

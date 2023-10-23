@@ -85,41 +85,103 @@
                                     <td></td>
                                     <td></td>
                                 </tr>
-                                <tr>
-                                    <td><span style="width: 20px; display: inline-block">1.</span>
-                                        <span class="text-uppercase">Gaji Operator</span>
-                                    </td>
-                                    <td>=</td>
-                                    <td class="d-flex justify-content-between">
-                                        <span>Rp</span>
-                                        <span class="number">{{ $report->gaji_operator }}</span>
-                                    </td>
-                                    <td class="px-2"></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td><span style="width: 20px; display: inline-block">2.</span>
-                                        <span class="text-uppercase">Gaji Admin</span>
-                                    </td>
-                                    <td>=</td>
-                                    <td class="d-flex justify-content-between">
-                                        <span>Rp</span>
-                                        <span class="number">{{ $report->gaji_admin }}</span>
-                                    </td>
-                                    <td class="px-2"></td>
-                                    <td></td>
-                                </tr>
-                                @foreach ($spendings as $spending)
+
+                                @foreach ($spendingByAdmin as $spending)
                                     <tr>
-                                        <td><span
-                                                style="width: 20px; display: inline-block">{{ $loop->iteration + 2 }}.</span>
+                                        <td><span style="width: 20px; display: inline-block">{{ $loop->iteration }}.</span>
+                                            <span class="text-uppercase">{{ $spending->keterangan }}</span>
+                                        </td>
+                                        <td>=</td>
+                                        <td class="d-flex justify-content-between currency">
+                                            {{ $spending->jumlah }}
+                                        </td>
+                                        <td class="px-2"></td>
+                                        <td class=" d-flex align-items-center">
+                                            <button class="btn btn-link px-1" data-toggle="modal"
+                                                data-target="#spendingEdit{{ $spending->id }}"><i
+                                                    class="fas fa-edit"></i></button>
+                                            <button class="btn btn-link px-1 text-danger spending-delete"
+                                                data-id="{{ $spending->id }}"><i class="fas fa-trash"></i></button>
+
+                                            <!-- Modal Pengeluaran -->
+                                            <div class="modal fade" id="spendingEdit{{ $spending->id }}" tabindex="-1"
+                                                role="dialog" aria-labelledby="modelTitleId" aria-hidden="true"
+                                                data-backdrop="static">
+                                                <div class="modal-dialog modal-md" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Edit Pengeluaran</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <form action="{{ route('spendings.update', $spending->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <div class="modal-body">
+
+                                                                <div class="form-group">
+                                                                    <label for="keterangan">Keterangan</label>
+                                                                    <input type="text"
+                                                                        class="form-control @error('keterangan') is-invalid @enderror"
+                                                                        id="keterangan" name="keterangan"
+                                                                        value="{{ old('keterangan', $spending->keterangan) }}"
+                                                                        required>
+                                                                    @error('keterangan')
+                                                                        <div class="invalid-feedback d-block">
+                                                                            {{ $message }}
+                                                                        </div>
+                                                                    @enderror
+
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="jumlah">Jumlah</label>
+                                                                    <div class="input-group">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text">Rp</span>
+                                                                        </div>
+                                                                        <input type="number"
+                                                                            class="form-control @error('jumlah') is-invalid @enderror"
+                                                                            id="jumlah" name="jumlah"
+                                                                            value="{{ old('jumlah', $spending->jumlah) }}"
+                                                                            required>
+                                                                    </div>
+                                                                    @error('jumlah')
+                                                                        <div class="invalid-feedback d-block">
+                                                                            {{ $message }}
+                                                                        </div>
+                                                                    @enderror
+
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-dismiss="modal">Cancel</button>
+                                                                <button type="submit"
+                                                                    class="btn btn-primary btn-save-pengeluaran">Update</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                @php
+                                    $no = $spendingByAdmin->count() + 1;
+                                @endphp
+                                @foreach ($spendingByOperator as $spending)
+                                    <tr>
+                                        <td><span style="width: 20px; display: inline-block">{{ $no++ }}.</span>
                                             <span class="text-uppercase">{{ $spending['pengeluaran'] }}</span>
                                         </td>
                                         <td>=</td>
                                         <td
-                                            class="d-flex justify-content-between @if ($loop->last) line-bottom @endif">
-                                            <span>Rp</span>
-                                            <span class="number">{{ $spending['jumlah'] }}</span>
+                                            class="d-flex justify-content-between currency @if ($loop->last) line-bottom @endif">
+                                            {{ $spending['jumlah'] }}
                                         </td>
                                         <td class="px-2">
                                             @if ($loop->last)
@@ -130,7 +192,10 @@
                                     </tr>
                                 @endforeach
                                 <tr>
-                                    <td></td>
+                                    <td>
+                                        <button class="btn btn-link px-0" data-toggle="modal" data-target="#spendingAdd"><i
+                                                class="fas fa-plus mr-2"></i>Tambah</button>
+                                    </td>
                                     <td></td>
                                     <td class="d-flex justify-content-between">
                                         <span>Rp</span>
@@ -162,8 +227,7 @@
                                     <td width="150">
                                         <div class="line-bottom d-flex justify-content-between">
                                             <span>Rp</span>
-                                            <span
-                                                class="number">{{ $report->total_biaya }}</span>
+                                            <span class="number">{{ $report->total_biaya }}</span>
                                         </div>
 
                                     </td>
@@ -182,8 +246,12 @@
                                     <td width="20"></td>
                                 </tr>
                                 <tr class="font-weight-bold">
-                                    <td class="text-right">Alokasi Modal Dasar dari
-                                        <span class="number-float">{{ $report['persentase_alokasi_modal'] }}</span>% Profit
+                                    <td class="text-right">
+                                        <button class="btn btn-link px-1" data-toggle="modal"
+                                            data-target="#persenAlokasiEdit"><i class="fas fa-edit"></i></button>
+                                        Alokasi Modal Dasar dari
+                                        <span class="number-float">{{ $report['persentase_alokasi_modal'] }}</span>%
+                                        Profit
                                     </td>
                                     <td width="20" class="px-2">=</td>
                                     <td width="150">
@@ -324,10 +392,6 @@
                                 <i class="fas fa-trash mr-2 "></i>
                                 <span>Hapus</span>
                             </button>
-                            <button class="btn btn-primary mr-2" data-toggle="modal" data-target="#modalEdit">
-                                <i class="fas fa-edit mr-2"></i>
-                                <span>Edit</span>
-                            </button>
                         @endif
 
                         <button class="btn btn-warning" onclick="window.print()">
@@ -342,13 +406,73 @@
 
     </section>
 
+
+    <!-- Modal Pengeluaran -->
+    <div class="modal fade" id="spendingAdd" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+        aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Pengeluaran</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ route('spendings.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+
+                        <input type="hidden" name="shop_id" value="{{ $report->shop_id }}">
+                        <input type="hidden" name="category_id" value="99">
+                        <input type="hidden" name="created_at" value="{{ $report->created_at }}">
+
+
+                        <div class="form-group">
+                            <label for="keterangan">Keterangan</label>
+                            <input type="text" class="form-control @error('keterangan') is-invalid @enderror"
+                                id="keterangan" name="keterangan" value="{{ old('keterangan') }}" required>
+                            @error('keterangan')
+                                <div class="invalid-feedback d-block">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+
+                        </div>
+                        <div class="form-group">
+                            <label for="jumlah">Jumlah</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Rp</span>
+                                </div>
+                                <input type="number" class="form-control @error('jumlah') is-invalid @enderror"
+                                    id="jumlah" name="jumlah" value="{{ old('jumlah') }}" required>
+                            </div>
+                            @error('jumlah')
+                                <div class="invalid-feedback d-block">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-save-pengeluaran">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Modal -->
-    <div class="modal fade" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+    <div class="modal fade" id="persenAlokasiEdit" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
         aria-hidden="true">
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Laporan Laba Bersih</h5>
+                    <h5 class="modal-title">Edit Persentase Alokasi Modal</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -357,64 +481,28 @@
                     @csrf
                     @method('PUT')
                     <div class="modal-body">
-                        <div class="form-group row">
-                            <label for="gaji_operator" class="col-4 col-form-label">Gaji Operator</label>
-                            <div class="col-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">Rp</span>
-                                    </div>
-                                    <input type="number"
-                                        class="form-control @error('gaji_operator') is-invalid @enderror"
-                                        id="gaji_operator" name="gaji_operator"
-                                        value="{{ old('gaji_operator', $report->gaji_operator) }}" required>
 
-                                </div>
-                                @error('gaji_operator')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="gaji_admin" class="col-4 col-form-label">Gaji Admin</label>
-                            <div class="col-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">Rp</span>
-                                    </div>
-                                    <input type="number" class="form-control @error('gaji_admin') is-invalid @enderror"
-                                        id="gaji_admin" name="gaji_admin"
-                                        value="{{ old('gaji_admin', $report->gaji_admin) }}" required>
-
-                                </div>
-                                @error('gaji_admin')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="persentase_alokasi_modal" class="col-4 col-form-label">Persen Alokasi
+                        <div class="form-group">
+                            <label for="persentase_alokasi_modal">Persen Alokasi
                                 Modal</label>
-                            <div class="col-8">
-                                <div class="input-group">
-                                    <input type="number" step="any"
-                                        class="form-control @error('persentase_alokasi_modal') is-invalid @enderror"
-                                        id="persentase_alokasi_modal" name="persentase_alokasi_modal"
-                                        value="{{ old('persentase_alokasi_modal', $report->persentase_alokasi_modal) }}"
-                                        required>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">%</span>
-                                    </div>
+                            <div class="input-group">
+                                <input type="number" step="any"
+                                    class="form-control @error('persentase_alokasi_modal') is-invalid @enderror"
+                                    id="persentase_alokasi_modal" name="persentase_alokasi_modal"
+                                    value="{{ old('persentase_alokasi_modal', $report->persentase_alokasi_modal) }}"
+                                    required>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
                                 </div>
-                                @error('persentase_alokasi_modal')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
                             </div>
+                            @error('persentase_alokasi_modal')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Update</button>
                     </div>
                 </form>
@@ -447,7 +535,7 @@
             }
 
             .btn-link {
-                visibility: hidden;
+                display: none
             }
 
             .ttd {
@@ -497,6 +585,38 @@
                                     window.location.replace(
                                         "{{ route('laba-bersih.index', ['shop_id' => $report->shop_id]) }}"
                                     );
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            $('.spending-delete').on('click', function() {
+                let id = $(this).data('id');
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Pengeluaran akan dihapus!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "DELETE",
+                            url: "{{ route('spendings.index') }}" + "/" + id,
+                            success: function(response) {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then((result) => {
+                                    window.location.reload();
                                 });
                             }
                         });

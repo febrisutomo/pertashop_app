@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Shop;
 use App\Models\Price;
 use App\Models\Purchase;
+use App\Models\LabaKotor;
 use App\Models\LabaBersih;
 use App\Models\RekapModal;
 use App\Models\DailyReport;
@@ -89,22 +90,26 @@ class RekapModalController extends Controller
         $reports = DailyReport::where('shop_id', $shop_id)
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
+            ->oldest()
             ->get();
+
+
 
         $harga_beli = $reports->last()?->price?->harga_beli ?? Price::where('created_at', '<=', $modal->created_at)->latest()->first()->harga_beli ?? 0;
 
-        $purchase = Purchase::where('shop_id', $shop_id)->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)->latest()->first();
+        $labaKotor = LabaKotor::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
 
-        $sisa_do = $purchase == null || $purchase->incoming ? 0 : $purchase->volume;
-
+        $sisa_do = $labaKotor->sisa_do ?? 0;
         $rupiah_sisa_do = $sisa_do * $harga_beli;
 
-        $belum_disetorkan = $reports->sum('tabungan') < 0 ? $reports->sum('tabungan') * -1 : 0;
+        $belum_disetorkan = $reports->last()?->tabungan ?? 0;
 
-        $uang_di_bank = $modal->modal_awal - $sisa_do - $modal->kas_kecil - $belum_disetorkan - $modal->piutang;
+        $sisa_stok = $reports->last()?->stok_akhir_aktual ?? 0;
+        $rupiah_sisa_stok = $sisa_stok * $harga_beli;
 
-        return view('rekap-modal.edit', compact('shop', 'modal', 'belum_disetorkan', 'sisa_do', 'rupiah_sisa_do', 'harga_beli', 'uang_di_bank'));
+        $uang_di_bank = $modal->modal_awal - $rupiah_sisa_do - $modal->kas_kecil + $belum_disetorkan - $modal->piutang - $rupiah_sisa_stok;
+
+        return view('rekap-modal.edit', compact('shop', 'modal', 'belum_disetorkan', 'sisa_do', 'rupiah_sisa_do', 'harga_beli', 'uang_di_bank', 'sisa_stok', 'rupiah_sisa_stok'));
     }
 
 

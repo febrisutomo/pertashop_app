@@ -138,10 +138,26 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-6 font-weight-bold">
-                                            Disetorkan
+                                            Setor Tunai
                                         </div>
                                         <div class="col-6 currency">
-                                            {{ $report->disetorkan }}
+                                            {{ $report->setor_tunai }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6 font-weight-bold">
+                                            Setor QRIS
+                                        </div>
+                                        <div class="col-6 currency">
+                                            {{ $report->setor_qris }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6 font-weight-bold">
+                                            Setor Transfer
+                                        </div>
+                                        <div class="col-6 currency">
+                                            {{ $report->setor_transfer }}
                                         </div>
                                     </div>
                                 @endif
@@ -255,10 +271,32 @@
                                             @if ($reports->count() > 1)
                                                 Total
                                             @endif
-                                            Disetorkan
+                                            Setor Tunai
                                         </div>
                                         <div class="col-6 currency">
-                                            {{ $reports->sum('disetorkan') }}
+                                            {{ $reports->sum('setor_tunai') }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6 font-weight-bold">
+                                            @if ($reports->count() > 1)
+                                                Total
+                                            @endif
+                                            Setor QRIS
+                                        </div>
+                                        <div class="col-6 currency">
+                                            {{ $reports->sum('setor_qris') }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6 font-weight-bold">
+                                            @if ($reports->count() > 1)
+                                                Total
+                                            @endif
+                                            Setor Transfer
+                                        </div>
+                                        <div class="col-6 currency">
+                                            {{ $reports->sum('setor_transfer') }}
                                         </div>
                                     </div>
                                 </div>

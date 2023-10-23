@@ -52,7 +52,7 @@
                         </div>
 
                         <div class="form-group row">
-                            <label for="created_at" class="col-4 col-form-label">Created_at</label>
+                            <label for="created_at" class="col-4 col-form-label">Tanggal</label>
                             <div class="col-8">
                                 <input type="date" class="form-control @error('created_at') is-invalid @enderror"
                                     id="created_at" name="created_at" value="{{ old('created_at', date('Y-m-d')) }}">

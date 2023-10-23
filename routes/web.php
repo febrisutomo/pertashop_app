@@ -16,6 +16,7 @@ use App\Http\Controllers\RekapModalController;
 use App\Http\Controllers\CorporationController;
 use App\Http\Controllers\DailyReportController;
 use App\Http\Controllers\ProfitSharingController;
+use App\Http\Controllers\SpendingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,8 @@ Route::get('/migrate-fresh-seed', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::resource('spendings', SpendingController::class);
 
     Route::resource('purchases', PurchaseController::class)->middleware(['role:super-admin,admin']);
     //route daily reports

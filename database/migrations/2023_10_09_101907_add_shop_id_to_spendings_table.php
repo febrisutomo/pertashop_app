@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('prices', function (Blueprint $table) {
-            $table->id();
-            $table->float('harga_beli', 15,10);
-            $table->decimal('harga_jual', 8, 3);
-            $table->timestamps();
+        Schema::table('spendings', function (Blueprint $table) {
+            $table->foreignId('shop_id')->nullable()->constrained('shops')->onDelete('cascade');
         });
     }
 
@@ -24,6 +21,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('prices');
+        Schema::table('spendings', function (Blueprint $table) {
+            $table->dropForeign(['shop_id']);
+            $table->dropColumn('shop_id');
+        });
     }
 };

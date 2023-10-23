@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Shop;
 use App\Models\Price;
+use App\Models\Purchase;
+use App\Models\LabaKotor;
 use App\Models\DailyReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
 
 class LabaKotorController extends Controller
 {
@@ -49,7 +50,7 @@ class LabaKotorController extends Controller
             $stok_awal_rp = $stok_awal *  $stok_awal_harga_beli;
 
             $datang = $reports->sum('penerimaan');
-            $count_datang =  $datang / 2000;
+            $count_datang =  $datang / 1000;
             $jumlah_pembelian = $stok_awal + $datang;
             $jumlah_pembelian_rp = $stok_awal_rp + $datang * $harga_beli;
 
@@ -72,6 +73,7 @@ class LabaKotorController extends Controller
 
             $losses_gain =  $reports->sum('losses_gain');
 
+
             $persen_losses_gain = $jumlah_penjualan == 0 ? 0 : $losses_gain / $jumlah_penjualan * 100;
 
             $losses_gain_rp = $losses_gain * $harga_beli;
@@ -81,7 +83,7 @@ class LabaKotorController extends Controller
             $laba_kotor = $jumlah_penjualan_bersih_rp - $jumlah_pembelian_rp;
 
             //get total days sale
-            $jumlah_hari = $reports->groupBy('tanggal')->count();
+            $jumlah_hari = Carbon::parse($year_month . "-01")->daysInMonth;
 
             $rata_rata_omset_harian = $jumlah_hari == 0 ? 0 : $jumlah_penjualan / $jumlah_hari;
             $rata_rata_omset_harian_rp = $jumlah_hari == 0 ? 0 : $jumlah_penjualan_rp / $jumlah_hari;
@@ -104,8 +106,8 @@ class LabaKotorController extends Controller
                 'jumlah_penjualan_rp' => round($jumlah_penjualan_rp, 2),
                 'jumlah_penjualan_bersih_rp' => round($jumlah_penjualan_bersih_rp, 2),
                 'sisa_stok' => round($sisa_stok, 2),
-                'persen_losses_gain' => abs(round($persen_losses_gain, 3)),
-                'losses_gain' => abs(round($losses_gain, 2)),
+                'persen_losses_gain' => round($persen_losses_gain, 3),
+                'losses_gain' => round($losses_gain, 2),
                 'stik_akhir' => round($stik_akhir, 2),
                 'sisa_stok_akhir' => round($sisa_stok_akhir, 2),
                 'laba_kotor' => round($laba_kotor, 2),
@@ -170,6 +172,40 @@ class LabaKotorController extends Controller
 
     public function edit(string $shop_id, string $year_month)
     {
+        //find LabaKotor where year and where month
+
+        list($year, $month) = explode('-', $year_month);
+
+
+        $labaKotor = LabaKotor::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
+        $prevLabaKotor = LabaKotor::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month - 1)->first();
+
+        if ($prevLabaKotor == null) {
+            $stok_awal_do = 0;
+        } else {
+            $stok_awal_do = $prevLabaKotor->sisa_do;
+        }
+
+        $purchases = Purchase::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
+        $setor_do = $purchases->sum('volume');
+
+        $incomings = DailyReport::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
+        $datang_do = $incomings->sum('penerimaan');
+
+        $jumlah_do = $stok_awal_do + $setor_do;
+
+        $sisa_do = $jumlah_do - $datang_do;
+
+        if ($labaKotor == null) {
+            $labaKotor = LabaKotor::create([
+                'shop_id' => $shop_id,
+                'created_at' => Carbon::createFromFormat('Y-m', $year_month)->endOfMonth(),
+            ]);
+        } else {
+            $labaKotor->update([
+                'sisa_do' => $sisa_do,
+            ]);
+        }
 
         $reports = self::getLabaKotor($shop_id, $year_month);
 
@@ -177,6 +213,11 @@ class LabaKotorController extends Controller
 
         $date = Carbon::createFromFormat('Y-m', $year_month);
 
-        return view('laba_kotor.edit', compact('shop', 'reports', 'date'));
+        $end_of_month = Carbon::createFromFormat('Y-m', $year_month)->endOfMonth()->format('Y-m-d');
+
+        //get prices where date is less than year month
+        $prices = Price::where('created_at', '<=', $end_of_month)->oldest()->get();
+
+        return view('laba_kotor.edit', compact('shop', 'reports', 'date', 'stok_awal_do', 'setor_do', 'datang_do', 'jumlah_do', 'sisa_do', 'prices'));
     }
 }

@@ -45,10 +45,10 @@
                         <p class="font-italic mb-0">PERTAMAX:</p>
                         @foreach ($reports as $i => $r)
                             <div class="row">
-                                <div class="col-md-3">Harga Beli {{ $i + 1 }} : Rp <span
-                                        class="number-float">{{ $r['harga_beli'] }}</span></div>
-                                <div class="col-md-3">Harga Jual {{ $i + 1 }}: Rp <span
-                                        class="number-float">{{ $r['harga_jual'] }}</span></div>
+                                <div class="col-md-3">Harga Beli {{ $i + 1 }} : <span
+                                        class="currency-decimal">{{ $r['harga_beli'] }}</span></div>
+                                <div class="col-md-3">Harga Jual {{ $i + 1 }}: <span
+                                        class="currency-decimal">{{ $r['harga_jual'] }}</span></div>
                                 @if ($loop->last)
                                     <div class="col-md-6 text-md-right">Rata-rata omset Harian (&ell;) = <span
                                             class="number-float">{{ $reports->sum('rata_rata_omset_harian') / $reports->count() }}</span>
@@ -63,7 +63,7 @@
                             @foreach ($reports as $i => $r)
                                 <table style="width: 100%">
                                     <tr class="font-weight-bold">
-                                        <td>I.</td>
+                                        <td width="20">I.</td>
                                         <td>PEMBELIAN {{ $i + 1 }}</td>
                                         <td colspan="100%"></td>
                                     </tr>
@@ -71,17 +71,14 @@
                                         <td></td>
                                         <td width="300" class="pl-3">Stok Awal</td>
                                         <td class="px-2">=</td>
-                                        <td class="text-right"><span class="number-float">{{ $r['stok_awal'] }}</span><span
-                                                class="ml-2">&ell;</span></td>
+                                        <td class="text-right number-float litter">{{ $r['stok_awal'] }}</td>
                                         <td class="px-3">x</td>
-                                        <td class="d-flex justify-content-between">
-                                            <span>Rp</span><span
-                                                class="number-float">{{ $r['stok_awal_harga_beli'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal">
+                                            {{ $r['stok_awal_harga_beli'] }}
                                         </td>
                                         <td class="px-5">&#10132;</td>
-                                        <td class="d-flex justify-content-between">
-                                            <span>Rp</span><span
-                                                class="number">{{ $r['stok_awal'] * $r['stok_awal_harga_beli'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal">
+                                            {{ $r['stok_awal'] * $r['stok_awal_harga_beli'] }}
                                         </td>
                                         <td></td>
                                     </tr>
@@ -92,23 +89,20 @@
                                             <span>
                                                 <span>{{ $r['count_datang'] }}</span>
                                                 <span class="px-3">x</span>
-                                                <span class="number">2000</span>
-                                                <span class="ml-2">&ell;</span>
+                                                <span class="number litter">1000</span>
                                             </span>
                                         </td>
                                         <td class="px-2">=</td>
                                         <td class="text-right line-bottom"><span
-                                                class="number-float">{{ $r['datang'] }}</span><span
-                                                class="ml-2">&ell;</span>
+                                                class="number-float litter">{{ $r['datang'] }}</span>
                                         </td>
                                         <td class="px-3">x</td>
-                                        <td class="d-flex justify-content-between">
-                                            <span>Rp</span>
-                                            <span class="number-float">{{ $r['harga_beli'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal">
+                                            {{ $r['harga_beli'] }}
                                         </td>
                                         <td class="px-5">&#10132;</td>
-                                        <td class="d-flex justify-content-between line-bottom"><span>Rp</span><span
-                                                class="number">{{ $r['datang'] * $r['harga_beli'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal line-bottom">
+                                            {{ $r['datang'] * $r['harga_beli'] }}
                                         </td>
                                         <td class="px-3">+</td>
                                     </tr>
@@ -117,19 +111,17 @@
                                         <td class="font-weight-bold font-italic">A. Jumlah Pembelian 1
                                         </td>
                                         <td class="px-2"></td>
-                                        <td class="text-right"><span
-                                                class="number-float">{{ $r['jumlah_pembelian'] }}</span><span
-                                                class="ml-2">&ell;</span></td>
+                                        <td class="text-right number-float litter">{{ $r['jumlah_pembelian'] }}</td>
                                         <td></td>
                                         <td></td>
                                         <td class="px-5"></td>
-                                        <td class="d-flex justify-content-between font-weight-bold">
-                                            <span>Rp</span><span class="number">{{ $r['jumlah_pembelian_rp'] }}</span>
+                                        <td class="d-flex justify-content-between font-weight-bold currency-decimal">
+                                            {{ $r['jumlah_pembelian_rp'] }}
                                         </td>
                                         <td></td>
                                     </tr>
                                     <tr class="font-weight-bold">
-                                        <td>II.</td>
+                                        <td width="20">II.</td>
                                         <td>PENJUALAN {{ $i + 1 }}</td>
                                         <td colspan="100%"></td>
                                     </tr>
@@ -137,18 +129,15 @@
                                         <td></td>
                                         <td class="pl-3">a. Totalisator Akhir {{ $i + 1 }}</td>
                                         <td class="px-2">=</td>
-                                        <td class="text-right"><span
-                                                class="number-float">{{ $r['totalisator_akhir'] }}</span><span
-                                                class="ml-2">&ell;</span></td>
+                                        <td class="text-right number-float litter">{{ $r['totalisator_akhir'] }}</td>
                                         <td colspan="100%"></td>
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td class="pl-3">b. Totalisator Awal {{ $i + 1 }}</td>
                                         <td class="px-2">=</td>
-                                        <td class="text-right line-bottom"><span
-                                                class="number-float">{{ $r['totalisator_awal'] }}</span><span
-                                                class="ml-2">&ell;</span></td>
+                                        <td class="text-right line-bottom number-float litter">{{ $r['totalisator_awal'] }}
+                                        </td>
                                         <td class="px-3">-</td>
                                         <td colspan="100%"></td>
                                     </tr>
@@ -156,18 +145,16 @@
                                         <td></td>
                                         <td class="font-weight-bold pl-3">c. Total Penjualan (a-b)</td>
                                         <td class="px-2">=</td>
-                                        <td class="text-right font-weight-bold"><span
-                                                class="number-float">{{ $r['total_penjualan'] }}</span><span
-                                                class="ml-2">&ell;</span></td>
+                                        <td class="text-right font-weight-bold number-float litter">
+                                            {{ $r['total_penjualan'] }}</td>
                                         <td colspan="100%"></td>
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td class="pl-3">d. Percobaan 1 (Test Pump)</td>
                                         <td class="px-2">=</td>
-                                        <td class="text-right line-bottom"><span
-                                                class="number-float">{{ $r['test_pump'] }}</span><span
-                                                class="ml-2">&ell;</span>
+                                        <td class="text-right line-bottom number-float litter">
+                                            {{ $r['test_pump'] }}
                                         </td>
                                         <td class="px-3">-</td>
                                     </tr>
@@ -177,16 +164,14 @@
                                             (c-d)
                                         </td>
                                         <td class="px-2">=</td>
-                                        <td class="text-right"><span
-                                                class="number-float">{{ $r['jumlah_penjualan'] }}</span><span
-                                                class="ml-2">&ell;</span></td>
+                                        <td class="text-right number-float litter">{{ $r['jumlah_penjualan'] }}</td>
                                         <td class="px-3">x</td>
-                                        <td class="d-flex justify-content-between"><span>Rp</span><span
-                                                class="number-float">{{ $r['harga_jual'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal">
+                                            {{ $r['harga_jual'] }}
                                         </td>
                                         <td class="px-5">&#10132;</td>
-                                        <td class="d-flex justify-content-between">
-                                            <span>Rp</span><span class="number">{{ $r['jumlah_penjualan_rp'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal">
+                                            {{ $r['jumlah_penjualan_rp'] }}
                                         </td>
                                         <td></td>
                                     </tr>
@@ -195,17 +180,14 @@
                                         <td class="font-weight-bold font-italic pl-3">Sisa Stock {{ $i + 1 }} (A-B)
                                         </td>
                                         <td class="px-2">=</td>
-                                        <td class="text-right"><span
-                                                class="number-float">{{ $r['sisa_stok'] }}</span><span
-                                                class="ml-2">&ell;</span></td>
+                                        <td class="text-right number-float litter">{{ $r['sisa_stok'] }}</td>
                                         <td class="px-3">x</td>
-                                        <td class="d-flex justify-content-between"><span>Rp</span><span
-                                                class="number-float">{{ $r['harga_beli'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal">
+                                            {{ $r['harga_beli'] }}
                                         </td>
                                         <td class="px-5">&#10132;</td>
-                                        <td class="d-flex justify-content-between line-bottom">
-                                            <span>Rp</span><span
-                                                class="number">{{ $r['sisa_stok'] * $r['harga_beli'] }}</span>
+                                        <td class="d-flex justify-content-between line-bottom currency-decimal">
+                                            {{ $r['sisa_stok'] * $r['harga_beli'] }}
                                         </td>
                                         <td class="px-3">+</td>
                                     </tr>
@@ -213,9 +195,8 @@
                                         <td></td>
                                         <td class="pl-3">Jumlah</td>
                                         <td colspan="5"></td>
-                                        <td class="d-flex justify-content-between">
-                                            <span>Rp</span><span
-                                                class="number">{{ $r['jumlah_penjualan'] * $r['harga_jual'] + $r['sisa_stok'] * $r['harga_beli'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal">
+                                            {{ $r['jumlah_penjualan'] * $r['harga_jual'] + $r['sisa_stok'] * $r['harga_beli'] }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -224,21 +205,16 @@
                                             <span>Losses/Gain</span>
                                             <span class="px-3">&#10132;</span>
                                             <span class="text-danger mr-2">Losses</span>
-                                            <span class="text-danger">(<span
-                                                    class="number-float">{{ $r['persen_losses_gain'] }}</span>) %</span>
+                                            <span class="number-float percent">{{ $r['persen_losses_gain'] }}</span>
                                         </td>
                                         <td class="px-2">=</td>
-                                        <td class="text-right text-danger">(<span
-                                                class="number-float">{{ $r['losses_gain'] }}</span>)<span
-                                                class="ml-2">&ell;</span></td>
+                                        <td class="text-right number-float litter">{{ $r['losses_gain'] }}</td>
                                         <td class="px-3">x</td>
-                                        <td class="d-flex justify-content-between"><span>Rp</span><span
-                                                class="number-float">{{ $r['harga_beli'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal">{{ $r['harga_beli'] }}
                                         </td>
                                         <td class="px-5">&#10132;</td>
-                                        <td class="d-flex justify-content-between text-danger line-bottom">
-                                            <span>Rp</span><span
-                                                class="number">{{ $r['losses_gain'] * $r['harga_beli'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal line-bottom">
+                                            {{ $r['losses_gain'] * $r['harga_beli'] }}
                                         </td>
                                         <td class="px-3">+</td>
                                     </tr>
@@ -248,31 +224,28 @@
                                             {{ $i + 1 }}
                                         </td>
                                         <td colspan="5"></td>
-                                        <td class="d-flex justify-content-between font-weight-bold">
-                                            <span>Rp</span><span
-                                                class="number">{{ $r['jumlah_penjualan_bersih_rp'] }}</span>
+                                        <td class="d-flex justify-content-between font-weight-bold currency-decimal">
+                                            {{ $r['jumlah_penjualan_bersih_rp'] }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="font-weight-bold">III.</td>
+                                        <td class="font-weight-bold" width="20">III.</td>
                                         <td class="d-flex justify-content-between"><span class="font-weight-bold ">SISA
                                                 STOK
                                                 AKHIR
                                                 {{ $i + 1 }}</span> <span><span
-                                                    class="number-float">{{ $r['stik_akhir'] }}</span><span
-                                                    class="ml-2">cm</span></span>
+                                                    class="number-float">{{ $r['stik_akhir'] }}</span><span>
+                                                    cm</span></span>
                                         </td>
                                         <td class="px-2">=</td>
-                                        <td class="text-right"><span
-                                                class="number-float">{{ $r['sisa_stok_akhir'] }}</span><span
-                                                class="ml-2">&ell;</span></td>
+                                        <td class="text-right number-float litter">{{ $r['sisa_stok_akhir'] }}</td>
                                         <td class="px-3">x</td>
-                                        <td class="d-flex justify-content-between"><span>Rp</span><span
-                                                class="number-float">{{ $r['harga_beli'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal">
+                                            {{ $r['harga_beli'] }}
                                         </td>
                                         <td class="px-5">&#10132;</td>
-                                        <td class="d-flex justify-content-between"><span>Rp</span><span
-                                                class="number">{{ $r['sisa_stok_akhir'] * $r['harga_beli'] }}</span>
+                                        <td class="d-flex justify-content-between currency-decimal">
+                                            {{ $r['sisa_stok_akhir'] * $r['harga_beli'] }}
                                         </td>
                                     </tr>
                                 </table>
@@ -297,9 +270,9 @@
                                                                     {{ $i + 1 }}
                                                                 </td>
                                                                 <td class="px-2">=</td>
-                                                                <td class="d-flex justify-content-between">
-                                                                    <span>Rp</span><span
-                                                                        class="number">{{ $r['jumlah_penjualan_bersih_rp'] }}</span>
+                                                                <td
+                                                                    class="d-flex justify-content-between currency-decimal">
+                                                                    {{ $r['jumlah_penjualan_bersih_rp'] }}
                                                                 </td>
                                                                 <td></td>
                                                             </tr>
@@ -308,9 +281,9 @@
                                                                     {{ $i + 1 }}
                                                                 </td>
                                                                 <td class="px-2">=</td>
-                                                                <td class="d-flex justify-content-between line-bottom">
-                                                                    <span>Rp</span><span
-                                                                        class="number">{{ $r['jumlah_pembelian_rp'] }}</span>
+                                                                <td
+                                                                    class="d-flex justify-content-between line-bottom currency-decimal">
+                                                                    {{ $r['jumlah_pembelian_rp'] }}
                                                                 </td>
                                                                 <td class="px-1">-</td>
                                                             </tr>
@@ -321,9 +294,8 @@
                                                                 </td>
                                                                 <td class="px-2">=</td>
                                                                 <td
-                                                                    class="d-flex justify-content-between font-weight-bold">
-                                                                    <span>Rp</span><span
-                                                                        class="number">{{ $r['laba_kotor'] }}</span>
+                                                                    class="d-flex justify-content-between font-weight-bold currency-decimal">
+                                                                    {{ $r['laba_kotor'] }}
                                                                 </td>
                                                                 <td></td>
                                                             </tr>
@@ -347,9 +319,8 @@
                                                                 </td>
                                                                 <td class="px-2">=</td>
                                                                 <td
-                                                                    class="d-flex justify-content-between @if ($loop->last) line-bottom @endif">
-                                                                    <span>Rp</span><span
-                                                                        class="number">{{ $r['laba_kotor'] }}</span>
+                                                                    class="d-flex justify-content-between @if ($loop->last) line-bottom @endif currency-decimal">
+                                                                    {{ $r['laba_kotor'] }}
                                                                 </td>
                                                                 <td class="px-1">
                                                                     @if ($loop->last)
@@ -363,9 +334,9 @@
                                                             <td class="text-right font-weight-bold ">Grand Total Laba Kotor
                                                             </td>
                                                             <td class="px-2">=</td>
-                                                            <td class="d-flex justify-content-between font-weight-bold">
-                                                                <span>Rp</span><span
-                                                                    class="number">{{ $reports->sum('laba_kotor') }}</span>
+                                                            <td
+                                                                class="d-flex justify-content-between font-weight-bold currency-decimal">
+                                                                {{ $reports->sum('laba_kotor') }}
                                                             </td>
                                                             <td></td>
                                                         </tr>
@@ -388,8 +359,8 @@
                                                             <td width="180" class="text-right">Jumlah Penjualan Bersih
                                                             </td>
                                                             <td class="px-2">=</td>
-                                                            <td class="d-flex justify-content-between"><span>Rp</span><span
-                                                                    class="number">{{ count($reports) > 0 ? $reports[0]['jumlah_penjualan_bersih_rp'] : 0 }}</span>
+                                                            <td class="d-flex justify-content-between currency-decimal">
+                                                                {{ count($reports) > 0 ? $reports[0]['jumlah_penjualan_bersih_rp'] : 0 }}
                                                             </td>
                                                             <td></td>
                                                         </tr>
@@ -397,9 +368,9 @@
                                                             <td class="text-right">Jumlah Pembelian
                                                             </td>
                                                             <td class="px-2">=</td>
-                                                            <td class="d-flex justify-content-between line-bottom">
-                                                                <span>Rp</span><span
-                                                                    class="number">{{ count($reports) ? $reports[0]['jumlah_pembelian_rp'] : 0 }}</span>
+                                                            <td
+                                                                class="d-flex justify-content-between line-bottom currency-decimal">
+                                                                {{ count($reports) ? $reports[0]['jumlah_pembelian_rp'] : 0 }}
                                                             </td>
                                                             <td class="px-1">-</td>
                                                         </tr>
@@ -407,9 +378,9 @@
                                                             <td class="text-right font-weight-bold">Total Laba Kotor
                                                             </td>
                                                             <td class="px-2">=</td>
-                                                            <td class="d-flex justify-content-between font-weight-bold">
-                                                                <span>Rp</span><span
-                                                                    class="number">{{ count($reports) ? $reports[0]['laba_kotor'] : 0 }}</span>
+                                                            <td
+                                                                class="d-flex justify-content-between font-weight-bold currency-decimal">
+                                                                {{ count($reports) ? $reports[0]['laba_kotor'] : 0 }}
                                                             </td>
                                                             <td></td>
                                                         </tr>
@@ -419,11 +390,119 @@
                                         </table>
                                     </div>
                                 @endif
-
-
                             </div>
 
                         </div>
+
+                        <div class="row mt-3">
+                            <div class="col-lg-4">
+                                <table style="width: 100%">
+                                    <tr class="font-weight-bold">
+                                        <td width="20">IV.</td>
+                                        <td>Sisa Stock DO di Maos</td>
+                                    </tr>
+                                </table>
+                                <table style="width: 100%" class="table-border">
+                                    <tr>
+                                        <td></td>
+                                        <td class="text-center">PERTAMAX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Stok Awal</td>
+                                        <td class="text-right">{{ $stok_awal_do / 1000 }} KL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Setor </td>
+                                        <td class="text-right">{{ $setor_do / 1000 }} KL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Setor Tunai</td>
+                                        <td class="text-right">- KL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jumlah</td>
+                                        <td class="text-right">{{ $jumlah_do / 1000 }} KL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Datang</td>
+                                        <td class="text-right">{{ $datang_do / 1000 }} KL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sisa</td>
+                                        <td class="text-right"> {{ $sisa_do / 1000 }} KL</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="font-weight-bold font-italic">Ilustrasi Turun / Naik Margin Pertamax92
+                                    Pertashop
+                                </div>
+                                <table class="table-border" width="100%">
+                                    @foreach ($prices as $price)
+                                        @if ($loop->iteration > 1 && $price->harga_jual != $price->prev_harga_jual)
+                                            <tr>
+                                                <td>{{ $price->tanggal }}</td>
+                                                <td colspan="3">
+                                                    <span class="currency">{{ $price->prev_harga_jual }}</span>
+                                                    <span class="px-2">&#10132;</span>
+                                                    <span class="currency">{{ $price->harga_jual }}</span>
+                                                    <span class="ml-2">
+                                                        (@if ($price->harga_jual > $price->prev_harga_jual)
+                                                            <i class="fas fa-arrow-up text-danger"></i>
+                                                        @else
+                                                            <i class="fas fa-arrow-down text-success"></i>
+                                                        @endif
+                                                        <span class="currency">{{ $price->naik_turun_harga_jual }}</span>)
+                                                    </span>
+
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                    <tr style="background-color: yellow" class="font-weight-bold">
+                                        <td></td>
+                                        <td class="text-center">Harga Beli</td>
+                                        <td class="text-center">Harga Jual</td>
+                                        <td class="text-center">Margin</td>
+                                        <td class="text-center">Naik / Turun</td>
+                                    </tr>
+
+                                    @foreach ($prices as $price)
+                                        <tr>
+                                            <td class="@if ($loop->iteration == 1) bg-gray @endif">
+                                                @if ($loop->iteration > 1)
+                                                    {{ $price->tanggal }}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-between currency-decimal">
+                                                    {{ $price->harga_beli }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-between currency-decimal">
+                                                    {{ $price->harga_jual }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-between currency-decimal">
+                                                    {{ $price->margin }}</div>
+                                            </td>
+                                            <td class="@if ($loop->iteration == 1) bg-gray @endif">
+                                                @if ($loop->iteration > 1)
+                                                    @if ($price->naik_turun_margin > 0)
+                                                        <i class="fas fa-arrow-up text-success"></i>
+                                                    @else
+                                                        <i class="fas fa-arrow-down text-danger"></i>
+                                                    @endif
+                                                    <span class="currency-decimal">{{ $price->naik_turun_margin }}</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+
+                                </table>
+                            </div>
+                        </div>
+
                         <div class="ttd pt-4" style="display: none">
                             <p class="text-right px-3">Banyumas,
                                 {{ $date->endOfMonth()->format('d') . ' ' . $date->monthName . ' ' . $date->year }}
@@ -468,8 +547,6 @@
 
 
     </section>
-
-
 @endsection
 
 @push('style')
@@ -478,10 +555,17 @@
             border-bottom: 2px solid #000;
         }
 
+        .table-border td {
+            border: 1px solid #000;
+            padding: 1px 8px !important;
+        }
+
         @media print {
             body {
                 visibility: hidden;
+                -webkit-print-color-adjust: exact;
             }
+
 
             .ttd {
                 display: block !important;

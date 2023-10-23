@@ -89,7 +89,7 @@
                             </div>
                         </div>
 
-                       
+
 
                         <div class="form-group row">
                             <label for="no_hp" class="col-sm-4 col-form-label">No. HP</label>
@@ -149,6 +149,22 @@
                             </div>
                         </div>
 
+                        <div id="formTabungan" class="form-group row">
+                            <label for="tabungan_awal" class="col-sm-4 col-form-label">Tabungan Awal</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="number" class="form-control @error('tabungan_awal') is-invalid @enderror"
+                                        id="tabungan_awal" name="tabungan_awal" value="{{ old('tabungan_awal') }}">
+                                </div>
+                                @error('tabungan_awal')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
                         <hr>
                         <div class="form-group row">
                             <label for="password" class="col-sm-4 col-form-label">Password</label>
@@ -185,6 +201,12 @@
                 } else {
                     $('#formPertashop').show();
                 }
+                if ($(this).val() == 'operator') {
+                    $('#formTabungan').show();
+                } else {
+                    $('#formTabungan').hide();
+                }
+
             });
 
             $('#role').trigger('change');

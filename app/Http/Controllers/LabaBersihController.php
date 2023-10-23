@@ -65,17 +65,32 @@ class LabaBersihController extends Controller
 
         $laba_kotor = $summary['laba_kotor'];
 
-        $total_biaya = $reports->sum('pengeluaran');
+
 
         try {
             DB::beginTransaction();
 
+            Spending::insert([[
+                'shop_id' => $shop_id,
+                'category_id' => 99,
+                'keterangan' => 'Gaji Operator',
+                'jumlah' => 0,
+                'created_at' => Carbon::createFromFormat('Y-m', $year_month)->endOfMonth(),
+            ], [
+                'shop_id' => $shop_id,
+                'category_id' => 99,
+                'keterangan' => 'Gaji Admin',
+                'jumlah' => 0,
+                'created_at' => Carbon::createFromFormat('Y-m', $year_month)->endOfMonth(),
+            ]]);
+
+            $spendings = Spending::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
 
             $labaBersih = LabaBersih::create([
                 'shop_id' => $shop_id,
                 'created_at' => Carbon::createFromFormat('Y-m', $year_month)->endOfMonth(),
                 'laba_kotor' => $laba_kotor,
-                'total_biaya' => $total_biaya,
+                'total_biaya' => $spendings->sum('jumlah'),
             ]);
 
             //create profit sharing
@@ -112,7 +127,7 @@ class LabaBersihController extends Controller
         list($year, $month) = explode('-', $year_month);
 
         $summary = LabaKotorController::getLabaKotorFinal($shop_id, $year_month);
-        $reports = DailyReport::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
+        $spendings = Spending::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
 
         //update laba bersih if reports updated
         $report = LabaBersih::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
@@ -122,7 +137,7 @@ class LabaBersihController extends Controller
 
             $report->update([
                 'laba_kotor' => $summary['laba_kotor'],
-                'total_biaya' => $reports->sum('pengeluaran') + $report->gaji_operator + $report->gaji_admin,
+                'total_biaya' => $spendings->sum('jumlah'),
             ]);
 
             $report = LabaBersih::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
@@ -160,22 +175,25 @@ class LabaBersihController extends Controller
 
             $shop =  Shop::with(['investors'])->find($shop_id);
 
-            $spendings =  Spending::whereHas('dailyReport', function ($query) use ($month, $year, $shop_id) {
-                $query->where('shop_id', $shop_id)
-                    ->whereMonth('created_at', $month)
-                    ->whereYear('created_at', $year);
-            })->orderBy('category_id')
+            $spendingByAdmin = Spending::whereNull('daily_report_id')->where('shop_id', $shop_id)
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)->orderBy('category_id')
+                ->get();
+
+            $spendingByOperator =  Spending::whereNotNull('daily_report_id')->where('shop_id', $shop_id)
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)->orderBy('category_id')
                 ->get()->groupBy('category_id');
 
             //spendings to array
-            $spendings = $spendings->map(function ($value, $key) {
+            $spendingByOperator = $spendingByOperator->map(function ($value, $key) {
                 $category = SpendingCategory::find($key)->nama;
                 return ['pengeluaran' => $category, 'jumlah' => $value->sum('jumlah')];
             });
 
             DB::commit();
 
-            return view('laba_bersih.edit', compact('report', 'shop', 'spendings'));
+            return view('laba_bersih.edit', compact('report', 'shop', 'spendingByOperator', 'spendingByAdmin'));
         } catch (\Exception $e) {
             DB::rollback();
 
@@ -191,8 +209,6 @@ class LabaBersihController extends Controller
         ];
 
         $validatedData = $request->validate([
-            'gaji_operator' => 'required|numeric',
-            'gaji_admin' => 'required|numeric',
             'persentase_alokasi_modal' => 'required|numeric',
         ], $customMessages);
 
@@ -236,7 +252,7 @@ class LabaBersihController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Laporan Laba Bersih berhasil diubah');
+            return redirect()->back()->with('success', 'Persen alokasi modal berhasil diubah');
         } catch (\Exception $e) {
             DB::rollback();
 
@@ -247,6 +263,8 @@ class LabaBersihController extends Controller
     public function destroy(LabaBersih $labaBersih)
     {
         $labaBersih->delete();
+
+        Spending::whereYear('created_at', $labaBersih->created_at->format('Y'))->whereMonth('created_at', $labaBersih->created_at->format('m'))->where('shop_id', $labaBersih->shop_id)->whereNull('daily_report_id')->delete();
 
         //delete profit sharing
 

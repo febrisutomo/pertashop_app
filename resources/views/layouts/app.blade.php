@@ -24,13 +24,17 @@
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
         integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer" />
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.3.0/css/OverlayScrollbars.min.css"
         integrity="sha512-ZVVoM7L0mJANR/tsZmE6JqvKq8VG8Ry7YVFc6WioMUNkQiU0tzuuJLTKmKuz7vaDIqiYaeDTvlcrURXmOdnqlg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer" />
+    {{-- <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet"> --}}
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" rel="stylesheet">
+    {{-- <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.dataTables.min.css"> --}}
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
     @stack('style')
 
@@ -58,6 +62,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    {{-- <script src="https://cdn.datatables.net/fixedcolumns/4.3.0/js/dataTables.fixedColumns.min.js"></script> --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.0/dist/chart.min.js"></script>
 
@@ -120,50 +125,70 @@
             $('.currency').each(function() {
                 var value = parseFloat($(this).text());
                 if (!isNaN(value)) {
-                    var formattedValue = formatCurrency(value, 0);
-                    $(this).text(formattedValue);
+                    let html = '';
+                    if (value >= 0) {
+                        var formattedValue = formatNumber(value);
+                        html = `<span class="mr-1">Rp</span><span>${formattedValue}</span>`;
+                        $(this).html(html).addClass('text-nowrap');
+                    } else {
+                        var formattedValue = formatNumber(value * -1);
+                        html = `<span class="mr-1">Rp</span><span>(${formattedValue})</span>`;
+                        $(this).html(html).addClass('text-danger').addClass('text-nowrap');
+                    }
                 }
             });
 
             $('.currency-decimal').each(function() {
                 var value = parseFloat($(this).text());
                 if (!isNaN(value)) {
-                    var formattedValue = formatCurrency(value, 2);
-                    $(this).text(formattedValue);
+                    let html = '';
+                    if (value >= 0) {
+                        var formattedValue = formatNumber(value, 2);
+                        html = `<span class="mr-1">Rp</span><span>${formattedValue}</span>`;
+                        $(this).html(html);
+                    } else {
+                        var formattedValue = formatNumber(value * -1, 2);
+                        html = `<span class="mr-1">Rp</span><span>(${formattedValue})</span>`;
+                        $(this).html(html).addClass('text-danger');
+                    }
                 }
             });
 
             $('.number').each(function() {
                 var value = parseFloat($(this).text());
                 if (!isNaN(value)) {
-                    var formattedValue = formatNumber(value);
-                    $(this).text(formattedValue);
+                    if (value >= 0) {
+                        var formattedValue = formatNumber(value);
+                        $(this).text(formattedValue);
+                    } else {
+                        var formattedValue = formatNumber(value * -1);
+                        $(this).text(`(${formattedValue})`).addClass('text-danger');
+                    }
+
                 }
             });
 
             $('.number-float').each(function() {
                 var value = parseFloat($(this).text());
                 if (!isNaN(value)) {
-                    var formattedValue = formatNumber(value, 2);
-                    $(this).text(formattedValue);
+                    if (value >= 0) {
+                        var formattedValue = formatNumber(value, 2);
+                        $(this).text(formattedValue);
+                    } else  {
+                        var formattedValue = formatNumber(value * -1, 2);
+                        $(this).text(`(${formattedValue})`).addClass('text-danger');
+                    } 
                 }
             });
 
-            $('.liter').each(function() {
-                var value = parseFloat($(this).text());
-                if (!isNaN(value)) {
-                    var formattedValue = `${formatNumber(value, 2)} &ell;`;
-                    $(this).html(formattedValue);
-                }
+            $('.litter').each(function() {
+                $(this).append(' &ell;');
             });
 
-            $('.number-abs').each(function() {
-                var value = Math.abs(parseFloat($(this).text()));
-                if (!isNaN(value)) {
-                    var formattedValue = formatNumber(value);
-                    $(this).text(formattedValue);
-                }
-            });
+            $('.percent').each(function() {
+                $(this).append(' %');
+            })
+
         });
 
 

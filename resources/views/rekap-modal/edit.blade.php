@@ -61,12 +61,12 @@
                                     <td width="20">1.</td>
                                     <td class="d-flex justify-content-between">
                                         <span>DO yang masih ada di Pertamina</span>
-                                        <span>{{ $sisa_do }} &ell; <span class="px-2">x</span>Rp <span
+                                        <span>{{ $sisa_do * 1 }} &ell; <span class="px-2">x</span>Rp <span
                                                 class="number">{{ $harga_beli }}</span></span>
                                     </td>
                                     <th width="20">:</th>
                                     <td class="d-flex justify-content-between">
-                                        <span>Rp</span><span class="number">{{ $rupiah_sisa_do }}</span>
+                                        <span>Rp</span><span class="number">{{ $rupiah_sisa_do * -1 }}</span>
                                     </td>
                                     <td></td>
                                 </tr>
@@ -88,12 +88,26 @@
                                     </td>
                                     <th width="20">:</th>
                                     <td class="d-flex justify-content-between">
-                                        <span>Rp</span><span class="number">{{ $modal->kas_kecil }}</span>
+                                        <span>Rp</span><span class="number">{{ $modal->kas_kecil * -1 }}</span>
                                     </td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td width="20">4.</td>
+                                    <td class="d-flex justify-content-between">
+                                        <span>Sisa Stok yang Masih ada Di Pertashop
+                                        </span>
+                                        <span>{{ $sisa_stok }} &ell; <span class="px-2">x</span>Rp <span
+                                                class="number">{{ $harga_beli }}</span></span>
+                                    </td>
+                                    <th width="20">:</th>
+                                    <td class="d-flex justify-content-between">
+                                        <span>Rp</span><span class="number">{{ $rupiah_sisa_stok * -1 }}</span>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td width="20">5.</td>
                                     <td>
                                         Hasil Penjualan yang Belum Disetor di Akhir Periode (TUNAI)
                                     </td>
@@ -104,13 +118,13 @@
                                     <td></td>
                                 </tr>
                                 <tr>
-                                    <td width="20">5.</td>
+                                    <td width="20">6.</td>
                                     <td>
                                         Piutang
                                     </td>
                                     <th width="20">:</th>
                                     <td class="d-flex justify-content-between line-bottom">
-                                        <span>Rp</span><span class="number">{{ $modal->piutang }}</span>
+                                        <span>Rp</span><span class="number">{{ $modal->piutang * -1 }}</span>
                                     </td>
                                     <td class="px-1">+</td>
                                 </tr>

@@ -23,9 +23,8 @@
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <div class="row justify-content-between align-items-center">
-                        <div
-                            class="col-6 col-lg-3 d-flex justify-content-between align-items-center">
-                            @if (Auth::user()->role != 'admin' )
+                        <div class="col-6 col-lg-3 d-flex justify-content-between align-items-center">
+                            @if (Auth::user()->role != 'admin')
                                 <select id="shop_id" name="shop_id" class="form-control mr-2">
                                     <option value="" disabled>--Pilih Pertashop--</option>
                                     @foreach ($shops as $s)
@@ -59,11 +58,23 @@
                                 @foreach ($labaKotors as $laba)
                                     <tr>
                                         <td class="text-left text-nowrap">{{ $laba['bulan'] }}</td>
-                                        <td class="text-right currency">{{ $laba['jumlah_pembelian_rp'] }}</td>
-                                        <td class="text-right currency">{{ $laba['jumlah_penjualan_bersih_rp'] }}</td>
+                                        <td class="text-nowrap">
+                                            <div class="d-flex justify-content-between currency">
+                                                {{ $laba['jumlah_pembelian_rp'] }}
+                                            </div>
+                                        </td>
+                                        <td class="text-nowrap">
+                                            <div class="d-flex justify-content-between currency">
+                                                {{ $laba['jumlah_penjualan_bersih_rp'] }}
+                                            </div>
+                                        </td>
                                         <td class="text-right number-float">{{ $laba['rata_rata_omset_harian'] }}</td>
                                         <td class="text-right number-float">{{ $laba['sisa_stok_akhir'] }}</td>
-                                        <td class="text-right currency">{{ $laba['laba_kotor'] }}</td>
+                                        <td class="text-nowrap">
+                                            <div class="d-flex justify-content-between currency">
+                                                {{ $laba['laba_kotor'] }}
+                                            </div>
+                                        </td>
                                         <td class="align-middle text-center">
                                             <a class="btn btn-sm btn-link"
                                                 href="{{ route('laba-kotor.edit', ['shop_id' => $laba['shop_id'], 'year_month' => $laba['bulan']]) }}">
