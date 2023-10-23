@@ -73,7 +73,7 @@ class DashboardController extends Controller
             $totalisator_akhir = $latest_report ? $latest_report->totalisator_akhir : Shop::find($shop_id)->totalisator_awal;
             $volume_penjualan = $today_report->sum('volume_penjualan');
             $rupiah_penjualan = $today_report->sum('rupiah_penjualan');
-            $tabungan = DailyReport::where('operator_id', $operator_id)->get()->sum('selisih_setoran');
+            $tabungan = DailyReport::where('operator_id', $operator_id)->latest()->first()->tabungan ?? 0;
 
             return view('dashboard.index-operator', compact('sapaan', 'tabungan', 'stok_akhir', 'totalisator_akhir', 'volume_penjualan', 'rupiah_penjualan'));
         }
@@ -149,7 +149,8 @@ class DashboardController extends Controller
             if (isset($dailyReports[$formattedDate])) {
                 $sales[$formattedDate] = $dailyReports[$formattedDate]->sum('volume_penjualan');
             } else {
-                $sales[$formattedDate] = null;
+                //if day < now() then 0 else null
+                $sales[$formattedDate] = $currentDate->isPast() ? 0 : null;
             }
             $currentDate->addDay();
         }

@@ -85,10 +85,10 @@
                             <tbody>
                                 @foreach ($purchases as $purchase)
                                     <tr>
-                                        <td>{{ $purchase->tanggal }}</td>
+                                        <td class="text-nowrap">{{ $purchase->tanggal }}</td>
                                         <td>{{ $purchase->no_so }}</td>
-                                        <td>{{ $purchase->vendor->nama }}</td>
-                                        <td class="text-right number-float">{{ $purchase->volume }}</td>
+                                        <td class="text-nowrap">{{ $purchase->vendor->nama }}</td>
+                                        <td class="text-right number">{{ $purchase->volume }}</td>
                                         <td class="text-right currency-decimal">{{ $purchase->harga_per_liter }}</td>
                                         <td class="text-right currency">{{ $purchase->total_bayar }}</td>
                                         <td class="text-right">
@@ -185,7 +185,7 @@
                                                 <button class="btn text-warning btn-link">0</button>
                                             @endif
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-center text-nowrap">
                                             <a href="{{ route('purchases.edit', $purchase->id) }}"
                                                 class="btn btn-sm btn-link"><i class="fas fa-edit"></i></a>
                                             <button class="btn btn-sm text-danger btn-link btn-delete"
