@@ -122,6 +122,9 @@
         }
 
         $(document).ready(function() {
+
+            $('input[type="number"]').attr('step', 'any');
+            
             $('.currency').each(function() {
                 var value = parseFloat($(this).text());
                 if (!isNaN(value)) {
