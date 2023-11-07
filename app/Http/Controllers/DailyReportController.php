@@ -161,6 +161,7 @@ class DailyReportController extends Controller
                     'no_polisi' => $request->input('no_polisi'),
                     'stik_sebelum_curah' => $request->input('stik_sebelum_curah'),
                     'stik_setelah_curah' => $request->input('stik_setelah_curah'),
+                    'volume' => $request->input('penerimaan'),
                 ]);
             }
 
