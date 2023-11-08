@@ -157,7 +157,7 @@
                                             </td>
                                             @if ($shop->operators->count() > 1)
                                                 <td rowspan="{{ $reports->where('tanggal', $report->tanggal)->count() }}"
-                                                    class="align-middlemodal text-right number-float">
+                                                    class="align-middle text-right number-float">
                                                     {{ $reports->where('tanggal', $report->tanggal)->last()->stik_akhir }}
                                                 </td>
                                             @else
