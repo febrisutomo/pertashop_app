@@ -85,7 +85,9 @@ class DailyReportController extends Controller
 
         $shops = Shop::all();
         $operators = User::where('role', 'operator')->where('shop_id', $shop_id)->get();
-        $purchases = Purchase::where('shop_id', $shop_id)->doesntHave('incomings')->get();
+        $purchases = Purchase::where('shop_id', $shop_id)->get()->filter(function ($purchase) {
+            return $purchase->sisa > 0;
+        });
 
         $categories = SpendingCategory::all();
 
