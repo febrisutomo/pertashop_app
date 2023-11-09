@@ -34,9 +34,14 @@ Route::get('login', [LoginController::class, 'index'])->name('login');
 Route::post('login', [LoginController::class, 'authenticate'])->name('authenticate');
 Route::delete('logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/migrate-fresh-seed', function () {
-    Artisan::call('migrate:fresh --seed');
-    return 'Success migrate fresh and seed!';
+// Route::get('/migrate-fresh-seed', function () {
+//     Artisan::call('migrate:fresh --seed');
+//     return 'Success migrate fresh and seed!';
+// });
+
+Route::get('/seed-profit-kalibenda', function () {
+    Artisan::call('db:seed', ['--class' => 'ProfitSharingKalibenda']);
+    return 'Seeder executed successfully';
 });
 
 Route::middleware('auth')->group(function () {
