@@ -258,7 +258,7 @@
                                     </div>
                                     <input type="number" class="form-control" name="rupiah_penjualan"
                                         id="rupiah_penjualan"
-                                        value="{{ old('rupiah_penjualan', $dailyReport->rupiah_penjualan) }}" readonly>
+                                        value="{{ old('rupiah_penjualan', round($dailyReport->rupiah_penjualan)) }}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -638,7 +638,7 @@
                                         <span class="input-group-text">Rp</span>
                                     </div>
                                     <input type="text" class="form-control" id="pendapatan" name="pendapatan"
-                                        value="{{ old('pendapatan', $dailyReport->pendapatan) }}" readonly>
+                                        value="{{ old('pendapatan', round($dailyReport->pendapatan)) }}" readonly>
                                 </div>
                             </div>
 

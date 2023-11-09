@@ -142,7 +142,7 @@ class DailyReport extends Model
 
     public function getRupiahPenjualanAttribute()
     {
-        return round($this->price->harga_jual * ($this->totalisator_akhir - $this->totalisator_awal - $this->percobaan));
+        return $this->price->harga_jual * ($this->totalisator_akhir - $this->totalisator_awal - $this->percobaan);
     }
 
     public function getDisetorkanAttribute()
