@@ -181,7 +181,7 @@ class LabaKotorController extends Controller
         $prevLabaKotor = LabaKotor::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month - 1)->first();
 
         if ($prevLabaKotor == null) {
-            $stok_awal_do = 0;
+            $stok_awal_do = Purchase::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month - 1)->sum('volume');
         } else {
             $stok_awal_do = $prevLabaKotor->sisa_do;
         }
