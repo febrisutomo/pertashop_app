@@ -395,7 +395,7 @@
                         </div>
 
                         <div class="row mt-3">
-                            <div class="col-lg-4">
+                            <div class="col-md-4">
                                 <table style="width: 100%">
                                     <tr class="font-weight-bold">
                                         <td width="20">IV.</td>
@@ -433,7 +433,7 @@
                                     </tr>
                                 </table>
                             </div>
-                            <div class="col-lg-8">
+                            <div class="col-md-8">
                                 <div class="font-weight-bold font-italic">Ilustrasi Turun / Naik Margin Pertamax92
                                     Pertashop
                                 </div>
