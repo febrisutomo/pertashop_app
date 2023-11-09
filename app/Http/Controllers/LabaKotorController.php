@@ -61,8 +61,8 @@ class LabaKotorController extends Controller
             $test_pump = $reports->sum('percobaan'); //d
 
 
-            // $total_penjualan = $totalisator_akhir - $totalisator_awal; //c: (a-b)
-            $total_penjualan = $reports->sum('volume_penjualan');
+            $total_penjualan = $totalisator_akhir - $totalisator_awal; //c: (a-b)
+            // $total_penjualan = $reports->sum('volume_penjualan');
 
             $jumlah_penjualan = $total_penjualan - $test_pump; //B: (c-d)
             // $jumlah_penjualan_rp = $jumlah_penjualan * $harga_jual;
