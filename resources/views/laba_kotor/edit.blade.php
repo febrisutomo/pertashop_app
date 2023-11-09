@@ -86,11 +86,11 @@
                                         <td></td>
                                         <td class="d-flex justify-content-between pl-3">
                                             <span class="mr-2">Datang</span>
-                                            <span>
+                                            {{-- <span>
                                                 <span>{{ $r['count_datang'] }}</span>
                                                 <span class="px-3">x</span>
                                                 <span class="number litter">1000</span>
-                                            </span>
+                                            </span> --}}
                                         </td>
                                         <td class="px-2">=</td>
                                         <td class="text-right line-bottom"><span
@@ -151,7 +151,7 @@
                                     </tr>
                                     <tr>
                                         <td></td>
-                                        <td class="pl-3">d. Percobaan 1 (Test Pump)</td>
+                                        <td class="pl-3">d. Percobaan (Test Pump)</td>
                                         <td class="px-2">=</td>
                                         <td class="text-right line-bottom number-float litter">
                                             {{ $r['test_pump'] }}

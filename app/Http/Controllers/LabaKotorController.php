@@ -101,7 +101,7 @@ class LabaKotorController extends Controller
                 'totalisator_akhir' => round($totalisator_akhir, 2),
                 'totalisator_awal' => round($totalisator_awal, 2),
                 'total_penjualan' => round($total_penjualan, 2),
-                'test_pump' => round($test_pump),
+                'test_pump' => $test_pump,
                 'jumlah_penjualan' => round($jumlah_penjualan, 2),
                 'jumlah_penjualan_rp' => round($jumlah_penjualan_rp, 2),
                 'jumlah_penjualan_bersih_rp' => round($jumlah_penjualan_bersih_rp, 2),
