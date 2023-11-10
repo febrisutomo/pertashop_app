@@ -98,27 +98,27 @@ class ProfitSharingKalibenda extends Seeder
             ],
             [
                 'created_at' => '2023-02-28',
-                'nilai_profit_sharing' => 284035,
+                'nilai_profit_sharing' => 2840345,
                 'alokasi_modal' => 284035,
             ],
             [
                 'created_at' => '2023-03-31',
-                'nilai_profit_sharing' => 263544,
+                'nilai_profit_sharing' => 2635439,
                 'alokasi_modal' => 263544,
             ],
             [
                 'created_at' => '2023-04-30',
-                'nilai_profit_sharing' => 263797,
+                'nilai_profit_sharing' => 2637974,
                 'alokasi_modal' => 263797,
             ],
             [
                 'created_at' => '2023-05-31',
-                'nilai_profit_sharing' => 494053,
+                'nilai_profit_sharing' => 4940529,
                 'alokasi_modal' => 494053,
             ],
             [
                 'created_at' => '2023-06-30',
-                'nilai_profit_sharing' => 298207,
+                'nilai_profit_sharing' => 2982065,
                 'alokasi_modal' => 298207,
             ],
             [

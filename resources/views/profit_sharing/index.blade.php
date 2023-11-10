@@ -116,7 +116,7 @@
                                             {{-- @dump($investor_profits->where('investor_shop_id', 1)->first()?->nilai_profit) --}}
                                             @foreach ($profits as $p)
                                                 <td
-                                                    class="text-right text-nowrap currency @if ($profit->nilai_profit_sharing < 0) text-danger @endif"">
+                                                    class="text-right text-nowrap currency @if ($profit->nilai_profit_sharing < 0) text-danger @endif">
                                                     {{ $p }}
                                                 </td>
                                             @endforeach
