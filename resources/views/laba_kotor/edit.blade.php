@@ -511,7 +511,7 @@
                                 <div class="col-sm-9">
                                     <div class="text-center">Disetujui Oleh,</div>
                                     <div class="row">
-                                        @foreach ($shop->investors as $investor)
+                                        @foreach ($shop->investors->sortByDesc('pivot.persentase') as $investor)
                                             <div class="col-sm mb-2 px-1">
                                                 <div class="text-center">
                                                     <p style="margin-top: 3cm">{{ $investor->name }}</p>

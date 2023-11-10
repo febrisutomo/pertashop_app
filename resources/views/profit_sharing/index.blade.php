@@ -78,7 +78,7 @@
                                         <th class="align-middle text-center">Nilai Profit Sharing</th>
                                         <th class="align-middle text-center">Alokasi Modal</th>
                                         <th class="align-middle text-center">Sisa Profit yang Dibagi</th>
-                                        @foreach ($shop->investors as $investor)
+                                        @foreach ($shop->investors->sortByDesc('pivot.persentase') as $investor)
                                             <th
                                                 class="align-middle text-center {{ Auth::user()->id == $investor->id ? 'bg-warning' : '' }}">
                                                 {{ $investor->nama }}
@@ -109,7 +109,7 @@
                                             </td>
                                             @php
                                                 $investor_profits = $profit->investorProfits;
-                                                $profits = $shop->investors->map(function ($inv) use ($investor_profits) {
+                                                $profits = $shop->investors->sortByDesc('pivot.persentase')->map(function ($inv) use ($investor_profits) {
                                                     return $investor_profits->where('investor_shop_id', $inv->pivot->id)->first()?->nilai_profit ?? 0;
                                                 });
                                             @endphp
