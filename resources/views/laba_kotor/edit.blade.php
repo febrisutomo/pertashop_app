@@ -392,118 +392,116 @@
                                 @endif
                             </div>
 
-                            <div class="row mt-3">
-                                <div class="col-sm-4">
-                                    <table style="width: 100%">
-                                        <tr class="font-weight-bold">
-                                            <td width="20">IV.</td>
-                                            <td>Sisa Stock DO di Maos</td>
-                                        </tr>
-                                    </table>
-                                    <table style="width: 100%" class="table-border">
-                                        <tr>
-                                            <td></td>
-                                            <td class="text-center">PERTAMAX</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Stok Awal</td>
-                                            <td class="text-right">{{ $stok_awal_do / 1000 }} KL</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Setor </td>
-                                            <td class="text-right">{{ $setor_do / 1000 }} KL</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Setor Tunai</td>
-                                            <td class="text-right">- KL</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Jumlah</td>
-                                            <td class="text-right">{{ $jumlah_do / 1000 }} KL</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Datang</td>
-                                            <td class="text-right">{{ $datang_do / 1000 }} KL</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sisa</td>
-                                            <td class="text-right"> {{ $sisa_do / 1000 }} KL</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div class="col-sm-8">
-                                    <div class="font-weight-bold font-italic">Ilustrasi Turun / Naik Margin Pertamax92
-                                        Pertashop
-                                    </div>
-                                    <table class="table-border" width="100%">
-                                        @foreach ($prices as $price)
-                                            @if ($loop->iteration > 1 && $price->harga_jual != $price->prev_harga_jual)
-                                                <tr>
-                                                    <td>{{ $price->tanggal }}</td>
-                                                    <td colspan="3">
-                                                        <span class="currency">{{ $price->prev_harga_jual }}</span>
-                                                        <span class="px-2">&#10132;</span>
-                                                        <span class="currency">{{ $price->harga_jual }}</span>
-                                                        <span class="ml-2">
-                                                            (@if ($price->harga_jual > $price->prev_harga_jual)
-                                                                <i class="fas fa-arrow-up text-danger"></i>
-                                                            @else
-                                                                <i class="fas fa-arrow-down text-success"></i>
-                                                            @endif
-                                                            <span class="currency">{{ $price->naik_turun_harga_jual }}</span>)
-                                                        </span>
-    
-                                                    </td>
-                                                </tr>
-                                            @endif
-                                        @endforeach
-                                        <tr style="background-color: yellow" class="font-weight-bold">
-                                            <td></td>
-                                            <td class="text-center">Harga Beli</td>
-                                            <td class="text-center">Harga Jual</td>
-                                            <td class="text-center">Margin</td>
-                                            <td class="text-center">Naik / Turun</td>
-                                        </tr>
-    
-                                        @foreach ($prices as $price)
-                                            <tr>
-                                                <td class="@if ($loop->iteration == 1) bg-gray @endif">
-                                                    @if ($loop->iteration > 1)
-                                                        {{ $price->tanggal }}
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-between currency-decimal">
-                                                        {{ $price->harga_beli }}</div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-between currency-decimal">
-                                                        {{ $price->harga_jual }}</div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-between currency-decimal">
-                                                        {{ $price->margin }}</div>
-                                                </td>
-                                                <td class="@if ($loop->iteration == 1) bg-gray @endif">
-                                                    @if ($loop->iteration > 1)
-                                                        @if ($price->naik_turun_margin > 0)
-                                                            <i class="fas fa-arrow-up text-success"></i>
-                                                        @else
-                                                            <i class="fas fa-arrow-down text-danger"></i>
-                                                        @endif
-                                                        <span class="currency-decimal">{{ $price->naik_turun_margin }}</span>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-    
-                                    </table>
-                                </div>
-                            </div>
-                            
                         </div>
 
-                        
+                        <div class="row mt-3">
+                            <div class="col-sm-4">
+                                <table style="width: 100%">
+                                    <tr class="font-weight-bold">
+                                        <td width="20">IV.</td>
+                                        <td>Sisa Stock DO di Maos</td>
+                                    </tr>
+                                </table>
+                                <table style="width: 100%" class="table-border">
+                                    <tr>
+                                        <td></td>
+                                        <td class="text-center">PERTAMAX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Stok Awal</td>
+                                        <td class="text-right">{{ $stok_awal_do / 1000 }} KL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Setor </td>
+                                        <td class="text-right">{{ $setor_do / 1000 }} KL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Setor Tunai</td>
+                                        <td class="text-right">- KL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jumlah</td>
+                                        <td class="text-right">{{ $jumlah_do / 1000 }} KL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Datang</td>
+                                        <td class="text-right">{{ $datang_do / 1000 }} KL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sisa</td>
+                                        <td class="text-right"> {{ $sisa_do / 1000 }} KL</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="font-weight-bold font-italic">Ilustrasi Turun / Naik Margin Pertamax92
+                                    Pertashop
+                                </div>
+                                <table class="table-border" width="100%">
+                                    @foreach ($prices as $price)
+                                        @if ($loop->iteration > 1 && $price->harga_jual != $price->prev_harga_jual)
+                                            <tr>
+                                                <td>{{ $price->tanggal }}</td>
+                                                <td colspan="3">
+                                                    <span class="currency">{{ $price->prev_harga_jual }}</span>
+                                                    <span class="px-2">&#10132;</span>
+                                                    <span class="currency">{{ $price->harga_jual }}</span>
+                                                    <span class="ml-2">
+                                                        (@if ($price->harga_jual > $price->prev_harga_jual)
+                                                            <i class="fas fa-arrow-up text-danger"></i>
+                                                        @else
+                                                            <i class="fas fa-arrow-down text-success"></i>
+                                                        @endif
+                                                        <span class="currency">{{ $price->naik_turun_harga_jual }}</span>)
+                                                    </span>
+
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                    <tr style="background-color: yellow" class="font-weight-bold">
+                                        <td></td>
+                                        <td class="text-center">Harga Beli</td>
+                                        <td class="text-center">Harga Jual</td>
+                                        <td class="text-center">Margin</td>
+                                        <td class="text-center">Naik / Turun</td>
+                                    </tr>
+
+                                    @foreach ($prices as $price)
+                                        <tr>
+                                            <td class="@if ($loop->iteration == 1) bg-gray @endif">
+                                                @if ($loop->iteration > 1)
+                                                    {{ $price->tanggal }}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-between currency-decimal">
+                                                    {{ $price->harga_beli }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-between currency-decimal">
+                                                    {{ $price->harga_jual }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-between currency-decimal">
+                                                    {{ $price->margin }}</div>
+                                            </td>
+                                            <td class="@if ($loop->iteration == 1) bg-gray @endif">
+                                                @if ($loop->iteration > 1)
+                                                    @if ($price->naik_turun_margin > 0)
+                                                        <i class="fas fa-arrow-up text-success"></i>
+                                                    @else
+                                                        <i class="fas fa-arrow-down text-danger"></i>
+                                                    @endif
+                                                    <span class="currency-decimal">{{ $price->naik_turun_margin }}</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+
+                                </table>
+                            </div>
+                        </div>
 
                         <div class="ttd pt-4" style="display: none">
                             <p class="text-right px-3">Banyumas,
