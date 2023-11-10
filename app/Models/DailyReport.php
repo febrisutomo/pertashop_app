@@ -147,12 +147,12 @@ class DailyReport extends Model
 
     public function getDisetorkanAttribute()
     {
-        return round($this->setor_tunai + $this->setor_qris + $this->setor_transfer);
+        return $this->setor_tunai + $this->setor_qris + $this->setor_transfer;
     }
 
     public function getSelisihSetoranAttribute()
     {
-        return round($this->disetorkan - $this->pendapatan);
+        return $this->disetorkan - $this->pendapatan;
     }
 
     public function getTabunganAttribute()
