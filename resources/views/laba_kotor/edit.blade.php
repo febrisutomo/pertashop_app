@@ -196,7 +196,7 @@
                                         <td class="pl-3">Jumlah</td>
                                         <td colspan="5"></td>
                                         <td class="d-flex justify-content-between currency-decimal">
-                                            {{ $r['jumlah_penjualan'] * $r['harga_jual'] + $r['sisa_stok'] * $r['harga_beli'] }}
+                                            {{ $r['jumlah_penjualan_rp'] + $r['sisa_stok_rp'] }}
                                         </td>
                                     </tr>
                                     <tr>
