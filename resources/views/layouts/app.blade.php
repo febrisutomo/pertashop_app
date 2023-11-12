@@ -175,14 +175,15 @@
                 var value = parseFloat($(this).text());
                 if (!isNaN(value)) {
                     if (value >= 0) {
-                        var formattedValue = formatNumber(value, 2);
+                        var formattedValue = formatNumber(value, 3);
                         $(this).text(formattedValue);
                     } else  {
-                        var formattedValue = formatNumber(value * -1, 2);
+                        var formattedValue = formatNumber(value * -1, 3);
                         $(this).text(`(${formattedValue})`).addClass('text-danger');
                     } 
                 }
             });
+            
 
             $('.litter').each(function() {
                 $(this).append(' &ell;');
