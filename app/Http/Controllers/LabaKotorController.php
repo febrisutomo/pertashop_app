@@ -70,7 +70,7 @@ class LabaKotorController extends Controller
 
             $sisa_stok = $jumlah_pembelian - $jumlah_penjualan; //(A-B)
             $sisa_stok_rp = $sisa_stok * $harga_beli;
-            dd($harga_beli, $sisa_stok, $sisa_stok_rp);
+            // dd($harga_beli, $sisa_stok, $sisa_stok_rp);
 
             $losses_gain =  $reports->sum('losses_gain');
 
