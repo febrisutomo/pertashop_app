@@ -122,12 +122,12 @@ class DailyReport extends Model
 
     public function getStokAkhirTeoritisAttribute()
     {
-        return $this->stik_akhir ? round($this->stok_awal + $this->today()->sum('penerimaan') - $this->today()->sum('volume_penjualan'), 2) : round($this->stok_awal + $this->penerimaan - $this->volume_penjualan, 2);
+        return $this->stik_akhir ? $this->stok_awal + $this->today()->sum('penerimaan') - $this->today()->sum('volume_penjualan') : $this->stok_awal + $this->penerimaan - $this->volume_penjualan;
     }
 
     public function getLossesGainAttribute()
     {
-        return $this->stik_akhir ? round($this->stok_akhir_aktual - $this->stok_akhir_teoritis, 2) : null;
+        return $this->stik_akhir ? $this->stok_akhir_aktual - $this->stok_akhir_teoritis : null;
     }
 
     public function getPengeluaranAttribute()
