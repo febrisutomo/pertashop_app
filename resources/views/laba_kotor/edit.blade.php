@@ -187,7 +187,7 @@
                                         </td>
                                         <td class="px-5">&#10132;</td>
                                         <td class="d-flex justify-content-between line-bottom currency-decimal">
-                                            {{ $r['sisa_stok'] * $r['harga_beli'] }}
+                                            {{ $r['sisa_stok_rp'] }}
                                         </td>
                                         <td class="px-3">+</td>
                                     </tr>
