@@ -102,7 +102,7 @@ class DailyReport extends Model
 
     public function getStokAkhirAktualAttribute()
     {
-        return $this->stik_akhir ? round($this->stik_akhir * $this->shop->skala, 2) : null;
+        return $this->stik_akhir ? $this->stik_akhir * $this->shop->skala : null;
     }
 
     public function getPercobaanAttribute()
