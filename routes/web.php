@@ -44,6 +44,11 @@ Route::get('/seed-profit-kalibenda', function () {
     return 'Seeder executed successfully';
 });
 
+Route::get('/seed-profit-pgr', function () {
+    Artisan::call('db:seed', ['--class' => 'ProfitSharingPageralang']);
+    return 'Seeder executed successfully';
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
