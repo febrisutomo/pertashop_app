@@ -101,9 +101,18 @@
                                     @endif
                                     <th class="text-center align-middle">Deep (cm)</th>
                                     <th class="text-center align-middle">Volume (&ell;)</th>
-                                    <th class="text-center align-middle">Tunai</th>
+                                    <th class="text-center align-middle">BRI</th>
                                     <th class="text-center align-middle">QRIS</th>
-                                    <th class="text-center align-middle">Transfer</th>
+                                    <th class="text-center align-middle">
+                                        @if ($shop->id == 2)
+                                            BRI Pak Agus
+                                        @elseif($shop->id == 5)
+                                            Hutang BBPTUHPT
+                                        @else
+                                            BRI Transfer
+                                        @endif
+                                        
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
