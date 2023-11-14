@@ -373,7 +373,28 @@
                                             <span class="number">{{ $reports->sum('pendapatan') }}</span>
                                         </div>
                                     </th>
-                                    <th rowspan="2" colspan="4" class="table-primary align-middle">
+
+                                    <th>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="mr-1">Rp</span>
+                                            <span class="number">{{ $reports->sum('setor_tunai') }}</span>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="mr-1">Rp</span>
+                                            <span class="number">{{ $reports->sum('setor_qris') }}</span>
+                                        </div>
+                                    </th>
+
+                                    <th>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="mr-1">Rp</span>
+                                            <span class="number">{{ $reports->sum('setor_transfer') }}</span>
+                                        </div>
+                                    </th>
+
+                                    <th rowspan="2" class="table-primary align-middle">
                                         @foreach ($shop->operators as $operator)
                                             <div class="text-right text-nowrap">Tbgn {{ $operator->nama }}</div>
                                         @endforeach
@@ -431,6 +452,9 @@
                                             </div>
                                         </th>
                                     @endif
+                                    <th class="text-right number-float"></th>
+                                    <th class="text-right number-float"></th>
+                                    <th class="text-right number-float"></th>
                                 </tr>
                             </tfoot>
                         </table>

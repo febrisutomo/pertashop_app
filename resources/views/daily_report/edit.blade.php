@@ -661,7 +661,7 @@
                             </div>
                         </div>
                         <div class="form-group row @if($dailyReport->shop_id == 2) d-none @endif">
-                            <label for="setor_qris" class="col-4 col-form-label">Setor QRIS</label>
+                            <label for="setor_qris" class="col-4 col-form-label">QRIS</label>
                             <div class="col-8">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
