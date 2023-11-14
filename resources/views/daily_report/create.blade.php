@@ -639,7 +639,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="form-group row @if($shop->id == 2) d-none @endif">
+                        <div class="form-group row @if($shop_id == 2) d-none @endif">
                             <label for="setor_qris" class="col-4 col-form-label">QRIS</label>
                             <div class="col-8">
                                 <div class="input-group">
@@ -655,7 +655,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="setor_transfer" class="col-4 col-form-label">@if($shop->id == 5) Hutang BBPTUHPT @elseif($shop->id == 2) BRI Pak Agus @else Transfer @endif</label>
+                            <label for="setor_transfer" class="col-4 col-form-label">@if($shop_id == 5) Hutang BBPTUHPT @elseif($shop_id == 2) BRI Pak Agus @else Transfer @endif</label>
                             <div class="col-8">
                                 <div class="input-group">
                                     <div class="input-group-prepend">

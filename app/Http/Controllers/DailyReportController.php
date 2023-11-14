@@ -93,7 +93,7 @@ class DailyReportController extends Controller
 
         $vendors = Vendor::all();
 
-        return view('daily_report.create', compact('shops', 'operators', 'purchases', 'categories', 'vendors'));
+        return view('daily_report.create', compact('shops', 'shop_id', 'operators', 'purchases', 'categories', 'vendors'));
     }
 
     /**
