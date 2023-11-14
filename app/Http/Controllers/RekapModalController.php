@@ -83,6 +83,12 @@ class RekapModalController extends Controller
 
         $modal = RekapModal::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->first();
 
+        $piutang = $modal->piutang;
+
+        if($shop->id == 5){
+            $piutang = DailyReport::where('shop_id', $shop_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('setor_transfer');
+        }
+        
         if ($modal == null) {
             abort(404);
         }
@@ -109,7 +115,7 @@ class RekapModalController extends Controller
 
         $uang_di_bank = $modal->modal_awal - $rupiah_sisa_do - $modal->kas_kecil + $belum_disetorkan - $modal->piutang - $rupiah_sisa_stok;
 
-        return view('rekap-modal.edit', compact('shop', 'modal', 'belum_disetorkan', 'sisa_do', 'rupiah_sisa_do', 'harga_beli', 'uang_di_bank', 'sisa_stok', 'rupiah_sisa_stok'));
+        return view('rekap-modal.edit', compact('shop', 'modal', 'belum_disetorkan', 'sisa_do', 'rupiah_sisa_do', 'harga_beli', 'uang_di_bank', 'sisa_stok', 'rupiah_sisa_stok', 'piutang'));
     }
 
 

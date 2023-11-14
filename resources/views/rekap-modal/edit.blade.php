@@ -124,7 +124,7 @@
                                     </td>
                                     <th width="20">:</th>
                                     <td class="d-flex justify-content-between line-bottom">
-                                        <span>Rp</span><span class="number">{{ $modal->piutang * -1 }}</span>
+                                        <span>Rp</span><span class="number">{{ $piutang * -1 }}</span>
                                     </td>
                                     <td class="px-1">+</td>
                                 </tr>
@@ -135,7 +135,9 @@
                                     </td>
                                     <th width="20">:</th>
                                     <td class="d-flex justify-content-between">
-                                        <span>Rp</span><span class="number">{{ $modal->modal_awal }}</span>
+                                        <span>Rp</span><span class="number">
+                                            {{ $shop->id == 5 ? $modal->modal_awal : $modal->modal_awal - $piutang }}
+                                        </span>
                                     </td>
                                     <td></td>
                                 </tr>
@@ -178,7 +180,7 @@
                                 <tr>
                                     <td width="20">{{ $modal->rugi > 0 ? 9 : 8 }}</td>
                                     <td>
-                                        Penambahan Modal dari Keuntungan bulan ini
+                                        Penambahan / Pengurangan Modal dari Keuntungan bulan ini
                                     </td>
                                     <th width="20">:</th>
                                     <td class="d-flex justify-content-between line-bottom">
@@ -293,7 +295,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="form-group row">
+                        <div class="form-group row @if($shop->id == 5) d-none @endif">
                             <label for="piutang" class="col-4 col-form-label">Piutang</label>
                             <div class="col-8">
                                 <div class="input-group">
