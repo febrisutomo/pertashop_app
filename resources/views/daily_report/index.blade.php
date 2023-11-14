@@ -89,7 +89,7 @@
                                     @endif
                                     <th colspan="3" class="text-center align-middle">Disetorkan</th>
                                     <th rowspan="2" class="text-center align-middle">Selisih</th>
-                                    {{-- <th rowspan="2" class="text-center align-middle">Tabungan</th> --}}
+                                    <th rowspan="2" class="text-center align-middle">Tabungan</th>
                                     <th rowspan="2" class="text-center align-middle">Aksi</th>
                                 </tr>
                                 <tr>
@@ -111,7 +111,7 @@
                                         @else
                                             BRI Transfer
                                         @endif
-                                        
+
                                     </th>
                                 </tr>
                             </thead>
@@ -237,11 +237,11 @@
                                                     {{ $report->selisih_setoran }}
                                                 </div>
                                             </td>
-                                            {{-- <td class="align-middle">
+                                            <td class="align-middle">
                                                 <div class="d-flex justify-content-between currency">
                                                     {{ $report->tabungan }}
                                                 </div>
-                                            </td> --}}
+                                            </td>
                                             <td rowspan="{{ $reports->where('tanggal', $report->tanggal)->count() }}"
                                                 class="align-middle text-center">
                                                 <a class="btn btn-sm btn-link text-primary"
@@ -322,11 +322,11 @@
                                                     {{ $report->selisih_setoran }}
                                                 </div>
                                             </td>
-                                            {{-- <td class="align-middle">
+                                            <td class="align-middle">
                                                 <div class="d-flex justify-content-between currency">
                                                     {{ $report->tabungan }}
                                                 </div>
-                                            </td> --}}
+                                            </td>
                                         </tr>
                                     @endif
                                 @endforeach
@@ -373,12 +373,11 @@
                                             <span class="number">{{ $reports->sum('pendapatan') }}</span>
                                         </div>
                                     </th>
-                                    <th rowspan="2" colspan="3" class="table-primary align-middle">
+                                    <th rowspan="2" colspan="4" class="table-primary align-middle">
                                         @foreach ($shop->operators as $operator)
                                             <div class="text-right text-nowrap">Tbgn {{ $operator->nama }}</div>
                                         @endforeach
                                     </th>
-                                    {{-- <th rowspan="2"></th> --}}
                                     <th rowspan="2" class="table-primary align-middle">
                                         @foreach ($shop->operators as $operator)
                                             <div class="d-flex justify-content-between currency">
