@@ -639,7 +639,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="form-group row @elseif($shop->id == 2) d-none @endif">
+                        <div class="form-group row @if($shop->id == 2) d-none @endif">
                             <label for="setor_qris" class="col-4 col-form-label">QRIS</label>
                             <div class="col-8">
                                 <div class="input-group">
