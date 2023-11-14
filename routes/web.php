@@ -39,13 +39,18 @@ Route::delete('logout', [LoginController::class, 'logout'])->name('logout');
 //     return 'Success migrate fresh and seed!';
 // });
 
-Route::get('/seed-profit-kalibenda', function () {
-    Artisan::call('db:seed', ['--class' => 'ProfitSharingKalibenda']);
-    return 'Seeder executed successfully';
-});
+// Route::get('/seed-profit-klb', function () {
+//     Artisan::call('db:seed', ['--class' => 'ProfitSharingKalibenda']);
+//     return 'Seeder executed successfully';
+// });
 
-Route::get('/seed-profit-pgr', function () {
-    Artisan::call('db:seed', ['--class' => 'ProfitSharingPageralang']);
+// Route::get('/seed-profit-pgr', function () {
+//     Artisan::call('db:seed', ['--class' => 'ProfitSharingPageralang']);
+//     return 'Seeder executed successfully';
+// });
+
+Route::get('/seed-profit-kmt', function () {
+    Artisan::call('db:seed', ['--class' => 'ProfitSharingKemutug']);
     return 'Seeder executed successfully';
 });
 
