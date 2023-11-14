@@ -296,7 +296,7 @@
                             </div>
                         </div>
                         <div class="form-group row @if($shop->id == 5) d-none @endif">
-                            <label for="piutang" class="col-4 col-form-label">Piutang</label>
+                            <label for="piutang" class="col-4 col-form-label">Piutang @if($shop->id == 5) BBPTU @endif</label>
                             <div class="col-8">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
