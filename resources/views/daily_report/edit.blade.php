@@ -840,6 +840,7 @@
 
                     });
 
+            $('#totalisator_akhir').trigger('input');
 
             //PENERIMAAN
 
