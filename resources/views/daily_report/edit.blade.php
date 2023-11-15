@@ -839,8 +839,11 @@
                         $('#selisih_setoran').val(selisih.toFixed());
 
                     });
-
-            $('#totalisator_akhir').trigger('input');
+            
+            //settimeout 1s
+            setTimeout(() => {
+                $('#totalisator_akhir').trigger('input');
+            }, 1000);
 
             //PENERIMAAN
 
