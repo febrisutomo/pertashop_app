@@ -258,7 +258,8 @@
                                     </div>
                                     <input type="number" class="form-control" name="rupiah_penjualan"
                                         id="rupiah_penjualan"
-                                        value="{{ old('rupiah_penjualan', round($dailyReport->rupiah_penjualan)) }}" readonly>
+                                        value="{{ old('rupiah_penjualan', round($dailyReport->rupiah_penjualan)) }}"
+                                        readonly>
                                 </div>
                             </div>
                         </div>
@@ -660,7 +661,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="form-group row @if($dailyReport->shop_id == 2) d-none @endif">
+                        <div class="form-group row @if ($dailyReport->shop_id == 2) d-none @endif">
                             <label for="setor_qris" class="col-4 col-form-label">QRIS</label>
                             <div class="col-8">
                                 <div class="input-group">
@@ -677,7 +678,15 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="setor_transfer" class="col-4 col-form-label">@if($dailyReport->shop_id == 5) Hutang BBPTUHPT @elseif($dailyReport->shop_id == 2) BRI Pak Agus @else Transfer @endif</label>
+                            <label for="setor_transfer" class="col-4 col-form-label">
+                                @if ($dailyReport->shop_id == 5)
+                                    Hutang BBPTUHPT
+                                @elseif($dailyReport->shop_id == 2)
+                                    BRI Pak Agus
+                                @else
+                                    Transfer
+                                @endif
+                            </label>
                             <div class="col-8">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -782,6 +791,8 @@
                         today_penjualan = response.today_penjualan;
                         today_penerimaan = response.today_penerimaan;
 
+                        $('#totalisator_akhir').trigger('input');
+
                     }
                 });
             });
@@ -839,11 +850,7 @@
                         $('#selisih_setoran').val(selisih.toFixed());
 
                     });
-            
-            //settimeout 1s
-            setTimeout(() => {
-                $('#totalisator_akhir').trigger('input');
-            }, 1000);
+
 
             //PENERIMAAN
 
