@@ -808,10 +808,10 @@
                         const penerimaan = $('#penerimaan').val() * 1;
                         const old_penerimaan = "{{ old('penerimaan', $dailyReport->penerimaan) }}";
                         const old_penjualan = "{{ old('volume_penjualan', $dailyReport->volume_penjualan) }}";
-                        // const stok_akhir_teoritis = stok_awal + today_penerimaan + (penerimaan - old_penerimaan) -
-                        //     today_penjualan - (volume_penjualan - old_penjualan);
-                        const stok_akhir_teoritis = stok_awal + today_penerimaan -
-                            today_penjualan - volume_penjualan;
+                        const stok_akhir_teoritis = stok_awal + today_penerimaan + (penerimaan - old_penerimaan) -
+                            today_penjualan - (volume_penjualan - old_penjualan);
+                        // const stok_akhir_teoritis = stok_awal + today_penerimaan -
+                        //     today_penjualan - volume_penjualan;
                         $('#stok_akhir_teoritis').val(stok_akhir_teoritis.toFixed(2));
 
                         const stik_akhir = $('#stik_akhir').val() * 1;
